@@ -1,20 +1,20 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.0.0'
+__version__ = '2.0.1'
 
 """
 TODO:
 1. implement TURBOMOLE, PSI4, C4.
 2. implement PP
 3. implement unrestricted
-4. implement g-orbitals
+4. verified g-orbitals normalisation
 5. implement cartesian->spherical conversion
 """
 
 import os
 import sys
-from math import pi, sqrt
+from math import pi, sqrt, factorial, fabs
 from itertools import combinations
 
 
@@ -24,7 +24,7 @@ def fact2(k):
 
     inspired by https://gist.github.com/fmeyer/289467
     """
-    return reduce(int.__mul__, range(k, 0, -2), 1)
+    return reduce(float.__mul__, range(k, 0, -2), 1.0)
 
 
 def smart_float(x):
@@ -38,6 +38,66 @@ def smart_float(x):
     """
     return float(x.replace('D', 'E').replace('d', 'e'))
 
+
+def m_independent_factor(l):
+    """
+    The m-independent factors for the different shells:
+           2^l
+    root --------
+         (2l-1)!!
+    """
+
+    return sqrt(2.0**l/fact2(2*l-1))
+
+
+def m_dependent_factor(l, m):
+    """
+    The m-dependent factors for the different shells:
+
+           (2 - delta_m,0) * (l - |m|)!
+    root  ------------------------------
+                 (l + |m|)!
+
+    d functions
+    -----------
+
+    l,m
+    ---
+    2,0   root 1*2/2  = 1
+    2,1   root 2*1/6  = 1/root(3)
+    2,-1              = 1/root(3)
+    2,2   root 2*1/24 = 1/root(12) = 1/(2*root3)
+    2,-2              = 1/root(12) = 1/(2*root3)
+
+    f_functions
+    -----------
+
+    l,m
+    ---
+    3,0   root 1*6/6   = 1
+    3,1   root 2*2/24  = 1/root(6)
+    3,-1               = 1/root(6)
+    3,2   root 2*1/120 = 1/root(60)
+    3,-2               = 1/root(60)
+    3,3   root 2*1/720 = 1/root(360)
+    3,-3               = 1/root(360)
+
+    g functions
+    -----------
+    4,0   root 1*24/24   = 1
+    4,1   root 2*6/120   = 1/root(10)
+    4,-1                 = 1/root(10)
+    4,2   root 2*2/720   = 1/root(180)
+    4,-2                 = 1/root(180)
+    4,3   root 2*1/5040  = 1/root(2520)
+    4,-3                 = 1/root(2520)
+    4,4   root 2*1/40320 = 1/root(20160)
+    4,-4                 = 1/root(20160)
+    """
+    if l < 2 or m == 0:
+        return 1
+    else:
+        return sqrt(2.0 * factorial(l - fabs(m))/factorial(l + fabs(m)))
 
 class Molden(object):
     """
@@ -244,7 +304,7 @@ class Molden(object):
                     nbasis_functions += mo_length_map[shell['TYPE']]
 
         section_body = self.molden_section("MO")[1:]
-        for nmo in xrange(nbasis_functions):
+        for nmo in xrange(self.nbasis_functions()):
             offset = nmo*(nbasis_functions+4)
             mo_orbital_block = {'SYMMETRY': section_body[offset].split()[1],
                                 'ENERGY': float(section_body[offset+1].split()[1]),
@@ -543,8 +603,6 @@ class Turbomole(Molden):
         The following order of D functions is expected:
             5D: D 0, D+1, D-1, D+2, D-2
             6D: xx, yy, zz, xy, xz, yz
-
-        P.S. omitted (1/4)sqrt(15/pi) multiplier
         """
         xx, yy, zz, xy, xz, yz = cartesian
 
@@ -562,15 +620,6 @@ class Turbomole(Molden):
         The following order of F functions is expected:
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
-
-        P.S. omitted (1/2)sqrt(7/pi)
-        f7_vectors.append(zero  *  0.331990278) - ???
-        f7_vectors.append(plus_1 * 0.059894236) - ???
-        f7_vectors.append(minus_1* 0.064894235) - ???
-        f7_vectors.append(plus_2*  0.059227155) - ???
-        f7_vectors.append(minus_2* 0.050227159) - ???
-        f7_vectors.append(plus_3 * 0.010915709) - ???
-        f7_vectors.append(minus_3* 0.010915709) - ???
         """
         xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz = cartesian
 
@@ -594,14 +643,13 @@ class Turbomole(Molden):
         """
         xxxx, yyyy, zzzz, xxxy, xxxz, yyyx, yyyz, zzzx, zzzy, xxyy, xxzz, yyzz, xxyz, yyxz, zzxy = cartesian
 
-        xyr2 = xxxy + yyyx + zzxy + 2.0 * (xxyy + xxyz + yyxz)
-        xzr2 = xxxz + yyxz + zzzx + 2.0 * (xxyz + xxzz + zzxy)
-        yzr2 = xxyz + yyyz + zzzy + 2.0 * (yyxz + zzxy + yyzz)
-        x2r2 = xxxx + xxyy + xxzz + 2.0 * (xxxy + xxxz + xxyz)
-        y2r2 = xxyy + yyyy + yyzz + 2.0 * (yyyx + yyxz + yyyz)
-        z2r2 = xxzz + yyzz + zzzz + 2.0 * (zzxy + zzzx + zzzy)
-        r4 = xxxx + yyyy + zzzz + 4.0 * (xxxy + xxxz + yyyx + yyyz + zzzx + zzzy) + \
-             6.0 * (xxyy + xxzz + yyzz) + 12.0 * (xxyz + yyxz + zzxy)
+        xyr2 = xxxy + yyyx + zzxy
+        xzr2 = xxxz + yyxz + zzzx
+        yzr2 = xxyz + yyyz + zzzy
+        x2r2 = xxxx + xxyy + xxzz
+        y2r2 = xxyy + yyyy + xxyy
+        z2r2 = xxzz + yyzz + zzzz
+        r4 = xxxx + yyyy + zzzz + 2.0 * (xxyy + xxzz + yyzz)
 
         zero = 35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4
         plus_1 = 7.0 * zzzx - 3.0 * xzr2
@@ -633,10 +681,35 @@ class Turbomole(Molden):
                     ao['DATA'] = self.g_to_spherical(ao['DATA'])
 
 
-class CFour(Turbomole):
+class CFour(Molden):
     """
-    Turbomole and CFour are the same.
+    CFour....
     """
+
+    def molden_atoms(self):
+        """
+        parse [Atoms] section.
+        Format:
+        [Atoms] (Angs|AU)
+        element_name number atomic_number x y z
+        """
+        section = self.molden_section("ATOMS")
+        section_header = section[0]
+        section_body = section[1:]
+
+        for line in section_body:
+            splited_line = line.split()
+            if section_header.split()[1] == 'Angs':
+                atom = {'N': int(splited_line[2]),  # atomic number
+                        'X': float(splited_line[3]) * self.Ang2Bohr,
+                        'Y': float(splited_line[4]) * self.Ang2Bohr,
+                        'Z': float(splited_line[5]) * self.Ang2Bohr}
+            else:
+                atom = {'N': int(splited_line[2]),  # atomic number
+                        'X': float(splited_line[3]),
+                        'Y': float(splited_line[4]),
+                        'Z': float(splited_line[5])}
+            self.atom_list.append(atom)
 
 
 class Orca(Molden):
@@ -654,49 +727,53 @@ class Orca(Molden):
         """
         for atom in self.atom_list:
             for shell in atom['SHELLS']:
-                shell_ang_momentum = self.ang_momentum_map[shell['TYPE']]
-                norm_coeff = sqrt(fact2(2 * shell_ang_momentum - 1))
+                l = self.ang_momentum_map[shell['TYPE']]
                 for primitive in shell['DATA']:
-                    primitive[1] /= norm_coeff
+                    if l >= 2:
+                        primitive[1] *= m_independent_factor(l) / sqrt(2**l)
 
     def d_normalize(self, coefficient):
         """
         The following order of D functions is expected:
             5D: D 0, D+1, D-1, D+2, D-2
+            P.S.
+            Using Katharina Doblhoff's magic factors
+            http://www.vallico.net/casino-forum/viewtopic.php?f=4&t=118&sid=0933ab5943f0199188abf7f52af7d894#p481
         """
-        return (coefficient[0] / sqrt(3),
-                coefficient[1] * 2.0,
-                coefficient[2] * 2.0,
-                coefficient[3],
-                coefficient[4] * 2.0)
+        magic_factor = (0.5, 3.0, 3.0, 3.0, 6.0)
+        return (coefficient[0] * m_independent_factor(2) * m_dependent_factor(2, 0) * magic_factor[0],
+                coefficient[1] * m_independent_factor(2) * m_dependent_factor(2, 1) * magic_factor[1],
+                coefficient[2] * m_independent_factor(2) * m_dependent_factor(2,-1) * magic_factor[2],
+                coefficient[3] * m_independent_factor(2) * m_dependent_factor(2, 2) * magic_factor[3],
+                coefficient[4] * m_independent_factor(2) * m_dependent_factor(2,-2) * magic_factor[4])
 
     def f_normalize(self, coefficient):
         """
         The following order of F functions is expected:
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
         """
-        return (coefficient[0] * sqrt(8.0/15.0),
-                coefficient[1] * 2.0 / sqrt(45),
-                coefficient[2] * 2.0 / sqrt(45),
-                coefficient[3] * sqrt(2) / 15.0,
-                coefficient[4] * sqrt(2) / 15.0,
-                coefficient[5] / sqrt(3) / 15.0,
-                coefficient[6] / sqrt(3) / 15.0)
+        return (coefficient[0] * m_independent_factor(3) * m_dependent_factor(3, 0),  # sqrt(8.0/15.0)=sqrt(2*2*2/3*5)
+                coefficient[1] * m_independent_factor(3) * m_dependent_factor(3, 1),  # 2.0 / sqrt(45) = sqrt(2*2/3*3*5) = sqrt(2*2*2/3*5) / sqrt(6)
+                coefficient[2] * m_independent_factor(3) * m_dependent_factor(3,-1),  # 2.0 / sqrt(45) = sqrt(2*2/3*3*5) = sqrt(2*2*2/3*5) / sqrt(6)
+                coefficient[3] * m_independent_factor(3) * m_dependent_factor(3, 2),  # sqrt(2) / 15.0 = sqrt(2/3*3*5*5) = sqrt(2*2*2/3*5) / sqrt(60)
+                coefficient[4] * m_independent_factor(3) * m_dependent_factor(3,-2),  # sqrt(2) / 15.0 = sqrt(2/3*3*5*5) = sqrt(2*2*2/3*5) / sqrt(60)
+                coefficient[5] * m_independent_factor(3) * m_dependent_factor(3, 3),  # sqrt(3) / 15.0 = sqrt(1/3*3*3*5*5) = sqrt(2*2*2/3*5) / sqrt(60)
+                coefficient[6] * m_independent_factor(3) * m_dependent_factor(3,-3))  # sqrt(3) / 15.0 = sqrt(1/3*3*3*5*5) = sqrt(2*2*2/3*5) / sqrt(60)
 
     def g_normalize(self, coefficient):
         """
         The following order of G functions is expected:
             9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
         """
-        return (coefficient[0],
-                coefficient[1],
-                coefficient[2],
-                coefficient[3],
-                coefficient[4],
-                coefficient[5],
-                coefficient[6],
-                coefficient[7],
-                coefficient[8])
+        return (coefficient[0] * m_independent_factor(4) * m_dependent_factor(4, 0),
+                coefficient[1] * m_independent_factor(4) * m_dependent_factor(4, 1),
+                coefficient[2] * m_independent_factor(4) * m_dependent_factor(4,-1),
+                coefficient[3] * m_independent_factor(4) * m_dependent_factor(4, 2),
+                coefficient[4] * m_independent_factor(4) * m_dependent_factor(4,-2),
+                coefficient[5] * m_independent_factor(4) * m_dependent_factor(4, 3),
+                coefficient[6] * m_independent_factor(4) * m_dependent_factor(4,-3),
+                coefficient[7] * m_independent_factor(4) * m_dependent_factor(4, 4),
+                coefficient[8] * m_independent_factor(4) * m_dependent_factor(4,-4))
 
     def mo_matrix_converter(self):
         """
@@ -746,7 +823,6 @@ if __name__ == "__main__":
     elif code == 1:
         PSI4(f).gwfn(g)
     elif code == 2:
-        sys.exit("Sorry, this is not functioning yet, but it is on the to-do list, so I left it in here.")
         CFour(f).gwfn(g)
     elif code == 3:
         Orca(f).gwfn(g)
