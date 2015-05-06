@@ -247,7 +247,7 @@ class Molden(object):
         Conversion required by default.
         """
         self.f.seek(0)
-        for line in f:
+        for line in self.f:
             if line.startswith("[5D]"):
                 self.D_orb_conversion_required = False
                 self.F_orb_conversion_required = False
