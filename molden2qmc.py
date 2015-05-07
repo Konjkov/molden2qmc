@@ -809,29 +809,39 @@ class Orca(Molden):
         """
         The following order of F functions is expected:
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
+
+        P.S. ORCA use slightly different sign conventions:
+            F(+3)_ORCA = - F(+3)_MOLDEN
+            F(-3)_ORCA = - F(-3)_MOLDEN
         """
         return (coefficient[0] * m_independent_factor_b(3) * m_dependent_factor(3,  0),
                 coefficient[1] * m_independent_factor_b(3) * m_dependent_factor(3,  1),
                 coefficient[2] * m_independent_factor_b(3) * m_dependent_factor(3, -1),
                 coefficient[3] * m_independent_factor_b(3) * m_dependent_factor(3,  2),
                 coefficient[4] * m_independent_factor_b(3) * m_dependent_factor(3, -2),
-                coefficient[5] * m_independent_factor_b(3) * m_dependent_factor(3,  3),
-                coefficient[6] * m_independent_factor_b(3) * m_dependent_factor(3, -3))
+               -coefficient[5] * m_independent_factor_b(3) * m_dependent_factor(3,  3),
+               -coefficient[6] * m_independent_factor_b(3) * m_dependent_factor(3, -3))
 
     def g_normalize(self, coefficient):
         """
         The following order of G functions is expected:
             9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
+
+        P.S. ORCA use slightly different sign conventions:
+            G(+3)_ORCA = - G(+3)_MOLDEN
+            G(-3)_ORCA = - G(-3)_MOLDEN
+            G(+4)_ORCA = - G(+4)_MOLDEN
+            G(-4)_ORCA = - G(-4)_MOLDEN
         """
         return (coefficient[0] * m_independent_factor_b(4) * m_dependent_factor(4,  0),
                 coefficient[1] * m_independent_factor_b(4) * m_dependent_factor(4,  1),
                 coefficient[2] * m_independent_factor_b(4) * m_dependent_factor(4, -1),
                 coefficient[3] * m_independent_factor_b(4) * m_dependent_factor(4,  2),
                 coefficient[4] * m_independent_factor_b(4) * m_dependent_factor(4, -2),
-                coefficient[5] * m_independent_factor_b(4) * m_dependent_factor(4,  3),
-                coefficient[6] * m_independent_factor_b(4) * m_dependent_factor(4, -3),
-                coefficient[7] * m_independent_factor_b(4) * m_dependent_factor(4,  4),
-                coefficient[8] * m_independent_factor_b(4) * m_dependent_factor(4, -4))
+               -coefficient[5] * m_independent_factor_b(4) * m_dependent_factor(4,  3),
+               -coefficient[6] * m_independent_factor_b(4) * m_dependent_factor(4, -3),
+               -coefficient[7] * m_independent_factor_b(4) * m_dependent_factor(4,  4),
+               -coefficient[8] * m_independent_factor_b(4) * m_dependent_factor(4, -4))
 
     def mo_matrix_converter(self):
         """
