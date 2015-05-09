@@ -673,13 +673,17 @@ class CFour(Molden):
         """
         xx, yy, zz, xy, xz, yz = cartesian
 
+        xx *= sqrt(3)
+        yy *= sqrt(3)
+        zz *= sqrt(3)
+
         r2 = xx + yy + zz
 
-        zero = zz - r2/3.0
-        plus_1 = 2.0 * xz
-        minus_1 = 2.0 * yz
-        plus_2 = xx - yy
-        minus_2 = 2.0 * xy
+        zero = (3.0 * zz - r2) / 6.0
+        plus_1 = sqrt(3) * xz
+        minus_1 = sqrt(3) * yz
+        plus_2 = (xx - yy) / 2.0
+        minus_2 = sqrt(3) * xy
         return zero, plus_1, minus_1, plus_2, minus_2
 
     def f_to_spherical(self, cartesian):
@@ -692,17 +696,28 @@ class CFour(Molden):
         """
         xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz = cartesian
 
+        xxy *= sqrt(3)
+        xxz *= sqrt(3)
+        xyy *= sqrt(3)
+        yyz *= sqrt(3)
+        xzz *= sqrt(3)
+        yzz *= sqrt(3)
+
+        xxx *= sqrt(15)
+        yyy *= sqrt(15)
+        zzz *= sqrt(15)
+
         xr2 = xxx + xyy + xzz
         yr2 = xxy + yyy + yzz
         zr2 = xxz + yyz + zzz
 
-        zero = (5.0 * zzz - 3.0 * zr2) / 2.0
-        plus_1 = (15.0 * xzz - 3.0 * xr2)
-        minus_1 = (15.0 * yzz - 3.0 * yr2)
-        plus_2 = (xxz - yyz)
-        minus_2 = 2.0 * xyz
-        plus_3 = (xxx - 3.0 * xyy)
-        minus_3 = (3.0 * xxy - yyy)
+        zero = (5.0 * zzz - 3.0 * zr2) / 6.0
+        plus_1 = (5.0 * xzz - xr2) / 12.0
+        minus_1 = (5.0 * yzz - yr2) / 12.0
+        plus_2 = (xxz - yyz) / sqrt(180)
+        minus_2 = xyz / sqrt(60)
+        plus_3 = (xxx - 3.0 * xyy) / 75.0
+        minus_3 = (3.0 * xxy - yyy) / 75.0
         return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3
 
     def g_to_spherical(self, cartesian):
@@ -715,6 +730,25 @@ class CFour(Molden):
                  xxyy xxzz yyzz xxyz yyxz zzxy
         """
         xxxx, yyyy, zzzz, xxxy, xxxz, yyyx, yyyz, zzzx, zzzy, xxyy, xxzz, yyzz, xxyz, yyxz, zzxy = cartesian
+
+        xxyz *= sqrt(3)
+        yyxz *= sqrt(3)
+        zzxy *= sqrt(3)
+
+        xxyy *= 3.0
+        xxzz *= 3.0
+        yyzz *= 3.0
+
+        xxxy *= sqrt(15)
+        xxxz *= sqrt(15)
+        yyyx *= sqrt(15)
+        yyyz *= sqrt(15)
+        zzzx *= sqrt(15)
+        zzzy *= sqrt(15)
+
+        xxxx *= sqrt(105)
+        yyyy *= sqrt(105)
+        zzzz *= sqrt(105)
 
         xyr2 = xxxy + yyyx + zzxy
         xzr2 = xxxz + yyxz + zzzx
@@ -757,10 +791,10 @@ class CFour(Molden):
             for ao in orbital['MO']:
                 if ao['TYPE'] == 'd':
                     ao['DATA'] = self.d_to_spherical(ao['DATA'])
-                # elif ao['TYPE'] == 'f':
-                #     ao['DATA'] = self.f_to_spherical(ao['DATA'])
-                # elif ao['TYPE'] == 'g':
-                #     ao['DATA'] = self.g_to_spherical(ao['DATA'])
+                elif ao['TYPE'] == 'f':
+                     ao['DATA'] = self.f_to_spherical(ao['DATA'])
+                elif ao['TYPE'] == 'g':
+                     ao['DATA'] = self.g_to_spherical(ao['DATA'])
 
 
 class Orca(Molden):
