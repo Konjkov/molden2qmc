@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 
 """
 TODO:
@@ -776,12 +776,15 @@ class Orca(Molden):
         Only contraction_coefficients must be converted.
 
         norm_coeff = 1 for 's', 'p', 'sp' orbital
+        g-orbitals need to be scaled up by a factor of sqrt(3)
         """
         for atom in self.atom_list:
             for shell in atom['SHELLS']:
                 l = self.ang_momentum_map[shell['TYPE']]
                 for primitive in shell['DATA']:
                     primitive[1] /= sqrt(fact2(2*l-1))
+                    if l == 4:
+                        primitive[1] *= sqrt(3)
 
     def d_normalize(self, coefficient):
         """
