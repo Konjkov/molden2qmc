@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.0.1'
+__version__ = '2.0.2'
 
 """
 TODO:
@@ -799,11 +799,11 @@ class Orca(Molden):
         backwards-consistent way)
         """
         premultiplied_factor = (0.5, 3.0, 3.0, 3.0, 6.0)
-        return (coefficient[0] * m_independent_factor_b(2) * m_dependent_factor(2,  0) * premultiplied_factor[0],
-                coefficient[1] * m_independent_factor_b(2) * m_dependent_factor(2,  1) * premultiplied_factor[1],
-                coefficient[2] * m_independent_factor_b(2) * m_dependent_factor(2, -1) * premultiplied_factor[2],
-                coefficient[3] * m_independent_factor_b(2) * m_dependent_factor(2,  2) * premultiplied_factor[3],
-                coefficient[4] * m_independent_factor_b(2) * m_dependent_factor(2, -2) * premultiplied_factor[4])
+        return (coefficient[0] * m_dependent_factor(2,  0) * premultiplied_factor[0],
+                coefficient[1] * m_dependent_factor(2,  1) * premultiplied_factor[1],
+                coefficient[2] * m_dependent_factor(2, -1) * premultiplied_factor[2],
+                coefficient[3] * m_dependent_factor(2,  2) * premultiplied_factor[3],
+                coefficient[4] * m_dependent_factor(2, -2) * premultiplied_factor[4])
 
     def f_normalize(self, coefficient):
         """
@@ -814,13 +814,13 @@ class Orca(Molden):
             F(+3)_ORCA = - F(+3)_MOLDEN
             F(-3)_ORCA = - F(-3)_MOLDEN
         """
-        return (coefficient[0] * m_independent_factor_b(3) * m_dependent_factor(3,  0),
-                coefficient[1] * m_independent_factor_b(3) * m_dependent_factor(3,  1),
-                coefficient[2] * m_independent_factor_b(3) * m_dependent_factor(3, -1),
-                coefficient[3] * m_independent_factor_b(3) * m_dependent_factor(3,  2),
-                coefficient[4] * m_independent_factor_b(3) * m_dependent_factor(3, -2),
-               -coefficient[5] * m_independent_factor_b(3) * m_dependent_factor(3,  3),
-               -coefficient[6] * m_independent_factor_b(3) * m_dependent_factor(3, -3))
+        return (coefficient[0] * m_dependent_factor(3,  0),
+                coefficient[1] * m_dependent_factor(3,  1),
+                coefficient[2] * m_dependent_factor(3, -1),
+                coefficient[3] * m_dependent_factor(3,  2),
+                coefficient[4] * m_dependent_factor(3, -2),
+                -coefficient[5] * m_dependent_factor(3,  3),
+                -coefficient[6] * m_dependent_factor(3, -3))
 
     def g_normalize(self, coefficient):
         """
@@ -833,15 +833,15 @@ class Orca(Molden):
             G(+4)_ORCA = - G(+4)_MOLDEN
             G(-4)_ORCA = - G(-4)_MOLDEN
         """
-        return (coefficient[0] * m_independent_factor_b(4) * m_dependent_factor(4,  0),
-                coefficient[1] * m_independent_factor_b(4) * m_dependent_factor(4,  1),
-                coefficient[2] * m_independent_factor_b(4) * m_dependent_factor(4, -1),
-                coefficient[3] * m_independent_factor_b(4) * m_dependent_factor(4,  2),
-                coefficient[4] * m_independent_factor_b(4) * m_dependent_factor(4, -2),
-               -coefficient[5] * m_independent_factor_b(4) * m_dependent_factor(4,  3),
-               -coefficient[6] * m_independent_factor_b(4) * m_dependent_factor(4, -3),
-               -coefficient[7] * m_independent_factor_b(4) * m_dependent_factor(4,  4),
-               -coefficient[8] * m_independent_factor_b(4) * m_dependent_factor(4, -4))
+        return (coefficient[0] * m_dependent_factor(4,  0),
+                coefficient[1] * m_dependent_factor(4,  1),
+                coefficient[2] * m_dependent_factor(4, -1),
+                coefficient[3] * m_dependent_factor(4,  2),
+                coefficient[4] * m_dependent_factor(4, -2),
+                -coefficient[5] * m_dependent_factor(4,  3),
+                -coefficient[6] * m_dependent_factor(4, -3),
+                -coefficient[7] * m_dependent_factor(4,  4),
+                -coefficient[8] * m_dependent_factor(4, -4))
 
     def mo_matrix_converter(self):
         """
