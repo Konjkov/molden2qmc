@@ -672,14 +672,18 @@ class CFour(Molden):
         """
         xx, yy, zz, xy, xz, yz = cartesian
 
+        xx *= 2.0
+        yy *= 2.0
+        zz *= 2.0
+
         r2 = xx + yy + zz
 
         premultiplied_factor = (0.5, 3.0, 3.0, 3.0, 6.0)
 
-        zero = (3.0 * zz - r2) / 2.0             * premultiplied_factor[0] * m_dependent_factor(2,  0) * 2.0 / sqrt(3)
+        zero = (3.0 * zz - r2) / 2.0             * premultiplied_factor[0] * m_dependent_factor(2,  0) / sqrt(3)
         plus_1 = sqrt(3) * xz                    * premultiplied_factor[1] * m_dependent_factor(2,  1) / sqrt(3)
         minus_1 = sqrt(3) * yz                   * premultiplied_factor[2] * m_dependent_factor(2, -1) / sqrt(3)
-        plus_2 = sqrt(3) * (xx - yy) / 2.0       * premultiplied_factor[3] * m_dependent_factor(2,  2) * 2.0 / sqrt(3)
+        plus_2 = sqrt(3) * (xx - yy) / 2.0       * premultiplied_factor[3] * m_dependent_factor(2,  2) / sqrt(3)
         minus_2 = sqrt(3) * xy                   * premultiplied_factor[4] * m_dependent_factor(2, -2) / sqrt(3)
         return zero, plus_1, minus_1, plus_2, minus_2
 
@@ -693,31 +697,28 @@ class CFour(Molden):
         """
         xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz = cartesian
 
-        xyz *= 0.25
+        xxy *= 2.0
+        xxz *= 2.0
+        xyy *= 2.0
+        yyz *= 2.0
+        xzz *= 2.0
+        yzz *= 2.0
 
-        xxy *= 0.5
-        xxz *= 0.5
-        xyy *= 0.5
-        yyz *= 0.5
-        xzz *= 0.5
-        yzz *= 0.5
-
-        xxx *= 1.5
-        yyy *= 1.5
-        zzz *= 1.5
-
+        xxx *= 6.0
+        yyy *= 6.0
+        zzz *= 6.0
 
         xr2 = xxx + xyy + xzz
         yr2 = xxy + yyy + yzz
         zr2 = xxz + yyz + zzz
 
-        zero = (5.0 * zzz - 3.0 * zr2) / 2.0          * m_dependent_factor(3,  0)
-        plus_1 = sqrt(6) * (5.0 * xzz - xr2) / 4.0    * m_dependent_factor(3,  1)
-        minus_1 = sqrt(6) * (5.0 * yzz - yr2) / 4.0   * m_dependent_factor(3, -1)
-        plus_2 = sqrt(15) * (xxz - yyz) / 2.0         * m_dependent_factor(3,  2)
-        minus_2 = sqrt(15) * xyz                      * m_dependent_factor(3, -2)
-        plus_3 = sqrt(10) * (xxx - 3.0 * xyy) / 4.0   * m_dependent_factor(3,  3)
-        minus_3 = sqrt(10) * (3.0 * xxy - yyy) / 4.0  * m_dependent_factor(3, -3)
+        zero = (5.0 * zzz - 3.0 * zr2) / 2.0          * m_dependent_factor(3,  0) / sqrt(15)
+        plus_1 = sqrt(6) * (5.0 * xzz - xr2) / 4.0    * m_dependent_factor(3,  1) / sqrt(15)
+        minus_1 = sqrt(6) * (5.0 * yzz - yr2) / 4.0   * m_dependent_factor(3, -1) / sqrt(15)
+        plus_2 = sqrt(15) * (xxz - yyz) / 2.0         * m_dependent_factor(3,  2) / sqrt(15)
+        minus_2 = sqrt(15) * xyz                      * m_dependent_factor(3, -2) / sqrt(15)
+        plus_3 = sqrt(10) * (xxx - 3.0 * xyy) / 4.0   * m_dependent_factor(3,  3) / sqrt(15)
+        minus_3 = sqrt(10) * (3.0 * xxy - yyy) / 4.0  * m_dependent_factor(3, -3) / sqrt(15)
         return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3
 
     def g_to_spherical(self, cartesian):
@@ -731,24 +732,24 @@ class CFour(Molden):
         """
         xxxx, yyyy, zzzz, xxxy, xxxz, yyyx, yyyz, zzzx, zzzy, xxyy, xxzz, yyzz, xxyz, yyxz, zzxy = cartesian
 
-        xxyz *= sqrt(3)
-        yyxz *= sqrt(3)
-        zzxy *= sqrt(3)
+        xxyz *= 2.0
+        yyxz *= 2.0
+        zzxy *= 2.0
 
-        xxyy *= 3.0
-        xxzz *= 3.0
-        yyzz *= 3.0
+        xxyy *= 4.0
+        xxzz *= 4.0
+        yyzz *= 4.0
 
-        xxxy *= sqrt(15)
-        xxxz *= sqrt(15)
-        yyyx *= sqrt(15)
-        yyyz *= sqrt(15)
-        zzzx *= sqrt(15)
-        zzzy *= sqrt(15)
+        xxxy *= 6.0
+        xxxz *= 6.0
+        yyyx *= 6.0
+        yyyz *= 6.0
+        zzzx *= 6.0
+        zzzy *= 6.0
 
-        xxxx *= sqrt(105)
-        yyyy *= sqrt(105)
-        zzzz *= sqrt(105)
+        xxxx *= 24.0
+        yyyy *= 24.0
+        zzzz *= 24.0
 
         xyr2 = xxxy + yyyx + zzxy
         xzr2 = xxxz + yyxz + zzzx
@@ -758,15 +759,15 @@ class CFour(Molden):
         z2r2 = xxzz + yyzz + zzzz
         r4 = xxxx + yyyy + zzzz + 2.0 * (xxyy + xxzz + yyzz)
 
-        zero = 35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4
-        plus_1 = 7.0 * zzzx - 3.0 * xzr2
-        minus_1 = 7.0 * zzzx - 3.0 * yzr2
-        plus_2 = 7.0 * (xxzz - yyzz) - (x2r2 - y2r2)
-        minus_2 = 7.0 * zzxy - xyr2
-        plus_3 = xxxz - 3.0 * yyxz
-        minus_3 = 3.0 * xxyz - yyyz
-        plus_4 = (xxxx - 3.0 * xxyy) - (3.0 * xxyy - yyyy)
-        minus_4 = xxxy - yyyx
+        zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0            * m_dependent_factor(4,  0) / sqrt(105)
+        plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0            * m_dependent_factor(4,  1) / sqrt(105)
+        minus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * yzr2) / 4.0           * m_dependent_factor(4, -1) / sqrt(105)
+        plus_2 = sqrt(5) * (7.0 * (xxzz - yyzz) - (x2r2 - y2r2)) / 2.0 * m_dependent_factor(4,  2) / sqrt(105)
+        minus_2 = sqrt(5) * (7.0 * zzxy - xyr2) / 2.0                  * m_dependent_factor(4, -2) / sqrt(105)
+        plus_3 = sqrt(70) * (xxxz - 3.0 * yyxz) / 4.0                  * m_dependent_factor(4,  3) / sqrt(105)
+        minus_3 = sqrt(70) * (3.0 * xxyz - yyyz) / 4.0                 * m_dependent_factor(4, -3) / sqrt(105)
+        plus_4 = sqrt(35) * (xxxx - 6.0 * xxyy + yyyy) / 8.0           * m_dependent_factor(4,  4) / sqrt(105)
+        minus_4 = sqrt(35) * (xxxy - yyyx) / 8.0                       * m_dependent_factor(4, -4) / sqrt(105)
         return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3, plus_4, minus_4
 
     def atom_list_converter(self):
