@@ -8,8 +8,7 @@ TODO:
 1. implement TURBOMOLE, PSI4, C4.
 2. implement PP
 3. implement unrestricted
-4. verified g-orbitals normalisation
-5. implement cartesian->spherical conversion
+4. implement cartesian->spherical conversion
 """
 
 import os
@@ -809,8 +808,8 @@ class Orca(Molden):
         """
         Only contraction_coefficients must be converted.
 
-        norm_coeff = 1 for 's', 'p', 'sp' orbital
-        g-orbitals need to be scaled up by a factor of sqrt(3)
+        's', 'p' orbital don't require normalization.
+        'g' orbitals need to be additionally scaled up by a factor of sqrt(3).
         """
         for atom in self.atom_list:
             for shell in atom['SHELLS']:
