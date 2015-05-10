@@ -672,17 +672,15 @@ class CFour(Molden):
         """
         xx, yy, zz, xy, xz, yz = cartesian
 
-        xx *= sqrt(3)
-        yy *= sqrt(3)
-        zz *= sqrt(3)
-
         r2 = xx + yy + zz
 
-        zero = (3.0 * zz - r2) / 6.0
-        plus_1 = sqrt(3) * xz
-        minus_1 = sqrt(3) * yz
-        plus_2 = (xx - yy) / 2.0
-        minus_2 = sqrt(3) * xy
+        premultiplied_factor = (0.5, 3.0, 3.0, 3.0, 6.0)
+
+        zero = (3.0 * zz - r2) / 2.0             * premultiplied_factor[0] * m_dependent_factor(2,  0) * 2.0 / sqrt(3)
+        plus_1 = sqrt(3) * xz                    * premultiplied_factor[1] * m_dependent_factor(2,  1) / sqrt(3)
+        minus_1 = sqrt(3) * yz                   * premultiplied_factor[2] * m_dependent_factor(2, -1) / sqrt(3)
+        plus_2 = sqrt(3) * (xx - yy) / 2.0       * premultiplied_factor[3] * m_dependent_factor(2,  2) * 2.0 / sqrt(3)
+        minus_2 = sqrt(3) * xy                   * premultiplied_factor[4] * m_dependent_factor(2, -2) / sqrt(3)
         return zero, plus_1, minus_1, plus_2, minus_2
 
     def f_to_spherical(self, cartesian):
@@ -695,28 +693,31 @@ class CFour(Molden):
         """
         xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz = cartesian
 
-        xxy *= sqrt(3)
-        xxz *= sqrt(3)
-        xyy *= sqrt(3)
-        yyz *= sqrt(3)
-        xzz *= sqrt(3)
-        yzz *= sqrt(3)
+        xyz *= 0.25
 
-        xxx *= sqrt(15)
-        yyy *= sqrt(15)
-        zzz *= sqrt(15)
+        xxy *= 0.5
+        xxz *= 0.5
+        xyy *= 0.5
+        yyz *= 0.5
+        xzz *= 0.5
+        yzz *= 0.5
+
+        xxx *= 1.5
+        yyy *= 1.5
+        zzz *= 1.5
+
 
         xr2 = xxx + xyy + xzz
         yr2 = xxy + yyy + yzz
         zr2 = xxz + yyz + zzz
 
-        zero = (5.0 * zzz - 3.0 * zr2) / 6.0
-        plus_1 = (5.0 * xzz - xr2) / 12.0
-        minus_1 = (5.0 * yzz - yr2) / 12.0
-        plus_2 = (xxz - yyz) / sqrt(180)
-        minus_2 = xyz / sqrt(60)
-        plus_3 = (xxx - 3.0 * xyy) / 75.0
-        minus_3 = (3.0 * xxy - yyy) / 75.0
+        zero = (5.0 * zzz - 3.0 * zr2) / 2.0          * m_dependent_factor(3,  0)
+        plus_1 = sqrt(6) * (5.0 * xzz - xr2) / 4.0    * m_dependent_factor(3,  1)
+        minus_1 = sqrt(6) * (5.0 * yzz - yr2) / 4.0   * m_dependent_factor(3, -1)
+        plus_2 = sqrt(15) * (xxz - yyz) / 2.0         * m_dependent_factor(3,  2)
+        minus_2 = sqrt(15) * xyz                      * m_dependent_factor(3, -2)
+        plus_3 = sqrt(10) * (xxx - 3.0 * xyy) / 4.0   * m_dependent_factor(3,  3)
+        minus_3 = sqrt(10) * (3.0 * xxy - yyy) / 4.0  * m_dependent_factor(3, -3)
         return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3
 
     def g_to_spherical(self, cartesian):
