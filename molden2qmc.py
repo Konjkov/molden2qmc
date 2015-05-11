@@ -146,10 +146,10 @@ class Molden(object):
     ang_momentum_map = {'s': 0, 'p': 1, 'd': 2, 'f': 3, 'g': 4, 'sp': 1}
 
     def __init__(self, f):
-        """ Create instance that represent of molden_format file
+        """ Create instance that represent of MOLDEN file
         http://www.cmbi.ru.nl/molden/molden_format.html
 
-        :param f: file descriptor in molden_format file
+        :param f: file descriptor in MOLDEN file
         """
         self.D_orb_conversion_required = True  # Conversion D orbitals Cartesian -> Spherical required
         self.F_orb_conversion_required = True  # Conversion F orbitals Cartesian -> Spherical required
@@ -898,15 +898,32 @@ class Orca(Molden):
                     ao['DATA'] = self.g_normalize(ao['DATA'])
 
 
-class PSI4(Orca):
-    """
-    PSI4 and Orca are the same.
-    """
-    title = "generated from PSI4 output data.\n"
+class PSI4(Molden):
+
+    def __init__(self, f):
+        """
+        PSI4 correctly normalized contraction coefficients in the MOLDEN file, so we don't need to modify them.
+        """
+        super(PSI4, self).__init__(f)
+        self.title = "generated from PSI4 output data.\n"
+        self.mo_matrix_converter()
+
+    def mo_matrix_converter(self):
+        """
+        Only mo_coefficients of d, f, g must be converted.
+        """
+        for orbital in self.mo_matrix:
+            for ao in orbital['MO']:
+                if ao['TYPE'] == 'd':
+                    ao['DATA'] = self.d_normalize(ao['DATA'])
+                elif ao['TYPE'] == 'f':
+                    ao['DATA'] = self.f_normalize(ao['DATA'])
+                elif ao['TYPE'] == 'g':
+                    ao['DATA'] = self.g_normalize(ao['DATA'])
 
 
 if __name__ == "__main__":
-    print ("Hello, you are converting a MOLDEN output to a CASINO gwfn.data file.\n")
+    print ("Hello, you are converting a MOLDEN file to a CASINO gwfn.data file.\n")
 
     output_file = raw_input("Enter the name of your MOLDEN file: ")
 
