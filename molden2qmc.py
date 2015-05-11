@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.0.3'
+__version__ = '2.1.1'
 
 """
 TODO:
-1. implement TURBOMOLE, PSI4, C4.
+1. implement TURBOMOLE, PSI4.
 2. implement PP
 3. implement unrestricted
 4. implement cartesian->spherical conversion
@@ -729,8 +729,11 @@ class CFour(Molden):
             9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
             15G: xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
                  xxyy xxzz yyzz xxyz yyxz zzxy
+
+        but CFOUR has its own order for g-orbitals:
+        http://people.smu.edu/wzou/program/reorderdf.zip
         """
-        xxxx, yyyy, zzzz, xxxy, xxxz, yyyx, yyyz, zzzx, zzzy, xxyy, xxzz, yyzz, xxyz, yyxz, zzxy = cartesian
+        xxxx, xxxy, xxxz, xxyy, xxyz, xxzz, yyyx, yyxz, zzxy, zzzx, yyyy, yyyz, yyzz, zzzy, zzzz = cartesian
 
         xxyz *= 2.0
         yyxz *= 2.0
@@ -755,19 +758,19 @@ class CFour(Molden):
         xzr2 = xxxz + yyxz + zzzx
         yzr2 = xxyz + yyyz + zzzy
         x2r2 = xxxx + xxyy + xxzz
-        y2r2 = xxyy + yyyy + xxyy
+        y2r2 = xxyy + yyyy + yyzz
         z2r2 = xxzz + yyzz + zzzz
         r4 = xxxx + yyyy + zzzz + 2.0 * (xxyy + xxzz + yyzz)
 
         zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0            * m_dependent_factor(4,  0) / sqrt(105)
         plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0            * m_dependent_factor(4,  1) / sqrt(105)
-        minus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * yzr2) / 4.0           * m_dependent_factor(4, -1) / sqrt(105)
-        plus_2 = sqrt(5) * (7.0 * (xxzz - yyzz) - (x2r2 - y2r2)) / 2.0 * m_dependent_factor(4,  2) / sqrt(105)
+        minus_1 = sqrt(10) * (7.0 * zzzy - 3.0 * yzr2) / 4.0           * m_dependent_factor(4, -1) / sqrt(105)
+        plus_2 = sqrt(5) * (7.0 * (xxzz - yyzz) - (x2r2 - y2r2)) / 4.0 * m_dependent_factor(4,  2) / sqrt(105)
         minus_2 = sqrt(5) * (7.0 * zzxy - xyr2) / 2.0                  * m_dependent_factor(4, -2) / sqrt(105)
         plus_3 = sqrt(70) * (xxxz - 3.0 * yyxz) / 4.0                  * m_dependent_factor(4,  3) / sqrt(105)
         minus_3 = sqrt(70) * (3.0 * xxyz - yyyz) / 4.0                 * m_dependent_factor(4, -3) / sqrt(105)
         plus_4 = sqrt(35) * (xxxx - 6.0 * xxyy + yyyy) / 8.0           * m_dependent_factor(4,  4) / sqrt(105)
-        minus_4 = sqrt(35) * (xxxy - yyyx) / 8.0                       * m_dependent_factor(4, -4) / sqrt(105)
+        minus_4 = sqrt(35) * (xxxy - yyyx) / 2.0                       * m_dependent_factor(4, -4) / sqrt(105)
         return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3, plus_4, minus_4
 
     def atom_list_converter(self):
@@ -810,7 +813,7 @@ class Orca(Molden):
         """
         Only contraction_coefficients must be converted.
 
-        's', 'p' orbital don't require normalization.
+        's', 'p' orbitals don't require normalization.
         'g' orbitals need to be additionally scaled up by a factor of sqrt(3).
         """
         for atom in self.atom_list:
