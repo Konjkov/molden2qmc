@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.1.1'
+__version__ = '2.1.2'
 
 """
 TODO:
@@ -146,10 +146,10 @@ class Molden(object):
     ang_momentum_map = {'s': 0, 'p': 1, 'd': 2, 'f': 3, 'g': 4, 'sp': 1}
 
     def __init__(self, f):
-        """ Create instance that represent of MOLDEN file
+        """ Create instance that represent MOLDEN file data
         http://www.cmbi.ru.nl/molden/molden_format.html
 
-        :param f: file descriptor in MOLDEN file
+        :param f: file descriptor of MOLDEN file
         """
         self.D_orb_conversion_required = True  # Conversion D orbitals Cartesian -> Spherical required
         self.F_orb_conversion_required = True  # Conversion F orbitals Cartesian -> Spherical required
@@ -670,7 +670,10 @@ class CFour(Molden):
             5D: D 0, D+1, D-1, D+2, D-2
             6D: xx, yy, zz, xy, xz, yz
         """
-        xx, yy, zz, xy, xz, yz = cartesian
+        if self.g_orbitals_converted_in_mo:
+            xx, xy, xz, yy, yz, zz = cartesian
+        else:
+            xx, yy, zz, xy, xz, yz = cartesian
 
         xx *= 2.0
         yy *= 2.0
@@ -695,7 +698,10 @@ class CFour(Molden):
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
         """
-        xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz = cartesian
+        if self.g_orbitals_converted_in_mo:
+            xxx, xxy, xxz, xyy, xyz, xzz, yyy, yyz, yzz, zzz = cartesian
+        else:
+            xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz = cartesian
 
         xxy *= 2.0
         xxz *= 2.0
@@ -792,6 +798,7 @@ class CFour(Molden):
         mo_coefficients of d, f, g must be converted form cartesian to spherical
         """
         for orbital in self.mo_matrix:
+            self.g_orbitals_converted_in_mo = False
             for ao in orbital['MO']:
                 if ao['TYPE'] == 'd':
                     ao['DATA'] = self.d_to_spherical(ao['DATA'])
@@ -799,6 +806,7 @@ class CFour(Molden):
                      ao['DATA'] = self.f_to_spherical(ao['DATA'])
                 elif ao['TYPE'] == 'g':
                      ao['DATA'] = self.g_to_spherical(ao['DATA'])
+                     self.g_orbitals_converted_in_mo = True
 
 
 class Orca(Molden):
