@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.1.2'
+__version__ = '2.2.0'
 
 """
 TODO:
-1. implement TURBOMOLE, PSI4.
+1. implement TURBOMOLE.
 2. implement PP
 3. implement unrestricted
 4. implement cartesian->spherical conversion
@@ -95,6 +95,72 @@ def m_dependent_factor(l, m):
         return 1
     else:
         return sqrt(2.0 * factorial(l - fabs(m))/factorial(l + fabs(m)))
+
+
+class Converter(object):
+
+    def d_normalize(self, coefficient):
+        """
+        The following order of D functions is expected:
+            5D: D 0, D+1, D-1, D+2, D-2
+
+        P.S.
+        One historical CASINO inconsistency which may be easily overlooked:
+        Constant numerical factors in the real solid harmonics e.g. the '3' in the 3xy
+        d function, or '15' in the (15x^3-45^xy2) f function, may be premultiplied into
+        the orbital coefficients so that CASINO doesn't have to e.g. multiply by 3
+        every time it evaluates that particular d function. In practice the CASINO
+        orbital evaluators do this only for d functions, but *not for f and g* (this
+        may or may not be changed in the future if it can be done in a.
+        backwards-consistent way)
+        """
+        premultiplied_factor = (0.5, 3.0, 3.0, 3.0, 6.0)
+        return (coefficient[0] * m_dependent_factor(2,  0) * premultiplied_factor[0],
+                coefficient[1] * m_dependent_factor(2,  1) * premultiplied_factor[1],
+                coefficient[2] * m_dependent_factor(2, -1) * premultiplied_factor[2],
+                coefficient[3] * m_dependent_factor(2,  2) * premultiplied_factor[3],
+                coefficient[4] * m_dependent_factor(2, -2) * premultiplied_factor[4])
+
+    def f_normalize(self, coefficient):
+        """
+        The following order of F functions is expected:
+            7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
+        """
+        return (coefficient[0] * m_dependent_factor(3,  0),
+                coefficient[1] * m_dependent_factor(3,  1),
+                coefficient[2] * m_dependent_factor(3, -1),
+                coefficient[3] * m_dependent_factor(3,  2),
+                coefficient[4] * m_dependent_factor(3, -2),
+                coefficient[5] * m_dependent_factor(3,  3),
+                coefficient[6] * m_dependent_factor(3, -3))
+
+    def g_normalize(self, coefficient):
+        """
+        The following order of G functions is expected:
+            9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
+        """
+        return (coefficient[0] * m_dependent_factor(4,  0),
+                coefficient[1] * m_dependent_factor(4,  1),
+                coefficient[2] * m_dependent_factor(4, -1),
+                coefficient[3] * m_dependent_factor(4,  2),
+                coefficient[4] * m_dependent_factor(4, -2),
+                coefficient[5] * m_dependent_factor(4,  3),
+                coefficient[6] * m_dependent_factor(4, -3),
+                coefficient[7] * m_dependent_factor(4,  4),
+                coefficient[8] * m_dependent_factor(4, -4))
+
+    def mo_matrix_converter(self):
+        """
+        Only mo_coefficients of d, f, g must be converted.
+        """
+        for orbital in self.mo_matrix:
+            for ao in orbital['MO']:
+                if ao['TYPE'] == 'd':
+                    ao['DATA'] = self.d_normalize(ao['DATA'])
+                elif ao['TYPE'] == 'f':
+                    ao['DATA'] = self.f_normalize(ao['DATA'])
+                elif ao['TYPE'] == 'g':
+                    ao['DATA'] = self.g_normalize(ao['DATA'])
 
 
 class Molden(object):
@@ -579,14 +645,35 @@ class Molden(object):
         return result + "\n\n"
 
 
-class Turbomole(Molden):
+class Turbomole(Molden, Converter):
     """
-    Not implemented
+    Turbomole 6.6
     """
     title = "generated from Turbomole output data.\n"
 
+    def __init__(self, f):
+        super(Turbomole, self).__init__(f)
+        self.title = "generated from CFour output data.\n"
+        self.atom_list_converter()
+        self.mo_matrix_converter()
 
-class CFour(Molden):
+
+    def atom_list_converter(self):
+        """
+        Turbomole contraction coefficients is 'Published contraction coefficients',
+        so the transformation is well known.
+        """
+        for atom in self.atom_list:
+            for shell in atom['SHELLS']:
+                l = self.ang_momentum_map[shell['TYPE']]
+                w = whole_contraction_factor(shell['DATA'], l)
+                for primitive in shell['DATA']:
+                    primitive[1] *= (w *
+                                     m_independent_factor_a(primitive[0], l) *
+                                     m_independent_factor_b(l))
+
+
+class CFour(Molden, Converter):
     """
     CFour 2.0 beta
     """
@@ -660,7 +747,7 @@ class CFour(Molden):
         :returns: total number of electrons
         """
         # Occupation number takes value from list (0, 1)
-        return 2 * sum(orbital['OCCUPATION'] for orbital in self.mo_matrix)
+        return 2 * super(CFour, self).nelec()
 
     def d_to_spherical(self, cartesian):
         """
@@ -681,13 +768,11 @@ class CFour(Molden):
 
         r2 = xx + yy + zz
 
-        premultiplied_factor = (0.5, 3.0, 3.0, 3.0, 6.0)
-
-        zero = (3.0 * zz - r2) / 2.0             * premultiplied_factor[0] * m_dependent_factor(2,  0) / sqrt(3)
-        plus_1 = sqrt(3) * xz                    * premultiplied_factor[1] * m_dependent_factor(2,  1) / sqrt(3)
-        minus_1 = sqrt(3) * yz                   * premultiplied_factor[2] * m_dependent_factor(2, -1) / sqrt(3)
-        plus_2 = sqrt(3) * (xx - yy) / 2.0       * premultiplied_factor[3] * m_dependent_factor(2,  2) / sqrt(3)
-        minus_2 = sqrt(3) * xy                   * premultiplied_factor[4] * m_dependent_factor(2, -2) / sqrt(3)
+        zero = (3.0 * zz - r2) / 2.0             / sqrt(3)
+        plus_1 = sqrt(3) * xz                    / sqrt(3)
+        minus_1 = sqrt(3) * yz                   / sqrt(3)
+        plus_2 = sqrt(3) * (xx - yy) / 2.0       / sqrt(3)
+        minus_2 = sqrt(3) * xy                   / sqrt(3)
         return zero, plus_1, minus_1, plus_2, minus_2
 
     def f_to_spherical(self, cartesian):
@@ -718,13 +803,13 @@ class CFour(Molden):
         yr2 = xxy + yyy + yzz
         zr2 = xxz + yyz + zzz
 
-        zero = (5.0 * zzz - 3.0 * zr2) / 2.0          * m_dependent_factor(3,  0) / sqrt(15)
-        plus_1 = sqrt(6) * (5.0 * xzz - xr2) / 4.0    * m_dependent_factor(3,  1) / sqrt(15)
-        minus_1 = sqrt(6) * (5.0 * yzz - yr2) / 4.0   * m_dependent_factor(3, -1) / sqrt(15)
-        plus_2 = sqrt(15) * (xxz - yyz) / 2.0         * m_dependent_factor(3,  2) / sqrt(15)
-        minus_2 = sqrt(15) * xyz                      * m_dependent_factor(3, -2) / sqrt(15)
-        plus_3 = sqrt(10) * (xxx - 3.0 * xyy) / 4.0   * m_dependent_factor(3,  3) / sqrt(15)
-        minus_3 = sqrt(10) * (3.0 * xxy - yyy) / 4.0  * m_dependent_factor(3, -3) / sqrt(15)
+        zero = (5.0 * zzz - 3.0 * zr2) / 2.0          / sqrt(15)
+        plus_1 = sqrt(6) * (5.0 * xzz - xr2) / 4.0    / sqrt(15)
+        minus_1 = sqrt(6) * (5.0 * yzz - yr2) / 4.0   / sqrt(15)
+        plus_2 = sqrt(15) * (xxz - yyz) / 2.0         / sqrt(15)
+        minus_2 = sqrt(15) * xyz                      / sqrt(15)
+        plus_3 = sqrt(10) * (xxx - 3.0 * xyy) / 4.0   / sqrt(15)
+        minus_3 = sqrt(10) * (3.0 * xxy - yyy) / 4.0  / sqrt(15)
         return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3
 
     def g_to_spherical(self, cartesian):
@@ -768,15 +853,15 @@ class CFour(Molden):
         z2r2 = xxzz + yyzz + zzzz
         r4 = xxxx + yyyy + zzzz + 2.0 * (xxyy + xxzz + yyzz)
 
-        zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0            * m_dependent_factor(4,  0) / sqrt(105)
-        plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0            * m_dependent_factor(4,  1) / sqrt(105)
-        minus_1 = sqrt(10) * (7.0 * zzzy - 3.0 * yzr2) / 4.0           * m_dependent_factor(4, -1) / sqrt(105)
-        plus_2 = sqrt(5) * (7.0 * (xxzz - yyzz) - (x2r2 - y2r2)) / 4.0 * m_dependent_factor(4,  2) / sqrt(105)
-        minus_2 = sqrt(5) * (7.0 * zzxy - xyr2) / 2.0                  * m_dependent_factor(4, -2) / sqrt(105)
-        plus_3 = sqrt(70) * (xxxz - 3.0 * yyxz) / 4.0                  * m_dependent_factor(4,  3) / sqrt(105)
-        minus_3 = sqrt(70) * (3.0 * xxyz - yyyz) / 4.0                 * m_dependent_factor(4, -3) / sqrt(105)
-        plus_4 = sqrt(35) * (xxxx - 6.0 * xxyy + yyyy) / 8.0           * m_dependent_factor(4,  4) / sqrt(105)
-        minus_4 = sqrt(35) * (xxxy - yyyx) / 2.0                       * m_dependent_factor(4, -4) / sqrt(105)
+        zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0            / sqrt(105)
+        plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0            / sqrt(105)
+        minus_1 = sqrt(10) * (7.0 * zzzy - 3.0 * yzr2) / 4.0           / sqrt(105)
+        plus_2 = sqrt(5) * (7.0 * (xxzz - yyzz) - (x2r2 - y2r2)) / 4.0 / sqrt(105)
+        minus_2 = sqrt(5) * (7.0 * zzxy - xyr2) / 2.0                  / sqrt(105)
+        plus_3 = sqrt(70) * (xxxz - 3.0 * yyxz) / 4.0                  / sqrt(105)
+        minus_3 = sqrt(70) * (3.0 * xxyz - yyyz) / 4.0                 / sqrt(105)
+        plus_4 = sqrt(35) * (xxxx - 6.0 * xxyy + yyyy) / 8.0           / sqrt(105)
+        minus_4 = sqrt(35) * (xxxy - yyyx) / 2.0                       / sqrt(105)
         return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3, plus_4, minus_4
 
     def atom_list_converter(self):
@@ -795,21 +880,24 @@ class CFour(Molden):
 
     def mo_matrix_converter(self):
         """
-        mo_coefficients of d, f, g must be converted form cartesian to spherical
+        mo_coefficients of d, f, g must be converted from cartesian to spherical and normalised.
         """
         for orbital in self.mo_matrix:
             self.g_orbitals_converted_in_mo = False
             for ao in orbital['MO']:
                 if ao['TYPE'] == 'd':
                     ao['DATA'] = self.d_to_spherical(ao['DATA'])
+                    ao['DATA'] = self.d_normalize(ao['DATA'])
                 elif ao['TYPE'] == 'f':
-                     ao['DATA'] = self.f_to_spherical(ao['DATA'])
+                    ao['DATA'] = self.f_to_spherical(ao['DATA'])
+                    ao['DATA'] = self.f_normalize(ao['DATA'])
                 elif ao['TYPE'] == 'g':
-                     ao['DATA'] = self.g_to_spherical(ao['DATA'])
-                     self.g_orbitals_converted_in_mo = True
+                    ao['DATA'] = self.g_to_spherical(ao['DATA'])
+                    ao['DATA'] = self.g_normalize(ao['DATA'])
+                    self.g_orbitals_converted_in_mo = True
 
 
-class Orca(Molden):
+class Orca(Molden, Converter):
 
     def __init__(self, f):
         super(Orca, self).__init__(f)
@@ -832,81 +920,32 @@ class Orca(Molden):
                     if l == 4:
                         primitive[1] *= sqrt(3)
 
-    def d_normalize(self, coefficient):
-        """
-        The following order of D functions is expected:
-            5D: D 0, D+1, D-1, D+2, D-2
-
-        P.S.
-        One historical CASINO inconsistency which may be easily overlooked:
-        Constant numerical factors in the real solid harmonics e.g. the '3' in the 3xy
-        d function, or '15' in the (15x^3-45^xy2) f function, may be premultiplied into
-        the orbital coefficients so that CASINO doesn't have to e.g. multiply by 3
-        every time it evaluates that particular d function. In practice the CASINO
-        orbital evaluators do this only for d functions, but *not for f and g* (this
-        may or may not be changed in the future if it can be done in a.
-        backwards-consistent way)
-        """
-        premultiplied_factor = (0.5, 3.0, 3.0, 3.0, 6.0)
-        return (coefficient[0] * m_dependent_factor(2,  0) * premultiplied_factor[0],
-                coefficient[1] * m_dependent_factor(2,  1) * premultiplied_factor[1],
-                coefficient[2] * m_dependent_factor(2, -1) * premultiplied_factor[2],
-                coefficient[3] * m_dependent_factor(2,  2) * premultiplied_factor[3],
-                coefficient[4] * m_dependent_factor(2, -2) * premultiplied_factor[4])
-
     def f_normalize(self, coefficient):
         """
-        The following order of F functions is expected:
-            7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
-
-        P.S. ORCA use slightly different sign conventions:
+        ORCA use slightly different sign conventions:
             F(+3)_ORCA = - F(+3)_MOLDEN
             F(-3)_ORCA = - F(-3)_MOLDEN
         """
-        return (coefficient[0] * m_dependent_factor(3,  0),
-                coefficient[1] * m_dependent_factor(3,  1),
-                coefficient[2] * m_dependent_factor(3, -1),
-                coefficient[3] * m_dependent_factor(3,  2),
-                coefficient[4] * m_dependent_factor(3, -2),
-                -coefficient[5] * m_dependent_factor(3,  3),
-                -coefficient[6] * m_dependent_factor(3, -3))
+        coefficient[5] *= -1
+        coefficient[6] *= -1
+        return super(Orca, self).f_normalize(coefficient)
 
     def g_normalize(self, coefficient):
         """
-        The following order of G functions is expected:
-            9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
-
-        P.S. ORCA use slightly different sign conventions:
+        ORCA use slightly different sign conventions:
             G(+3)_ORCA = - G(+3)_MOLDEN
             G(-3)_ORCA = - G(-3)_MOLDEN
             G(+4)_ORCA = - G(+4)_MOLDEN
             G(-4)_ORCA = - G(-4)_MOLDEN
         """
-        return (coefficient[0] * m_dependent_factor(4,  0),
-                coefficient[1] * m_dependent_factor(4,  1),
-                coefficient[2] * m_dependent_factor(4, -1),
-                coefficient[3] * m_dependent_factor(4,  2),
-                coefficient[4] * m_dependent_factor(4, -2),
-                -coefficient[5] * m_dependent_factor(4,  3),
-                -coefficient[6] * m_dependent_factor(4, -3),
-                -coefficient[7] * m_dependent_factor(4,  4),
-                -coefficient[8] * m_dependent_factor(4, -4))
-
-    def mo_matrix_converter(self):
-        """
-        Only mo_coefficients of d, f, g must be converted.
-        """
-        for orbital in self.mo_matrix:
-            for ao in orbital['MO']:
-                if ao['TYPE'] == 'd':
-                    ao['DATA'] = self.d_normalize(ao['DATA'])
-                elif ao['TYPE'] == 'f':
-                    ao['DATA'] = self.f_normalize(ao['DATA'])
-                elif ao['TYPE'] == 'g':
-                    ao['DATA'] = self.g_normalize(ao['DATA'])
+        coefficient[5] *= -1
+        coefficient[6] *= -1
+        coefficient[7] *= -1
+        coefficient[8] *= -1
+        return super(Orca, self).g_normalize(coefficient)
 
 
-class PSI4(Molden):
+class PSI4(Molden, Converter):
 
     def __init__(self, f):
         """
@@ -916,18 +955,31 @@ class PSI4(Molden):
         self.title = "generated from PSI4 output data.\n"
         self.mo_matrix_converter()
 
-    def mo_matrix_converter(self):
+    def molden_spherical_cartesian(self):
         """
-        Only mo_coefficients of d, f, g must be converted.
+        Check that D, F, G orbitals required conversion from cartesian to spherical as described in documentation:
+        Use the keyword [5D] on a separate line to specify the use of 'spherical' D and F functions
+        (5 D and 7 F functions). The default is to use 'cartesian' D and F functions (6 D and 10 F functions).
+        The enable the use of mixed spherical and cartesian function, the following keywords where added
+        ([5D10F], [7F] (6D en 7F), [5D7F], (same as[5D], for reasons of backwards compatibility).
+        Since molden 4.4 G-functions are also supported, default is cartesian G functions.
+        Use [9G] to specify spherical G functions.
+
+        Conversion required by default.
         """
-        for orbital in self.mo_matrix:
-            for ao in orbital['MO']:
-                if ao['TYPE'] == 'd':
-                    ao['DATA'] = self.d_normalize(ao['DATA'])
-                elif ao['TYPE'] == 'f':
-                    ao['DATA'] = self.f_normalize(ao['DATA'])
-                elif ao['TYPE'] == 'g':
-                    ao['DATA'] = self.g_normalize(ao['DATA'])
+        self.f.seek(0)
+        for line in self.f:
+            if line.startswith("[5d]"):
+                self.D_orb_conversion_required = False
+                self.F_orb_conversion_required = False
+            if line.startswith("[5d10f]"):
+                self.D_orb_conversion_required = False
+                self.F_orb_conversion_required = True
+            if line.startswith("[7f]"):
+                self.D_orb_conversion_required = True
+                self.F_orb_conversion_required = False
+            if line.startswith("[9g]"):
+                self.G_orb_conversion_required = False
 
 
 if __name__ == "__main__":
