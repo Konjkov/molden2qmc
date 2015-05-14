@@ -1,18 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.2.0'
+__version__ = '2.3.0'
 
 """
 TODO:
-1. implement TURBOMOLE.
-2. implement PP
-3. implement unrestricted
-4. implement cartesian->spherical conversion
+1. implement PP
+2. implement unrestricted
 """
 
 import os
-import sys
 from math import pi, sqrt, factorial, fabs
 from itertools import combinations
 
@@ -41,7 +38,7 @@ def smart_float(x):
 def whole_contraction_factor(primitives, l):
     """
     :param primitives: ((a_1, d_1), (a_2, d_2), ...)
-    :param l: orbital angular momentum
+    :param l: angular quantum number
 
     The normalization constant N_cont for the whole contraction (in which the
     contraction coefficient for the ith primitive is d_i, and the exponent is a_i)
@@ -59,30 +56,23 @@ def whole_contraction_factor(primitives, l):
     return 1/sqrt(s)
 
 
-def m_independent_factor_a(a, l):
+def m_independent_factor(a, l):
     """
-    The m-independent factors for the different shells (part a):
-             root[2^(l+3/2) * alpha^(l+3/2)]
-    N_prim = -------------------------------
-                    pi^(3/4)
+    :param a: alpha
+    :param l: angular quantum number
+
+    The m-independent factors for the different shells:
+             root[2^(l+3/2) * alpha^(l+3/2)]          2^l
+    N_prim = ------------------------------- * root --------
+                    pi^(3/4)                        (2l-1)!!
     """
-    return sqrt(2**(l + 1.5) * a**(l + 1.5))/pi**0.75
-
-
-def m_independent_factor_b(l):
-    """
-    The m-independent factors for the different shells (part b):
-
-           2^l
-    root --------
-         (2l-1)!!
-    """
-
-    return sqrt(2**l/fact2(2*l-1))
+    return sqrt(2**(l + 1.5) * a**(l + 1.5))/pi**0.75 * sqrt(2**l/fact2(2*l-1))
 
 
 def m_dependent_factor(l, m):
     """
+    :param l: angular quantum number
+    :param m: magnetic quantum number
     The m-dependent factors for the different shells:
 
            (2 - delta_m,0) * (l - |m|)!
@@ -98,6 +88,12 @@ def m_dependent_factor(l, m):
 
 
 class Converter(object):
+
+    def d_to_spherical(self, cartesian):
+        raise RuntimeWarning("Cartesian input is not expected. Check that"
+                             " the quantum chemistry code is selected correctly")
+
+    g_to_spherical = f_to_spherical = d_to_spherical
 
     def d_normalize(self, coefficient):
         """
@@ -156,10 +152,16 @@ class Converter(object):
         for orbital in self.mo_matrix:
             for ao in orbital['MO']:
                 if ao['TYPE'] == 'd':
+                    if self.D_orb_conversion_required:
+                        ao['DATA'] = self.d_to_spherical(ao['DATA'])
                     ao['DATA'] = self.d_normalize(ao['DATA'])
                 elif ao['TYPE'] == 'f':
+                    if self.F_orb_conversion_required:
+                        ao['DATA'] = self.f_to_spherical(ao['DATA'])
                     ao['DATA'] = self.f_normalize(ao['DATA'])
                 elif ao['TYPE'] == 'g':
+                    if self.G_orb_conversion_required:
+                        ao['DATA'] = self.g_to_spherical(ao['DATA'])
                     ao['DATA'] = self.g_normalize(ao['DATA'])
 
 
@@ -649,14 +651,12 @@ class Turbomole(Molden, Converter):
     """
     Turbomole 6.6
     """
-    title = "generated from Turbomole output data.\n"
 
     def __init__(self, f):
         super(Turbomole, self).__init__(f)
-        self.title = "generated from CFour output data.\n"
+        self.title = "generated from Turbomole output data.\n"
         self.atom_list_converter()
         self.mo_matrix_converter()
-
 
     def atom_list_converter(self):
         """
@@ -668,9 +668,113 @@ class Turbomole(Molden, Converter):
                 l = self.ang_momentum_map[shell['TYPE']]
                 w = whole_contraction_factor(shell['DATA'], l)
                 for primitive in shell['DATA']:
-                    primitive[1] *= (w *
-                                     m_independent_factor_a(primitive[0], l) *
-                                     m_independent_factor_b(l))
+                    primitive[1] *= w * m_independent_factor(primitive[0], l)
+
+    def d_to_spherical(self, cartesian):
+        """
+        Convert cartesian representation of d-orbital to spherical
+        http://theochem.github.io/horton/tut_gaussian_basis.html
+        The following order of D functions is expected:
+            5D: D 0, D+1, D-1, D+2, D-2
+            6D: xx, yy, zz, xy, xz, yz
+        """
+        xx, yy, zz, xy, xz, yz = cartesian
+
+        xx *= 2.0 / sqrt(3)
+        yy *= 2.0 / sqrt(3)
+        zz *= 2.0 / sqrt(3)
+
+        r2 = xx + yy + zz
+
+        zero = (3.0 * zz - r2) / 2.0
+        plus_1 = sqrt(3) * xz
+        minus_1 = sqrt(3) * yz
+        plus_2 = sqrt(3) * (xx - yy) / 2.0
+        minus_2 = sqrt(3) * xy
+        return zero, plus_1, minus_1, plus_2, minus_2
+
+    def f_to_spherical(self, cartesian):
+        """
+        Convert cartesian representation of f-orbital to spherical
+        http://theochem.github.io/horton/tut_gaussian_basis.html
+        The following order of F functions is expected:
+            7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
+            10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
+        """
+        xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz = cartesian
+
+        xxy *= 2.0 / sqrt(3)
+        xxz *= 2.0 / sqrt(3)
+        xyy *= 2.0 / sqrt(3)
+        yyz *= 2.0 / sqrt(3)
+        xzz *= 2.0 / sqrt(3)
+        yzz *= 2.0 / sqrt(3)
+
+        xxx *= 6.0 / sqrt(15)
+        yyy *= 6.0 / sqrt(15)
+        zzz *= 6.0 / sqrt(15)
+
+        xr2 = xxx + xyy + xzz
+        yr2 = xxy + yyy + yzz
+        zr2 = xxz + yyz + zzz
+
+        zero = (5.0 * zzz - 3.0 * zr2) / 2.0
+        plus_1 = sqrt(6) * (5.0 * xzz - xr2) / 4.0
+        minus_1 = sqrt(6) * (5.0 * yzz - yr2) / 4.0
+        plus_2 = sqrt(15) * (xxz - yyz) / 2.0
+        minus_2 = sqrt(15) * xyz
+        plus_3 = sqrt(10) * (xxx - 3.0 * xyy) / 4.0
+        minus_3 = sqrt(10) * (3.0 * xxy - yyy) / 4.0
+        return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3
+
+    def g_to_spherical(self, cartesian):
+        """
+        Convert cartesian representation of g-orbital to spherical
+        http://theochem.github.io/horton/tut_gaussian_basis.html
+        The following order of G functions is expected:
+            9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
+            15G: xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
+                 xxyy xxzz yyzz xxyz yyxz zzxy
+        """
+        xxxx, yyyy, zzzz, xxxy, xxxz, yyyx, yyyz, zzzx, zzzy, xxyy, xxzz, yyzz, xxyz, yyxz, zzxy = cartesian
+
+        xxyz *= 2.0 / sqrt(3)
+        yyxz *= 2.0 / sqrt(3)
+        zzxy *= 2.0 / sqrt(3)
+
+        xxyy *= 4.0 / 3.0
+        xxzz *= 4.0 / 3.0
+        yyzz *= 4.0 / 3.0
+
+        xxxy *= 6.0 / sqrt(15)
+        xxxz *= 6.0 / sqrt(15)
+        yyyx *= 6.0 / sqrt(15)
+        yyyz *= 6.0 / sqrt(15)
+        zzzx *= 6.0 / sqrt(15)
+        zzzy *= 6.0 / sqrt(15)
+
+        xxxx *= 24.0 / sqrt(105)
+        yyyy *= 24.0 / sqrt(105)
+        zzzz *= 24.0 / sqrt(105)
+
+        xyr2 = xxxy + yyyx + zzxy
+        xzr2 = xxxz + yyxz + zzzx
+        yzr2 = xxyz + yyyz + zzzy
+        x2r2 = xxxx + xxyy + xxzz
+        y2r2 = xxyy + yyyy + yyzz
+        z2r2 = xxzz + yyzz + zzzz
+        r4 = xxxx + yyyy + zzzz + 2.0 * (xxyy + xxzz + yyzz)
+
+        zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0
+        plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0
+        minus_1 = sqrt(10) * (7.0 * zzzy - 3.0 * yzr2) / 4.0
+        plus_2 = sqrt(5) * (7.0 * (xxzz - yyzz) - (x2r2 - y2r2)) / 4.0
+        minus_2 = sqrt(5) * (7.0 * zzxy - xyr2) / 2.0
+        plus_3 = sqrt(70) * (xxxz - 3.0 * yyxz) / 4.0
+        minus_3 = sqrt(70) * (3.0 * xxyz - yyyz) / 4.0
+        plus_4 = sqrt(35) * (xxxx - 6.0 * xxyy + yyyy) / 8.0
+        minus_4 = sqrt(35) * (xxxy - yyyx) / 2.0
+        return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3, plus_4, minus_4
 
 
 class CFour(Molden, Converter):
@@ -762,17 +866,17 @@ class CFour(Molden, Converter):
         else:
             xx, yy, zz, xy, xz, yz = cartesian
 
-        xx *= 2.0
-        yy *= 2.0
-        zz *= 2.0
+        xx *= 2.0 / sqrt(3)
+        yy *= 2.0 / sqrt(3)
+        zz *= 2.0 / sqrt(3)
 
         r2 = xx + yy + zz
 
-        zero = (3.0 * zz - r2) / 2.0             / sqrt(3)
-        plus_1 = sqrt(3) * xz                    / sqrt(3)
-        minus_1 = sqrt(3) * yz                   / sqrt(3)
-        plus_2 = sqrt(3) * (xx - yy) / 2.0       / sqrt(3)
-        minus_2 = sqrt(3) * xy                   / sqrt(3)
+        zero = (3.0 * zz - r2) / 2.0
+        plus_1 = sqrt(3) * xz
+        minus_1 = sqrt(3) * yz
+        plus_2 = sqrt(3) * (xx - yy) / 2.0
+        minus_2 = sqrt(3) * xy
         return zero, plus_1, minus_1, plus_2, minus_2
 
     def f_to_spherical(self, cartesian):
@@ -788,28 +892,28 @@ class CFour(Molden, Converter):
         else:
             xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz = cartesian
 
-        xxy *= 2.0
-        xxz *= 2.0
-        xyy *= 2.0
-        yyz *= 2.0
-        xzz *= 2.0
-        yzz *= 2.0
+        xxy *= 2.0 / sqrt(15)
+        xxz *= 2.0 / sqrt(15)
+        xyy *= 2.0 / sqrt(15)
+        yyz *= 2.0 / sqrt(15)
+        xzz *= 2.0 / sqrt(15)
+        yzz *= 2.0 / sqrt(15)
 
-        xxx *= 6.0
-        yyy *= 6.0
-        zzz *= 6.0
+        xxx *= 6.0 / sqrt(15)
+        yyy *= 6.0 / sqrt(15)
+        zzz *= 6.0 / sqrt(15)
 
         xr2 = xxx + xyy + xzz
         yr2 = xxy + yyy + yzz
         zr2 = xxz + yyz + zzz
 
-        zero = (5.0 * zzz - 3.0 * zr2) / 2.0          / sqrt(15)
-        plus_1 = sqrt(6) * (5.0 * xzz - xr2) / 4.0    / sqrt(15)
-        minus_1 = sqrt(6) * (5.0 * yzz - yr2) / 4.0   / sqrt(15)
-        plus_2 = sqrt(15) * (xxz - yyz) / 2.0         / sqrt(15)
-        minus_2 = sqrt(15) * xyz                      / sqrt(15)
-        plus_3 = sqrt(10) * (xxx - 3.0 * xyy) / 4.0   / sqrt(15)
-        minus_3 = sqrt(10) * (3.0 * xxy - yyy) / 4.0  / sqrt(15)
+        zero = (5.0 * zzz - 3.0 * zr2) / 2.0
+        plus_1 = sqrt(6) * (5.0 * xzz - xr2) / 4.0
+        minus_1 = sqrt(6) * (5.0 * yzz - yr2) / 4.0
+        plus_2 = sqrt(15) * (xxz - yyz) / 2.0
+        minus_2 = sqrt(15) * xyz
+        plus_3 = sqrt(10) * (xxx - 3.0 * xyy) / 4.0
+        minus_3 = sqrt(10) * (3.0 * xxy - yyy) / 4.0
         return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3
 
     def g_to_spherical(self, cartesian):
@@ -826,24 +930,24 @@ class CFour(Molden, Converter):
         """
         xxxx, xxxy, xxxz, xxyy, xxyz, xxzz, yyyx, yyxz, zzxy, zzzx, yyyy, yyyz, yyzz, zzzy, zzzz = cartesian
 
-        xxyz *= 2.0
-        yyxz *= 2.0
-        zzxy *= 2.0
+        xxyz *= 2.0 / sqrt(105)
+        yyxz *= 2.0 / sqrt(105)
+        zzxy *= 2.0 / sqrt(105)
 
-        xxyy *= 4.0
-        xxzz *= 4.0
-        yyzz *= 4.0
+        xxyy *= 4.0 / sqrt(105)
+        xxzz *= 4.0 / sqrt(105)
+        yyzz *= 4.0 / sqrt(105)
 
-        xxxy *= 6.0
-        xxxz *= 6.0
-        yyyx *= 6.0
-        yyyz *= 6.0
-        zzzx *= 6.0
-        zzzy *= 6.0
+        xxxy *= 6.0 / sqrt(105)
+        xxxz *= 6.0 / sqrt(105)
+        yyyx *= 6.0 / sqrt(105)
+        yyyz *= 6.0 / sqrt(105)
+        zzzx *= 6.0 / sqrt(105)
+        zzzy *= 6.0 / sqrt(105)
 
-        xxxx *= 24.0
-        yyyy *= 24.0
-        zzzz *= 24.0
+        xxxx *= 24.0 / sqrt(105)
+        yyyy *= 24.0 / sqrt(105)
+        zzzz *= 24.0 / sqrt(105)
 
         xyr2 = xxxy + yyyx + zzxy
         xzr2 = xxxz + yyxz + zzzx
@@ -853,15 +957,15 @@ class CFour(Molden, Converter):
         z2r2 = xxzz + yyzz + zzzz
         r4 = xxxx + yyyy + zzzz + 2.0 * (xxyy + xxzz + yyzz)
 
-        zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0            / sqrt(105)
-        plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0            / sqrt(105)
-        minus_1 = sqrt(10) * (7.0 * zzzy - 3.0 * yzr2) / 4.0           / sqrt(105)
-        plus_2 = sqrt(5) * (7.0 * (xxzz - yyzz) - (x2r2 - y2r2)) / 4.0 / sqrt(105)
-        minus_2 = sqrt(5) * (7.0 * zzxy - xyr2) / 2.0                  / sqrt(105)
-        plus_3 = sqrt(70) * (xxxz - 3.0 * yyxz) / 4.0                  / sqrt(105)
-        minus_3 = sqrt(70) * (3.0 * xxyz - yyyz) / 4.0                 / sqrt(105)
-        plus_4 = sqrt(35) * (xxxx - 6.0 * xxyy + yyyy) / 8.0           / sqrt(105)
-        minus_4 = sqrt(35) * (xxxy - yyyx) / 2.0                       / sqrt(105)
+        zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0
+        plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0
+        minus_1 = sqrt(10) * (7.0 * zzzy - 3.0 * yzr2) / 4.0
+        plus_2 = sqrt(5) * (7.0 * (xxzz - yyzz) - (x2r2 - y2r2)) / 4.0
+        minus_2 = sqrt(5) * (7.0 * zzxy - xyr2) / 2.0
+        plus_3 = sqrt(70) * (xxxz - 3.0 * yyxz) / 4.0
+        minus_3 = sqrt(70) * (3.0 * xxyz - yyyz) / 4.0
+        plus_4 = sqrt(35) * (xxxx - 6.0 * xxyy + yyyy) / 8.0
+        minus_4 = sqrt(35) * (xxxy - yyyx) / 2.0
         return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3, plus_4, minus_4
 
     def atom_list_converter(self):
@@ -874,9 +978,7 @@ class CFour(Molden, Converter):
                 l = self.ang_momentum_map[shell['TYPE']]
                 w = whole_contraction_factor(shell['DATA'], l)
                 for primitive in shell['DATA']:
-                    primitive[1] *= (w *
-                                     m_independent_factor_a(primitive[0], l) *
-                                     m_independent_factor_b(l))
+                    primitive[1] *= w * m_independent_factor(primitive[0], l)
 
     def mo_matrix_converter(self):
         """
@@ -911,6 +1013,7 @@ class Orca(Molden, Converter):
 
         's', 'p' orbitals don't require normalization.
         'g' orbitals need to be additionally scaled up by a factor of sqrt(3).
+        https://orcaforum.cec.mpg.de/viewtopic.php?f=8&t=1484
         """
         for atom in self.atom_list:
             for shell in atom['SHELLS']:
@@ -957,15 +1060,8 @@ class PSI4(Molden, Converter):
 
     def molden_spherical_cartesian(self):
         """
-        Check that D, F, G orbitals required conversion from cartesian to spherical as described in documentation:
-        Use the keyword [5D] on a separate line to specify the use of 'spherical' D and F functions
-        (5 D and 7 F functions). The default is to use 'cartesian' D and F functions (6 D and 10 F functions).
-        The enable the use of mixed spherical and cartesian function, the following keywords where added
-        ([5D10F], [7F] (6D en 7F), [5D7F], (same as[5D], for reasons of backwards compatibility).
-        Since molden 4.4 G-functions are also supported, default is cartesian G functions.
-        Use [9G] to specify spherical G functions.
-
-        Conversion required by default.
+        PSI4 use lowercase letters instead of capital.
+        https://github.com/psi4/psi4public/issues/95
         """
         self.f.seek(0)
         for line in self.f:
@@ -985,31 +1081,32 @@ class PSI4(Molden, Converter):
 if __name__ == "__main__":
     print ("Hello, you are converting a MOLDEN file to a CASINO gwfn.data file.\n")
 
-    output_file = raw_input("Enter the name of your MOLDEN file: ")
-
-    while not os.path.exists(str(output_file)):
+    while True:
+        input_file_name = raw_input("Enter the name of your MOLDEN file: ")
+        if os.path.exists(str(input_file_name)):
+            break
         print "File not found..."
-        output_file = raw_input("Enter the name of your MOLDEN file: ")
 
-    f = open(str(output_file), "r")
+    input_file = open(str(input_file_name), "r")
 
-    code = int(raw_input("\n"
+    code = raw_input("\n"
                          "Enter the NUMBER corresponding to the quantum chemistry code used to produce this MOLDEN file:\n"
-                         "0 -- MOLPRO or TURBOMOLE\n"
+                         "0 -- TURBOMOLE\n"
                          "1 -- PSI4\n"
                          "2 -- C4\n"
-                         "3 -- ORCA\n"))
-    while code > 3:
-        code = int(raw_input('Sorry,  try again.'))
+                         "3 -- ORCA\n")
+    while not code.isdigit() or int(code) > 3:
+        code = raw_input('Sorry,  try again.')
 
+    code = int(code)
     print "You have entered NUMBER ", code, "\n"
 
-    g = open('gwfn.data', 'w')
+    output_file = open('gwfn.data', 'w')
     if code == 0:
-        Turbomole(f).gwfn(g)
+        Turbomole(input_file).gwfn(output_file)
     elif code == 1:
-        PSI4(f).gwfn(g)
+        PSI4(input_file).gwfn(output_file)
     elif code == 2:
-        CFour(f).gwfn(g)
+        CFour(input_file).gwfn(output_file)
     elif code == 3:
-        Orca(f).gwfn(g)
+        Orca(input_file).gwfn(output_file)
