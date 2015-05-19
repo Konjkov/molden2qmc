@@ -1,17 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.3.0'
+__version__ = '2.4.0'
 
 """
 TODO:
-1. implement PP
-2. implement unrestricted
+1. implement Dalton 2015
+2. implement Nwchem
 """
 
 import os
 from math import pi, sqrt, factorial, fabs
 from itertools import combinations
+from operator import itemgetter
 
 
 def fact2(k):
@@ -43,6 +44,7 @@ class Molden(object):
          'X': <x-coordinate>,
          'Y': <y-coordinate>,
          'Z': <z-coordinate>,
+         'pseudoatom': <True|False>,
          'SHELLS': [{'TYPE': <'s', 'p', 'd', ...>,
                      'DATA': [[exponent_primitive_1, contraction_coefficient_1],
                               [exponent_primitive_2, contraction_coefficient_2],
@@ -93,11 +95,12 @@ class Molden(object):
         self.D_orb_conversion_required = True  # Conversion D orbitals Cartesian -> Spherical required
         self.F_orb_conversion_required = True  # Conversion F orbitals Cartesian -> Spherical required
         self.G_orb_conversion_required = True  # Conversion G orbitals Cartesian -> Spherical required
-        self.pseudo_used = False  # PP used
+        self.spin_unrestricted = False  # RHF or UHF
         self.atom_list = []
         self.mo_matrix = []
         self.f = f
         self.molden_atoms()
+        self.molden_pseudo()
         self.molden_gto()
         self.molden_mo()
 
@@ -140,6 +143,31 @@ class Molden(object):
                         'Y': float(splited_line[4]),
                         'Z': float(splited_line[5])}
             self.atom_list.append(atom)
+
+    def molden_pseudo(self):
+        """
+        set pseudopotential for atoms
+        """
+        pseudo_used = raw_input("This script did not detect if a pseudopotential was used.\n"
+                                "Please eneter the list of atoms for thouse pseudopotential was used:\n\n"
+                                "none = a pseudopotential was not used for any atoms in this calculation.\n"
+                                "all = a pseudopotential was used for all atoms in this calculation.\n"
+                                "white space separated numbers = number of pseudoaotms (started from 1).\n\n").lower()
+
+        print "You have entered ", pseudo_used, "\n"
+
+        if pseudo_used == "none":
+            for atom in self.atom_list:
+                atom['pseudoatom'] = False
+        elif pseudo_used == "all":
+            for atom in self.atom_list:
+                atom['pseudoatom'] = True
+        else:
+            for i, atom in enumerate(self.atom_list):
+                if str(i + 1) in pseudo_used.split():
+                    atom['pseudoatom'] = True
+                else:
+                    atom['pseudoatom'] = False
 
     def molden_gto(self):
         """
@@ -231,51 +259,60 @@ class Molden(object):
                          'f': 10 if self.F_orb_conversion_required else 7,
                          'g': 15 if self.G_orb_conversion_required else 9}
 
-        nbasis_functions = 0
+        nbasis_functions = 0  # not converted to spherical basis functions
         for atom in self.atom_list:
             for shell in atom['SHELLS']:
                     nbasis_functions += mo_length_map[shell['TYPE']]
 
         section_body = self.molden_section("MO")[1:]
-        for nmo in xrange(self.nbasis_functions()):
-            offset = nmo*(nbasis_functions+4)
-            mo_orbital_block = {'SYMMETRY': section_body[offset].split()[1],
-                                'ENERGY': float(section_body[offset+1].split()[1]),
-                                'SPIN': section_body[offset+2].split()[1],
-                                'OCCUPATION': float(section_body[offset+3].split()[1]),
-                                'MO': []}
-            offset += 4
-            for atom in self.atom_list:
-                for shell in atom['SHELLS']:
-                    shell_length = mo_length_map[shell['TYPE']]
-                    ao = {'TYPE': shell['TYPE'],
-                          'DATA': [float(mo.split()[1]) for mo in section_body[offset:offset+shell_length]]}
-                    mo_orbital_block['MO'].append(ao)
-                    offset += shell_length
-            self.mo_matrix.append(mo_orbital_block)
+        # TODO: to be refactored
+        self.spin_unrestricted = bool(sum(line.find('Beta')+1 for line in section_body))
 
-    def valence_charge(self, atomic_number):
+        for spin in xrange(int(self.spin_unrestricted)+1):  # total spin-states
+            for nmo in xrange(self.nbasis_functions()):     # MO-orbitals in each spin-state
+                offset = (nmo + self.nbasis_functions() * spin) * (nbasis_functions + 4)
+                mo_orbital_block = {'SYMMETRY': section_body[offset].split()[1],
+                                    'ENERGY': float(section_body[offset+1].split()[1]),
+                                    'SPIN': section_body[offset+2].split('=')[1],
+                                    'OCCUPATION': float(section_body[offset+3].split()[1]),
+                                    'MO': []}
+                offset += 4
+                for atom in self.atom_list:
+                    for shell in atom['SHELLS']:
+                        shell_length = mo_length_map[shell['TYPE']]
+                        ao = {'TYPE': shell['TYPE'],
+                              'DATA': [float(mo.split()[1]) for mo in section_body[offset:offset+shell_length]]}
+                        mo_orbital_block['MO'].append(ao)
+                        offset += shell_length
+                self.mo_matrix.append(mo_orbital_block)
+
+    def charge(self, atom):
         """
-        legacy code, to be removed.
-        :returns: number of valence electrons for atom with atomic number
+        :returns: valence charge of atom.
         """
-        if self.pseudo_used:
-            if atomic_number <= 2:
-                return atomic_number
-            elif atomic_number <= 10:
-                return atomic_number - 2
-            elif atomic_number <= 18:
-                return atomic_number - 10
-            elif atomic_number <= 36:
-                return atomic_number - 18
-            elif atomic_number <= 54:
-                return atomic_number - 36
-            elif atomic_number <= 86:
-                return atomic_number - 54
+        if atom['pseudoatom']:
+            if atom['N'] <= 2:     # H-He
+                return atom['N']
+            elif atom['N'] <= 10:  # Li-Ne
+                return atom['N'] - 2
+            elif atom['N'] <= 18:  # Na-Ar
+                return atom['N'] - 10
+            elif atom['N'] <= 26:  # K-Zn
+                return atom['N'] - 18
+            elif atom['N'] <= 36:  # Ga-Kr
+                return atom['N'] - 28
+            elif atom['N'] <= 48:  # Rb-Cd
+                return atom['N'] - 36
+            elif atom['N'] <= 54:  # In-Xe
+                return atom['N'] - 46
+            elif atom['N'] <= 71:  # Cs-Lu
+                return atom['N'] - 54
+            elif atom['N'] <= 80:  # Hf-Hg
+                return atom['N'] - 68
             else:
-                raise NotImplementedError("If you're crazy enough to try QMC on this, you can update this script.")
+                raise NotImplementedError("AREP Trail & Needs PP didn't support elements after Hg")
         else:
-            return atomic_number
+            return atom['N']
 
     def natom(self):
         """
@@ -326,12 +363,6 @@ class Molden(object):
                 result = max(result, self.ang_momentum_map[shell['TYPE']] + 1)
         return result
 
-    def spin_unrestricted(self):
-        """
-        :returns: if wave function unrestricted
-        """
-        return reduce(bool.__or__, (orbital['SPIN'] == 'Beta' for orbital in self.mo_matrix), False)
-
     def distance(self, atom1, atom2):
         """
         :returns: distance between atoms
@@ -344,7 +375,7 @@ class Molden(object):
         """
         :returns: n-n repulsion energy
         """
-        return sum(atom1['N'] * atom2['N']/self.distance(atom1, atom2)
+        return sum(self.charge(atom1) * self.charge(atom2)/self.distance(atom1, atom2)
                    for atom1, atom2 in combinations(self.atom_list, 2))
 
     def gwfn(self, g):
@@ -388,7 +419,7 @@ class Molden(object):
                 "Number of electrons per primitive cell:\n"
                 "          %s\n"
                 "\n") % (__version__,
-                         '.true.' if self.spin_unrestricted() else '.false.',
+                         '.true.' if self.spin_unrestricted else '.false.',
                          self.nuclear_repulsion()/self.natom(),
                          int(self.nelec()))
 
@@ -409,13 +440,16 @@ class Molden(object):
         for num, atom in enumerate(self.atom_list):
             if num % 8 == 0:
                 result += "\n"
-            result += "%10d" % atom['N']
+            if atom['pseudoatom']:
+                result += "%10d" % (atom['N'] + 200)
+            else:
+                result += "%10d" % atom['N']
 
         result += '\nValence charges for each atom:'
         for num, atom in enumerate(self.atom_list):
             if num % 4 == 0:
                 result += "\n"
-            result += " %1.13E" % self.valence_charge(atom['N'])
+            result += " %1.13E" % self.charge(atom)
 
         return result + "\n\n"
 
@@ -504,14 +538,14 @@ class Molden(object):
 
     def gwfn_orbital_coefficients(self):
         """
-        :returns: ORBITAL COEFFICIENTS section of gwfn.data file
+        :returns: ORBITAL COEFFICIENTS section of gwfn.data file, sorted by ('SPIN', 'ENERGY')
         """
         result = ("ORBITAL COEFFICIENTS\n"
                   "------------------------")
 
         # (Number of basis functions) ** 2 coefficients
         num = 0
-        for orbital in self.mo_matrix:
+        for orbital in sorted(self.mo_matrix, key=itemgetter('SPIN', 'ENERGY')):
             for ao in orbital['MO']:
                 for coefficient in ao['DATA']:
                     if num % 4 == 0:
@@ -797,7 +831,10 @@ class CFour(DefaultConverter):
         """
         in CFOUR occupation number sometimes takes value from list (0, 1)
         """
-        return 2 * super(CFour, self).nelec()
+        if self.spin_unrestricted:
+            return super(CFour, self).nelec()
+        else:
+            return 2 * super(CFour, self).nelec()
 
     def d_to_spherical(self, cartesian):
         """
@@ -995,7 +1032,7 @@ if __name__ == "__main__":
                      "2 -- CFOUR 2.0beta\n"
                      "3 -- ORCA 3.X\n")
                      # "4 -- DALTON2013\n")
-    while not code.isdigit() or int(code) > 4:
+    while not code.isdigit() or int(code) > 3:
         code = raw_input('Sorry,  try again.')
 
     code = int(code)
