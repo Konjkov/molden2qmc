@@ -152,7 +152,7 @@ class Molden(object):
                                 "Please eneter the list of atoms for thouse pseudopotential was used:\n\n"
                                 "none = a pseudopotential was not used for any atoms in this calculation.\n"
                                 "all = a pseudopotential was used for all atoms in this calculation.\n"
-                                "white space separated numbers = number of pseudoaotms (started from 1).\n\n").lower()
+                                "white space separated numbers = number of pseudoatoms (started from 1).\n\n").lower()
 
         print "You have entered ", pseudo_used, "\n"
 
