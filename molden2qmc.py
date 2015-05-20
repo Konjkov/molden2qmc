@@ -806,7 +806,7 @@ class Turbomole(DefaultConverter):
         x2r2 = xxxx + xxyy + xxzz
         y2r2 = xxyy + yyyy + yyzz
         z2r2 = xxzz + yyzz + zzzz
-        r4 = xxxx + yyyy + zzzz + 2.0 * (xxyy + xxzz + yyzz)
+        r4 = x2r2 + y2r2 + z2r2
 
         zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0
         plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0
