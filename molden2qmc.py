@@ -378,18 +378,17 @@ class Molden(object):
         return sum(self.charge(atom1) * self.charge(atom2)/self.distance(atom1, atom2)
                    for atom1, atom2 in combinations(self.atom_list, 2))
 
-    def gwfn(self, g):
+    def gwfn(self):
         """
         write out gwfn.data file
-
-        :param g: file descriptor in gwfn.data file
         """
-        g.write(self.gwfn_title())
-        g.write(self.gwfn_basic_info())
-        g.write(self.gwfn_geometry())
-        g.write(self.gwfn_basis_set())
-        g.write(self.gwfn_multideterminant_information())
-        g.write(self.gwfn_orbital_coefficients())
+        gwfn = open('gwfn.data', 'w')
+        gwfn.write(self.gwfn_title())
+        gwfn.write(self.gwfn_basic_info())
+        gwfn.write(self.gwfn_geometry())
+        gwfn.write(self.gwfn_basis_set())
+        gwfn.write(self.gwfn_multideterminant_information())
+        gwfn.write(self.gwfn_orbital_coefficients())
 
     def gwfn_title(self):
         """
@@ -455,7 +454,7 @@ class Molden(object):
 
     def gwfn_basis_set(self):
         """
-        :returns: GEOMETRY section of gwfn.data file
+        :returns: BASIS SET section of gwfn.data file
         """
         result = ("BASIS SET\n"
                   "---------\n"
@@ -935,7 +934,7 @@ class CFour(DefaultConverter):
         x2r2 = xxxx + xxyy + xxzz
         y2r2 = xxyy + yyyy + yyzz
         z2r2 = xxzz + yyzz + zzzz
-        r4 = xxxx + yyyy + zzzz + 2.0 * (xxyy + xxzz + yyzz)
+        r4 = x2r2 + y2r2 + z2r2
 
         zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0
         plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0
@@ -1038,14 +1037,13 @@ if __name__ == "__main__":
     code = int(code)
     print "You have entered NUMBER ", code, "\n"
 
-    output_file = open('gwfn.data', 'w')
     if code == 0:
-        Turbomole(input_file).gwfn(output_file)
+        Turbomole(input_file).gwfn()
     elif code == 1:
-        PSI4(input_file).gwfn(output_file)
+        PSI4(input_file).gwfn()
     elif code == 2:
-        CFour(input_file).gwfn(output_file)
+        CFour(input_file).gwfn()
     elif code == 3:
-        Orca(input_file).gwfn(output_file)
+        Orca(input_file).gwfn()
     elif code == 4:
-        Dalton(input_file).gwfn(output_file)
+        Dalton(input_file).gwfn()
