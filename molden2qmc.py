@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.4.0'
+__version__ = '2.4.1'
 
 """
 TODO:
@@ -420,7 +420,7 @@ class Molden(object):
                 "\n") % (__version__,
                          '.true.' if self.spin_unrestricted else '.false.',
                          self.nuclear_repulsion()/self.natom(),
-                         int(self.nelec()))
+                         int(round(self.nelec())))
 
     def gwfn_geometry(self):
         """
