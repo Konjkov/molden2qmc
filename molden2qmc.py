@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.4.1'
+__version__ = '2.5.0'
 
 """
 TODO:
@@ -86,16 +86,18 @@ class Molden(object):
     ang_momentum_map = {'s': 0, 'p': 1, 'd': 2, 'f': 3, 'g': 4, 'sp': 1}
     title = "Insert Your Title Here\n"
 
-    def __init__(self, f):
+    def __init__(self, f, pseudoatoms="none"):
         """ Create instance that represent MOLDEN file data
         http://www.cmbi.ru.nl/molden/molden_format.html
 
         :param f: file descriptor of MOLDEN file
+        :param pseudoatoms: list of pseudoatoms (none, all or white space separated numbers)
         """
         self.D_orb_conversion_required = True  # Conversion D orbitals Cartesian -> Spherical required
         self.F_orb_conversion_required = True  # Conversion F orbitals Cartesian -> Spherical required
         self.G_orb_conversion_required = True  # Conversion G orbitals Cartesian -> Spherical required
         self.spin_unrestricted = False  # RHF or UHF
+        self.pseudoatoms = pseudoatoms
         self.atom_list = []
         self.mo_matrix = []
         self.f = f
@@ -110,6 +112,7 @@ class Molden(object):
         """
         self.f.seek(0)
         line = self.f.readline()
+        # CFOUR requires case insensitive comparition
         while line and not line.upper().startswith("[%s]" % section_name.upper()):
             line = self.f.readline()
         result = [line]
@@ -148,23 +151,16 @@ class Molden(object):
         """
         set pseudopotential for atoms
         """
-        pseudo_used = raw_input("This script did not detect if a pseudopotential was used.\n"
-                                "Please eneter the list of atoms for thouse pseudopotential was used:\n\n"
-                                "none = a pseudopotential was not used for any atoms in this calculation.\n"
-                                "all = a pseudopotential was used for all atoms in this calculation.\n"
-                                "white space separated numbers = number of pseudoatoms (started from 1).\n\n").lower()
 
-        print "You have entered ", pseudo_used, "\n"
-
-        if pseudo_used == "none":
+        if self.pseudoatoms == "none":
             for atom in self.atom_list:
                 atom['pseudoatom'] = False
-        elif pseudo_used == "all":
+        elif self.pseudoatoms == "all":
             for atom in self.atom_list:
                 atom['pseudoatom'] = True
         else:
             for i, atom in enumerate(self.atom_list):
-                if str(i + 1) in pseudo_used.split():
+                if str(i + 1) in self.pseudoatoms.split():
                     atom['pseudoatom'] = True
                 else:
                     atom['pseudoatom'] = False
@@ -217,7 +213,7 @@ class Molden(object):
         """
         self.f.seek(0)
         for line in self.f:
-            line = line.upper()
+            line = line.upper()  # PSI4 requires case insensitive comparition
             if line.startswith("[5D]") or line.startswith("[5D7F]"):
                 self.D_orb_conversion_required = False
                 self.F_orb_conversion_required = False
@@ -562,8 +558,8 @@ class DefaultConverter(Molden):
     in a spherical format and only m-dependent normalisation required.
     """
 
-    def __init__(self, f):
-        super(DefaultConverter, self).__init__(f)
+    def __init__(self, f, pseudoatoms="none"):
+        super(DefaultConverter, self).__init__(f, pseudoatoms)
         self.atom_list_converter()
         self.mo_matrix_converter()
 
@@ -1029,21 +1025,31 @@ if __name__ == "__main__":
                      "0 -- TURBOMOLE\n"
                      "1 -- PSI4\n"
                      "2 -- CFOUR 2.0beta\n"
-                     "3 -- ORCA 3.X\n")
-                     # "4 -- DALTON2013\n")
-    while not code.isdigit() or int(code) > 3:
+                     "3 -- ORCA 3.X\n"
+                     "4 -- DALTON2013\n")
+    while not code.isdigit() or int(code) > 4:
         code = raw_input('Sorry,  try again.')
 
     code = int(code)
     print "You have entered NUMBER ", code, "\n"
 
+    pseudoatoms = raw_input("This script did not detect if a pseudopotential was used.\n"
+                            "Please eneter the list of atoms for thouse pseudopotential was used:\n\n"
+                            "none = a pseudopotential was not used for any atoms in this calculation.\n"
+                            "all = a pseudopotential was used for all atoms in this calculation.\n"
+                            "white space separated numbers = number of pseudoatoms (started from 1).\n\n").lower()
+
+    print "You have entered ", pseudoatoms, "\n"
+
     if code == 0:
-        Turbomole(input_file).gwfn()
+        Turbomole(input_file, pseudoatoms).gwfn()
     elif code == 1:
-        PSI4(input_file).gwfn()
+        PSI4(input_file, pseudoatoms).gwfn()
     elif code == 2:
-        CFour(input_file).gwfn()
+        CFour(input_file, pseudoatoms).gwfn()
     elif code == 3:
-        Orca(input_file).gwfn()
+        Orca(input_file, pseudoatoms).gwfn()
     elif code == 4:
-        Dalton(input_file).gwfn()
+        Dalton(input_file, pseudoatoms).gwfn()
+        print ("In Dalton's MOLDEN file all occupation numbers of HF and DFT MOs are zero values by mistake\n"
+               "So you should correct 'Number of electrons per primitive cell' in gwfn.data file by hand.")
