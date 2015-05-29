@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.5.0'
+__version__ = '2.5.1'
 
 """
 TODO:
-1. implement Dalton 2015
+1. implement Dalton 2013/2015
 2. implement Nwchem
 """
 
@@ -44,7 +44,7 @@ class Molden(object):
          'X': <x-coordinate>,
          'Y': <y-coordinate>,
          'Z': <z-coordinate>,
-         'pseudoatom': <True|False>,
+         'pseudo': <True|False>,
          'SHELLS': [{'TYPE': <'s', 'p', 'd', ...>,
                      'DATA': [[exponent_primitive_1, contraction_coefficient_1],
                               [exponent_primitive_2, contraction_coefficient_2],
@@ -112,7 +112,7 @@ class Molden(object):
         """
         self.f.seek(0)
         line = self.f.readline()
-        # CFOUR requires case insensitive comparition
+        # CFOUR requires case insensitive comparison
         while line and not line.upper().startswith("[%s]" % section_name.upper()):
             line = self.f.readline()
         result = [line]
@@ -134,17 +134,17 @@ class Molden(object):
         section_body = section[1:]
 
         for line in section_body:
-            splited_line = line.split()
+            split_line = line.split()
             if section_header.split()[1] == 'Angs':
-                atom = {'N': int(splited_line[2]),  # atomic number
-                        'X': float(splited_line[3]) * self.Ang2Bohr,
-                        'Y': float(splited_line[4]) * self.Ang2Bohr,
-                        'Z': float(splited_line[5]) * self.Ang2Bohr}
+                atom = {'N': int(split_line[2]),  # atomic number
+                        'X': float(split_line[3]) * self.Ang2Bohr,
+                        'Y': float(split_line[4]) * self.Ang2Bohr,
+                        'Z': float(split_line[5]) * self.Ang2Bohr}
             else:
-                atom = {'N': int(splited_line[2]),  # atomic number
-                        'X': float(splited_line[3]),
-                        'Y': float(splited_line[4]),
-                        'Z': float(splited_line[5])}
+                atom = {'N': int(split_line[2]),  # atomic number
+                        'X': float(split_line[3]),
+                        'Y': float(split_line[4]),
+                        'Z': float(split_line[5])}
             self.atom_list.append(atom)
 
     def molden_pseudo(self):
@@ -154,16 +154,16 @@ class Molden(object):
 
         if self.pseudoatoms == "none":
             for atom in self.atom_list:
-                atom['pseudoatom'] = False
+                atom['pseudo'] = False
         elif self.pseudoatoms == "all":
             for atom in self.atom_list:
-                atom['pseudoatom'] = True
+                atom['pseudo'] = True
         else:
             for i, atom in enumerate(self.atom_list):
                 if str(i + 1) in self.pseudoatoms.split():
-                    atom['pseudoatom'] = True
+                    atom['pseudo'] = True
                 else:
-                    atom['pseudoatom'] = False
+                    atom['pseudo'] = False
 
     def molden_gto(self):
         """
@@ -186,18 +186,18 @@ class Molden(object):
         """
         section_body = self.molden_section("GTO")[1:]
         for line in section_body:
-            splited_line = line.split()
-            if len(splited_line) < 2:  # empty line
+            split_line = line.split()
+            if len(split_line) < 2:  # empty line
                 pass
-            elif len(splited_line) == 2 and splited_line[-1] == '0':  # new atom
-                atom = self.atom_list[int(splited_line[0])-1]
+            elif len(split_line) == 2 and split_line[-1] == '0':  # new atom
+                atom = self.atom_list[int(split_line[0])-1]
                 atom['SHELLS'] = []
-            elif len(splited_line) == 3:   # new shell
-                shell = {'TYPE': splited_line[0], 'DATA': []}
+            elif len(split_line) == 3:   # new shell
+                shell = {'TYPE': split_line[0], 'DATA': []}
                 atom['SHELLS'].append(shell)
             else:
-                if float(splited_line[1]) != 0.0:  # non zero contraction coefficient
-                    shell['DATA'].append([float(splited_line[0]), float(splited_line[1])])
+                if float(split_line[1]) != 0.0:  # non zero contraction coefficient
+                    shell['DATA'].append([float(split_line[0]), float(split_line[1])])
 
     def molden_spherical_cartesian(self):
         """
@@ -213,7 +213,7 @@ class Molden(object):
         """
         self.f.seek(0)
         for line in self.f:
-            line = line.upper()  # PSI4 requires case insensitive comparition
+            line = line.upper()  # PSI4 requires case insensitive comparison
             if line.startswith("[5D]") or line.startswith("[5D7F]"):
                 self.D_orb_conversion_required = False
                 self.F_orb_conversion_required = False
@@ -255,38 +255,48 @@ class Molden(object):
                          'f': 10 if self.F_orb_conversion_required else 7,
                          'g': 15 if self.G_orb_conversion_required else 9}
 
-        nbasis_functions = 0  # not converted to spherical basis functions
-        for atom in self.atom_list:
-            for shell in atom['SHELLS']:
-                    nbasis_functions += mo_length_map[shell['TYPE']]
-
         section_body = self.molden_section("MO")[1:]
-        # TODO: to be refactored
         self.spin_unrestricted = bool(sum(line.find('Beta')+1 for line in section_body))
-
-        for spin in xrange(int(self.spin_unrestricted)+1):  # total spin-states
-            for nmo in xrange(self.nbasis_functions()):     # MO-orbitals in each spin-state
-                offset = (nmo + self.nbasis_functions() * spin) * (nbasis_functions + 4)
-                mo_orbital_block = {'SYMMETRY': section_body[offset].split()[1],
-                                    'ENERGY': float(section_body[offset+1].split()[1]),
-                                    'SPIN': section_body[offset+2].split('=')[1],
-                                    'OCCUPATION': float(section_body[offset+3].split()[1]),
-                                    'MO': []}
-                offset += 4
-                for atom in self.atom_list:
-                    for shell in atom['SHELLS']:
-                        shell_length = mo_length_map[shell['TYPE']]
-                        ao = {'TYPE': shell['TYPE'],
-                              'DATA': [float(mo.split()[1]) for mo in section_body[offset:offset+shell_length]]}
-                        mo_orbital_block['MO'].append(ao)
-                        offset += shell_length
+        for line in self.molden_section("MO")[1:]:
+            if line.strip().startswith('Sym'):
+                mo_orbital_block = {}
+                offset = 0
+                mo_orbital_block['row_data'] = []
+                mo_orbital_block['MO'] = []
                 self.mo_matrix.append(mo_orbital_block)
+                mo_orbital_block['SYMMETRY'] = line.split()[1]
+            elif line.strip().startswith('Ene'):
+                mo_orbital_block['ENERGY'] = float(line.split()[1])
+            elif line.strip().startswith('Spin'):
+                # ORCA don't put a space between SPIN= and Beta.
+                mo_orbital_block['SPIN'] = line.split('=')[1],
+            elif line.strip().startswith('Occup'):
+                mo_orbital_block['OCCUPATION'] = float(line.split()[1])
+            else:
+                split_line = line.split()
+                while offset < int(split_line[0]):
+                    if offset == int(split_line[0]) - 1:
+                        mo_orbital_block['row_data'].append(float(split_line[1]))
+                    else:
+                        # Dalton remove lines with zero coefficients, restoring them
+                        mo_orbital_block['row_data'].append(0.0)
+                    offset += 1
+
+        for mo_orbital_block in self.mo_matrix:
+            offset = 0
+            for atom in self.atom_list:
+                for shell in atom['SHELLS']:
+                    shell_length = mo_length_map[shell['TYPE']]
+                    ao = {'TYPE': shell['TYPE'],
+                          'DATA': mo_orbital_block['row_data'][offset:offset+shell_length]}
+                    mo_orbital_block['MO'].append(ao)
+                    offset += shell_length
 
     def charge(self, atom):
         """
         :returns: valence charge of atom.
         """
-        if atom['pseudoatom']:
+        if atom['pseudo']:
             if atom['N'] <= 2:     # H-He
                 return atom['N']
             elif atom['N'] <= 10:  # Li-Ne
@@ -435,7 +445,7 @@ class Molden(object):
         for num, atom in enumerate(self.atom_list):
             if num % 8 == 0:
                 result += "\n"
-            if atom['pseudoatom']:
+            if atom['pseudo']:
                 result += "%10d" % (atom['N'] + 200)
             else:
                 result += "%10d" % atom['N']
@@ -1009,7 +1019,7 @@ class Dalton(DefaultConverter):
     title = "generated from Dalton output data.\n"
 
 
-if __name__ == "__main__":
+def main():
     print ("Hello, you are converting a MOLDEN file to a CASINO gwfn.data file.\n")
 
     while True:
@@ -1053,3 +1063,6 @@ if __name__ == "__main__":
         Dalton(input_file, pseudoatoms).gwfn()
         print ("In Dalton's MOLDEN file all occupation numbers of HF and DFT MOs are zero values by mistake\n"
                "So you should correct 'Number of electrons per primitive cell' in gwfn.data file by hand.")
+
+if __name__ == "__main__":
+    main()
