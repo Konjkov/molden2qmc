@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.5.1'
+__version__ = '2.5.2'
 
 """
 TODO:
-1. implement Dalton 2013/2015
-2. implement Nwchem
+1. implement Nwchem
+2. implement QChem
 """
 
 import os
@@ -255,35 +255,33 @@ class Molden(object):
                          'f': 10 if self.F_orb_conversion_required else 7,
                          'g': 15 if self.G_orb_conversion_required else 9}
 
+        nbasisfunctions = 0
+        for atom in self.atom_list:
+            for shell in atom['SHELLS']:
+                    nbasisfunctions += 2 * mo_length_map[shell['TYPE']] + 1
+
         section_body = self.molden_section("MO")[1:]
         self.spin_unrestricted = bool(sum(line.find('Beta')+1 for line in section_body))
         for line in self.molden_section("MO")[1:]:
-            if line.strip().startswith('Sym'):
-                mo_orbital_block = {}
-                offset = 0
-                mo_orbital_block['row_data'] = []
-                mo_orbital_block['MO'] = []
+            if line.strip().startswith('Sym='):
+                # Dalton remove lines with zero coefficients, restoring them
+                mo_orbital_block = {'row_data': [0.0] * nbasisfunctions}
                 self.mo_matrix.append(mo_orbital_block)
                 mo_orbital_block['SYMMETRY'] = line.split()[1]
-            elif line.strip().startswith('Ene'):
+            elif line.strip().startswith('Ene='):
                 mo_orbital_block['ENERGY'] = float(line.split()[1])
-            elif line.strip().startswith('Spin'):
+            elif line.strip().startswith('Spin='):
                 # ORCA don't put a space between SPIN= and Beta.
                 mo_orbital_block['SPIN'] = line.split('=')[1],
-            elif line.strip().startswith('Occup'):
+            elif line.strip().startswith('Occup='):
                 mo_orbital_block['OCCUPATION'] = float(line.split()[1])
             else:
                 split_line = line.split()
-                while offset < int(split_line[0]):
-                    if offset == int(split_line[0]) - 1:
-                        mo_orbital_block['row_data'].append(float(split_line[1]))
-                    else:
-                        # Dalton remove lines with zero coefficients, restoring them
-                        mo_orbital_block['row_data'].append(0.0)
-                    offset += 1
+                mo_orbital_block['row_data'][int(split_line[0])-1] = float(split_line[1])
 
         for mo_orbital_block in self.mo_matrix:
             offset = 0
+            mo_orbital_block['MO'] = []
             for atom in self.atom_list:
                 for shell in atom['SHELLS']:
                     shell_length = mo_length_map[shell['TYPE']]
