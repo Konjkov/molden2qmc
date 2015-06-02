@@ -265,19 +265,19 @@ class Molden(object):
         for line in self.molden_section("MO")[1:]:
             if line.strip().startswith('Sym='):
                 # Dalton remove lines with zero coefficients, restoring them
-                mo_orbital_block = {'row_data': [0.0] * nbasisfunctions}
+                mo_orbital_block = {'raw_data': [0.0] * nbasisfunctions}
                 self.mo_matrix.append(mo_orbital_block)
-                mo_orbital_block['SYMMETRY'] = line.split()[1]
+                mo_orbital_block['SYMMETRY'] = line.split('=')[1]
             elif line.strip().startswith('Ene='):
-                mo_orbital_block['ENERGY'] = float(line.split()[1])
+                mo_orbital_block['ENERGY'] = float(line.split('=')[1])
             elif line.strip().startswith('Spin='):
                 # ORCA don't put a space between SPIN= and Beta.
                 mo_orbital_block['SPIN'] = line.split('=')[1],
             elif line.strip().startswith('Occup='):
-                mo_orbital_block['OCCUPATION'] = float(line.split()[1])
+                mo_orbital_block['OCCUPATION'] = float(line.split('=')[1])
             else:
                 split_line = line.split()
-                mo_orbital_block['row_data'][int(split_line[0])-1] = float(split_line[1])
+                mo_orbital_block['raw_data'][int(split_line[0])-1] = float(split_line[1])
 
         for mo_orbital_block in self.mo_matrix:
             offset = 0
@@ -286,7 +286,7 @@ class Molden(object):
                 for shell in atom['SHELLS']:
                     shell_length = mo_length_map[shell['TYPE']]
                     ao = {'TYPE': shell['TYPE'],
-                          'DATA': mo_orbital_block['row_data'][offset:offset+shell_length]}
+                          'DATA': mo_orbital_block['raw_data'][offset:offset+shell_length]}
                     mo_orbital_block['MO'].append(ao)
                     offset += shell_length
 
