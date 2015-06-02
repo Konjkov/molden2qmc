@@ -96,7 +96,6 @@ class Molden(object):
         self.D_orb_conversion_required = True  # Conversion D orbitals Cartesian -> Spherical required
         self.F_orb_conversion_required = True  # Conversion F orbitals Cartesian -> Spherical required
         self.G_orb_conversion_required = True  # Conversion G orbitals Cartesian -> Spherical required
-        self.spin_unrestricted = False  # RHF or UHF
         self.pseudoatoms = pseudoatoms
         self.atom_list = []
         self.mo_matrix = []
@@ -261,18 +260,17 @@ class Molden(object):
                     nbasisfunctions += 2 * mo_length_map[shell['TYPE']] + 1
 
         section_body = self.molden_section("MO")[1:]
-        self.spin_unrestricted = bool(sum(line.find('Beta')+1 for line in section_body))
-        for line in self.molden_section("MO")[1:]:
+        for line in section_body:
             if line.strip().startswith('Sym='):
                 # Dalton remove lines with zero coefficients, restoring them
                 mo_orbital_block = {'raw_data': [0.0] * nbasisfunctions}
                 self.mo_matrix.append(mo_orbital_block)
-                mo_orbital_block['SYMMETRY'] = line.split('=')[1]
+                mo_orbital_block['SYMMETRY'] = line.split('=')[1].strip()
             elif line.strip().startswith('Ene='):
                 mo_orbital_block['ENERGY'] = float(line.split('=')[1])
             elif line.strip().startswith('Spin='):
                 # ORCA don't put a space between SPIN= and Beta.
-                mo_orbital_block['SPIN'] = line.split('=')[1],
+                mo_orbital_block['SPIN'] = line.split('=')[1].strip()
             elif line.strip().startswith('Occup='):
                 mo_orbital_block['OCCUPATION'] = float(line.split('=')[1])
             else:
@@ -289,6 +287,13 @@ class Molden(object):
                           'DATA': mo_orbital_block['raw_data'][offset:offset+shell_length]}
                     mo_orbital_block['MO'].append(ao)
                     offset += shell_length
+
+    def spin_unrestricted(self):
+        """
+        :return: True when wfn is unrestricted or False elsewhere.
+        """
+        return reduce(bool.__or__, [(mo_orbital_block['SPIN'] == 'Beta')
+                                    for mo_orbital_block in self.mo_matrix], False)
 
     def charge(self, atom):
         """
@@ -422,7 +427,7 @@ class Molden(object):
                 "Number of electrons per primitive cell:\n"
                 "          %s\n"
                 "\n") % (__version__,
-                         '.true.' if self.spin_unrestricted else '.false.',
+                         '.true.' if self.spin_unrestricted() else '.false.',
                          self.nuclear_repulsion()/self.natom(),
                          int(round(self.nelec())))
 
@@ -834,7 +839,7 @@ class CFour(DefaultConverter):
         """
         in CFOUR occupation number sometimes takes value from list (0, 1)
         """
-        if self.spin_unrestricted:
+        if self.spin_unrestricted():
             return super(CFour, self).nelec()
         else:
             return 2 * super(CFour, self).nelec()
