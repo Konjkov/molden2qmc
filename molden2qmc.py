@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.5.2'
+__version__ = '2.6.0'
 
 """
 TODO:
@@ -33,7 +33,7 @@ def smart_float(x):
     '-123D+45'
     ' 123d+45'
     """
-    return float(x.replace('D', 'E').replace('d', 'e'))
+    return float(x.replace('D', 'E').replace('d', 'e'))  # for MOLPRO only
 
 
 class Molden(object):
@@ -195,8 +195,8 @@ class Molden(object):
                 shell = {'TYPE': split_line[0], 'DATA': []}
                 atom['SHELLS'].append(shell)
             else:
-                if float(split_line[1]) != 0.0:  # non zero contraction coefficient
-                    shell['DATA'].append([float(split_line[0]), float(split_line[1])])
+                if smart_float(split_line[1]) != 0.0:  # non zero contraction coefficient
+                    shell['DATA'].append([smart_float(split_line[0]), smart_float(split_line[1])])
 
     def molden_spherical_cartesian(self):
         """
@@ -1022,6 +1022,125 @@ class Dalton(DefaultConverter):
     title = "generated from Dalton output data.\n"
 
 
+class Molpro(DefaultConverter):
+    """
+    Molpro
+    """
+    title = "generated from Molpro output data.\n"
+
+    def d_to_spherical(self, cartesian):
+        """
+        Convert cartesian representation of d-orbital to spherical
+        http://theochem.github.io/horton/tut_gaussian_basis.html
+        The following order of D functions is expected:
+            5D: D 0, D+1, D-1, D+2, D-2
+            6D: xx, yy, zz, xy, xz, yz
+        """
+        xx, yy, zz, xy, xz, yz = cartesian
+
+        xy *= 1.0 / sqrt(3)
+        xz *= 1.0 / sqrt(3)
+        yz *= 1.0 / sqrt(3)
+
+        xx *= 2.0 / sqrt(3) / sqrt(3)
+        yy *= 2.0 / sqrt(3) / sqrt(3)
+        zz *= 2.0 / sqrt(3) / sqrt(3)
+
+        r2 = xx + yy + zz
+
+        zero = (3.0 * zz - r2) / 2.0
+        plus_1 = sqrt(3) * xz
+        minus_1 = sqrt(3) * yz
+        plus_2 = sqrt(3) * (xx - yy) / 2.0
+        minus_2 = sqrt(3) * xy
+        return zero, plus_1, minus_1, plus_2, minus_2
+
+    def f_to_spherical(self, cartesian):
+        """
+        Convert cartesian representation of f-orbital to spherical
+        http://theochem.github.io/horton/tut_gaussian_basis.html
+        The following order of F functions is expected:
+            7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
+            10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
+        """
+        xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz = cartesian
+
+        xyz *= 1.0 / sqrt(15)
+
+        xxy *= 2.0 / sqrt(3) / sqrt(15)
+        xxz *= 2.0 / sqrt(3) / sqrt(15)
+        xyy *= 2.0 / sqrt(3) / sqrt(15)
+        yyz *= 2.0 / sqrt(3) / sqrt(15)
+        xzz *= 2.0 / sqrt(3) / sqrt(15)
+        yzz *= 2.0 / sqrt(3) / sqrt(15)
+
+        xxx *= 6.0 / sqrt(15) / sqrt(15)
+        yyy *= 6.0 / sqrt(15) / sqrt(15)
+        zzz *= 6.0 / sqrt(15) / sqrt(15)
+
+        xr2 = xxx + xyy + xzz
+        yr2 = xxy + yyy + yzz
+        zr2 = xxz + yyz + zzz
+
+        zero = (5.0 * zzz - 3.0 * zr2) / 2.0
+        plus_1 = sqrt(6) * (5.0 * xzz - xr2) / 4.0
+        minus_1 = sqrt(6) * (5.0 * yzz - yr2) / 4.0
+        plus_2 = sqrt(15) * (xxz - yyz) / 2.0
+        minus_2 = sqrt(15) * xyz
+        plus_3 = sqrt(10) * (xxx - 3.0 * xyy) / 4.0
+        minus_3 = sqrt(10) * (3.0 * xxy - yyy) / 4.0
+        return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3
+
+    def g_to_spherical(self, cartesian):
+        """
+        Convert cartesian representation of g-orbital to spherical
+        http://theochem.github.io/horton/tut_gaussian_basis.html
+        The following order of G functions is expected:
+            9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
+            15G: xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
+                 xxyy xxzz yyzz xxyz yyxz zzxy
+        """
+        xxxx, yyyy, zzzz, xxxy, xxxz, yyyx, yyyz, zzzx, zzzy, xxyy, xxzz, yyzz, xxyz, yyxz, zzxy = cartesian
+
+        xxyz *= 2.0 / sqrt(3) / sqrt(105)
+        yyxz *= 2.0 / sqrt(3) / sqrt(105)
+        zzxy *= 2.0 / sqrt(3) / sqrt(105)
+
+        xxyy *= 4.0 / 3.0 / sqrt(105)
+        xxzz *= 4.0 / 3.0 / sqrt(105)
+        yyzz *= 4.0 / 3.0 / sqrt(105)
+
+        xxxy *= 6.0 / sqrt(15) / sqrt(105)
+        xxxz *= 6.0 / sqrt(15) / sqrt(105)
+        yyyx *= 6.0 / sqrt(15) / sqrt(105)
+        yyyz *= 6.0 / sqrt(15) / sqrt(105)
+        zzzx *= 6.0 / sqrt(15) / sqrt(105)
+        zzzy *= 6.0 / sqrt(15) / sqrt(105)
+
+        xxxx *= 24.0 / sqrt(105) / sqrt(105)
+        yyyy *= 24.0 / sqrt(105) / sqrt(105)
+        zzzz *= 24.0 / sqrt(105) / sqrt(105)
+
+        xyr2 = xxxy + yyyx + zzxy
+        xzr2 = xxxz + yyxz + zzzx
+        yzr2 = xxyz + yyyz + zzzy
+        x2r2 = xxxx + xxyy + xxzz
+        y2r2 = xxyy + yyyy + yyzz
+        z2r2 = xxzz + yyzz + zzzz
+        r4 = x2r2 + y2r2 + z2r2
+
+        zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0
+        plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0
+        minus_1 = sqrt(10) * (7.0 * zzzy - 3.0 * yzr2) / 4.0
+        plus_2 = sqrt(5) * (7.0 * (xxzz - yyzz) - (x2r2 - y2r2)) / 4.0
+        minus_2 = sqrt(5) * (7.0 * zzxy - xyr2) / 2.0
+        plus_3 = sqrt(70) * (xxxz - 3.0 * yyxz) / 4.0
+        minus_3 = sqrt(70) * (3.0 * xxyz - yyyz) / 4.0
+        plus_4 = sqrt(35) * (xxxx - 6.0 * xxyy + yyyy) / 8.0
+        minus_4 = sqrt(35) * (xxxy - yyyx) / 2.0
+        return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3, plus_4, minus_4
+
+
 def main():
     print ("Hello, you are converting a MOLDEN file to a CASINO gwfn.data file.\n")
 
@@ -1039,8 +1158,9 @@ def main():
                      "1 -- PSI4\n"
                      "2 -- CFOUR 2.0beta\n"
                      "3 -- ORCA 3.X\n"
-                     "4 -- DALTON2013\n")
-    while not code.isdigit() or int(code) > 4:
+                     "4 -- DALTON2013\n"
+                     "5 -- MOLPRO\n")
+    while not code.isdigit() or int(code) > 5:
         code = raw_input('Sorry,  try again.')
 
     code = int(code)
@@ -1064,6 +1184,8 @@ def main():
         Orca(input_file, pseudoatoms).gwfn()
     elif code == 4:
         Dalton(input_file, pseudoatoms).gwfn()
+    elif code == 5:
+        Molpro(input_file, pseudoatoms).gwfn()
         print ("In Dalton's MOLDEN file all occupation numbers of HF and DFT MOs are zero values by mistake\n"
                "So you should correct 'Number of electrons per primitive cell' in gwfn.data file by hand.")
 
