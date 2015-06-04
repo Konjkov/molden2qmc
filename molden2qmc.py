@@ -36,6 +36,13 @@ def smart_float(x):
     return float(x.replace('D', 'E').replace('d', 'e'))  # for MOLPRO only
 
 
+def list_mul(list_a, list_b):
+    """
+    element-wise multiplication of two lists
+    """
+    return [a*b for a, b in zip(list_a, list_b)]
+
+
 class Molden(object):
     """
     Data structures used in Molden Class:
@@ -257,7 +264,7 @@ class Molden(object):
         nbasisfunctions = 0
         for atom in self.atom_list:
             for shell in atom['SHELLS']:
-                    nbasisfunctions += 2 * mo_length_map[shell['TYPE']] + 1
+                    nbasisfunctions += mo_length_map[shell['TYPE']]
 
         section_body = self.molden_section("MO")[1:]
         for line in section_body:
@@ -638,12 +645,75 @@ class DefaultConverter(Molden):
 
     def d_to_spherical(self, cartesian):
         """
-        Spherical MOLDEN input expected by default.
+        Convert cartesian representation of d-orbital to spherical
+        http://theochem.github.io/horton/tut_gaussian_basis.html
+        The following order of D functions is expected:
+            5D: D 0, D+1, D-1, D+2, D-2
+            6D: xx, yy, zz, xy, xz, yz
         """
-        raise RuntimeWarning("Cartesian input is not expected. Check that"
-                             " the quantum chemistry code is selected correctly")
+        xx, yy, zz, xy, xz, yz = cartesian
 
-    g_to_spherical = f_to_spherical = d_to_spherical
+        r2 = xx + yy + zz
+
+        zero = (3.0 * zz - r2) / 2.0
+        plus_1 = sqrt(3) * xz
+        minus_1 = sqrt(3) * yz
+        plus_2 = sqrt(3) * (xx - yy) / 2.0
+        minus_2 = sqrt(3) * xy
+        return zero, plus_1, minus_1, plus_2, minus_2
+
+    def f_to_spherical(self, cartesian):
+        """
+        Convert cartesian representation of f-orbital to spherical
+        http://theochem.github.io/horton/tut_gaussian_basis.html
+        The following order of F functions is expected:
+            7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
+            10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
+        """
+        xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz = cartesian
+
+        xr2 = xxx + xyy + xzz
+        yr2 = xxy + yyy + yzz
+        zr2 = xxz + yyz + zzz
+
+        zero = (5.0 * zzz - 3.0 * zr2) / 2.0
+        plus_1 = sqrt(6) * (5.0 * xzz - xr2) / 4.0
+        minus_1 = sqrt(6) * (5.0 * yzz - yr2) / 4.0
+        plus_2 = sqrt(15) * (xxz - yyz) / 2.0
+        minus_2 = sqrt(15) * xyz
+        plus_3 = sqrt(10) * (xxx - 3.0 * xyy) / 4.0
+        minus_3 = sqrt(10) * (3.0 * xxy - yyy) / 4.0
+        return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3
+
+    def g_to_spherical(self, cartesian):
+        """
+        Convert cartesian representation of g-orbital to spherical
+        http://theochem.github.io/horton/tut_gaussian_basis.html
+        The following order of G functions is expected:
+            9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
+            15G: xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
+                 xxyy xxzz yyzz xxyz yyxz zzxy
+        """
+        xxxx, yyyy, zzzz, xxxy, xxxz, yyyx, yyyz, zzzx, zzzy, xxyy, xxzz, yyzz, xxyz, yyxz, zzxy = cartesian
+
+        xyr2 = xxxy + yyyx + zzxy
+        xzr2 = xxxz + yyxz + zzzx
+        yzr2 = xxyz + yyyz + zzzy
+        x2r2 = xxxx + xxyy + xxzz
+        y2r2 = xxyy + yyyy + yyzz
+        z2r2 = xxzz + yyzz + zzzz
+        r4 = x2r2 + y2r2 + z2r2
+
+        zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0
+        plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0
+        minus_1 = sqrt(10) * (7.0 * zzzy - 3.0 * yzr2) / 4.0
+        plus_2 = sqrt(5) * (7.0 * (xxzz - yyzz) - (x2r2 - y2r2)) / 4.0
+        minus_2 = sqrt(5) * (7.0 * zzxy - xyr2) / 2.0
+        plus_3 = sqrt(70) * (xxxz - 3.0 * yyxz) / 4.0
+        minus_3 = sqrt(70) * (3.0 * xxyz - yyyz) / 4.0
+        plus_4 = sqrt(35) * (xxxx - 6.0 * xxyy + yyyy) / 8.0
+        minus_4 = sqrt(35) * (xxxy - yyyx) / 2.0
+        return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3, plus_4, minus_4
 
     def d_normalize(self, coefficient):
         """
@@ -729,20 +799,8 @@ class Turbomole(DefaultConverter):
             5D: D 0, D+1, D-1, D+2, D-2
             6D: xx, yy, zz, xy, xz, yz
         """
-        xx, yy, zz, xy, xz, yz = cartesian
-
-        xx *= 2.0 / sqrt(3)
-        yy *= 2.0 / sqrt(3)
-        zz *= 2.0 / sqrt(3)
-
-        r2 = xx + yy + zz
-
-        zero = (3.0 * zz - r2) / 2.0
-        plus_1 = sqrt(3) * xz
-        minus_1 = sqrt(3) * yz
-        plus_2 = sqrt(3) * (xx - yy) / 2.0
-        minus_2 = sqrt(3) * xy
-        return zero, plus_1, minus_1, plus_2, minus_2
+        norm = [2.0/sqrt(3)] * 3 + [1.0] * 3
+        return super(Turbomole, self).d_to_spherical(list_mul(norm, cartesian))
 
     def f_to_spherical(self, cartesian):
         """
@@ -752,31 +810,8 @@ class Turbomole(DefaultConverter):
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
         """
-        xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz = cartesian
-
-        xxy *= 2.0 / sqrt(3)
-        xxz *= 2.0 / sqrt(3)
-        xyy *= 2.0 / sqrt(3)
-        yyz *= 2.0 / sqrt(3)
-        xzz *= 2.0 / sqrt(3)
-        yzz *= 2.0 / sqrt(3)
-
-        xxx *= 6.0 / sqrt(15)
-        yyy *= 6.0 / sqrt(15)
-        zzz *= 6.0 / sqrt(15)
-
-        xr2 = xxx + xyy + xzz
-        yr2 = xxy + yyy + yzz
-        zr2 = xxz + yyz + zzz
-
-        zero = (5.0 * zzz - 3.0 * zr2) / 2.0
-        plus_1 = sqrt(6) * (5.0 * xzz - xr2) / 4.0
-        minus_1 = sqrt(6) * (5.0 * yzz - yr2) / 4.0
-        plus_2 = sqrt(15) * (xxz - yyz) / 2.0
-        minus_2 = sqrt(15) * xyz
-        plus_3 = sqrt(10) * (xxx - 3.0 * xyy) / 4.0
-        minus_3 = sqrt(10) * (3.0 * xxy - yyy) / 4.0
-        return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3
+        norm = [6.0 / sqrt(15)] * 3 + [2.0 / sqrt(3)] * 6 + [1.0]
+        return super(Turbomole, self).f_to_spherical(list_mul(norm, cartesian))
 
     def g_to_spherical(self, cartesian):
         """
@@ -787,51 +822,15 @@ class Turbomole(DefaultConverter):
             15G: xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
                  xxyy xxzz yyzz xxyz yyxz zzxy
         """
-        xxxx, yyyy, zzzz, xxxy, xxxz, yyyx, yyyz, zzzx, zzzy, xxyy, xxzz, yyzz, xxyz, yyxz, zzxy = cartesian
-
-        xxyz *= 2.0 / sqrt(3)
-        yyxz *= 2.0 / sqrt(3)
-        zzxy *= 2.0 / sqrt(3)
-
-        xxyy *= 4.0 / 3.0
-        xxzz *= 4.0 / 3.0
-        yyzz *= 4.0 / 3.0
-
-        xxxy *= 6.0 / sqrt(15)
-        xxxz *= 6.0 / sqrt(15)
-        yyyx *= 6.0 / sqrt(15)
-        yyyz *= 6.0 / sqrt(15)
-        zzzx *= 6.0 / sqrt(15)
-        zzzy *= 6.0 / sqrt(15)
-
-        xxxx *= 24.0 / sqrt(105)
-        yyyy *= 24.0 / sqrt(105)
-        zzzz *= 24.0 / sqrt(105)
-
-        xyr2 = xxxy + yyyx + zzxy
-        xzr2 = xxxz + yyxz + zzzx
-        yzr2 = xxyz + yyyz + zzzy
-        x2r2 = xxxx + xxyy + xxzz
-        y2r2 = xxyy + yyyy + yyzz
-        z2r2 = xxzz + yyzz + zzzz
-        r4 = x2r2 + y2r2 + z2r2
-
-        zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0
-        plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0
-        minus_1 = sqrt(10) * (7.0 * zzzy - 3.0 * yzr2) / 4.0
-        plus_2 = sqrt(5) * (7.0 * (xxzz - yyzz) - (x2r2 - y2r2)) / 4.0
-        minus_2 = sqrt(5) * (7.0 * zzxy - xyr2) / 2.0
-        plus_3 = sqrt(70) * (xxxz - 3.0 * yyxz) / 4.0
-        minus_3 = sqrt(70) * (3.0 * xxyz - yyyz) / 4.0
-        plus_4 = sqrt(35) * (xxxx - 6.0 * xxyy + yyyy) / 8.0
-        minus_4 = sqrt(35) * (xxxy - yyyx) / 2.0
-        return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3, plus_4, minus_4
+        norm = [24.0/sqrt(105)] * 3 + [6.0/sqrt(15)] * 6 + [4.0/3.0] * 3 + [2.0/sqrt(3)] * 3
+        return super(Turbomole, self).g_to_spherical(list_mul(norm, cartesian))
 
 
 class CFour(DefaultConverter):
     """
     CFour 2.0 beta
     In order to get the correct MOLDEN file recompile Cfour with modified reorderedf.f
+    https://github.com/Konjkov/molden2qmc/blob/master/test/CFOUR/reorderdf.f
     """
     title = "generated from CFour output data.\n"
 
@@ -852,24 +851,8 @@ class CFour(DefaultConverter):
             5D: D 0, D+1, D-1, D+2, D-2
             6D: xx, yy, zz, xy, xz, yz
         """
-        xx, yy, zz, xy, xz, yz = cartesian
-
-        xy *= 1.0 / sqrt(3)
-        xz *= 1.0 / sqrt(3)
-        yz *= 1.0 / sqrt(3)
-
-        xx *= 2.0 / sqrt(3)
-        yy *= 2.0 / sqrt(3)
-        zz *= 2.0 / sqrt(3)
-
-        r2 = xx + yy + zz
-
-        zero = (3.0 * zz - r2) / 2.0
-        plus_1 = sqrt(3) * xz
-        minus_1 = sqrt(3) * yz
-        plus_2 = sqrt(3) * (xx - yy) / 2.0
-        minus_2 = sqrt(3) * xy
-        return zero, plus_1, minus_1, plus_2, minus_2
+        norm = [2.0/sqrt(3)] * 3 + [1.0/sqrt(3)] * 3
+        return super(CFour, self).d_to_spherical(list_mul(norm, cartesian))
 
     def f_to_spherical(self, cartesian):
         """
@@ -879,33 +862,8 @@ class CFour(DefaultConverter):
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
         """
-        xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz = cartesian
-
-        xyz *= 1.0 / sqrt(15)
-
-        xxy *= 2.0 / sqrt(15)
-        xxz *= 2.0 / sqrt(15)
-        xyy *= 2.0 / sqrt(15)
-        yyz *= 2.0 / sqrt(15)
-        xzz *= 2.0 / sqrt(15)
-        yzz *= 2.0 / sqrt(15)
-
-        xxx *= 6.0 / sqrt(15)
-        yyy *= 6.0 / sqrt(15)
-        zzz *= 6.0 / sqrt(15)
-
-        xr2 = xxx + xyy + xzz
-        yr2 = xxy + yyy + yzz
-        zr2 = xxz + yyz + zzz
-
-        zero = (5.0 * zzz - 3.0 * zr2) / 2.0
-        plus_1 = sqrt(6) * (5.0 * xzz - xr2) / 4.0
-        minus_1 = sqrt(6) * (5.0 * yzz - yr2) / 4.0
-        plus_2 = sqrt(15) * (xxz - yyz) / 2.0
-        minus_2 = sqrt(15) * xyz
-        plus_3 = sqrt(10) * (xxx - 3.0 * xyy) / 4.0
-        minus_3 = sqrt(10) * (3.0 * xxy - yyy) / 4.0
-        return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3
+        norm = [6.0/sqrt(15)] * 3 + [2.0/sqrt(15)] * 6 + [1.0/sqrt(15)]
+        return super(CFour, self).f_to_spherical(list_mul(norm, cartesian))
 
     def g_to_spherical(self, cartesian):
         """
@@ -916,45 +874,8 @@ class CFour(DefaultConverter):
             15G: xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
                  xxyy xxzz yyzz xxyz yyxz zzxy
         """
-        xxxx, yyyy, zzzz, xxxy, xxxz, yyyx, yyyz, zzzx, zzzy, xxyy, xxzz, yyzz, xxyz, yyxz, zzxy = cartesian
-
-        xxyz *= 2.0 / sqrt(105)
-        yyxz *= 2.0 / sqrt(105)
-        zzxy *= 2.0 / sqrt(105)
-
-        xxyy *= 4.0 / sqrt(105)
-        xxzz *= 4.0 / sqrt(105)
-        yyzz *= 4.0 / sqrt(105)
-
-        xxxy *= 6.0 / sqrt(105)
-        xxxz *= 6.0 / sqrt(105)
-        yyyx *= 6.0 / sqrt(105)
-        yyyz *= 6.0 / sqrt(105)
-        zzzx *= 6.0 / sqrt(105)
-        zzzy *= 6.0 / sqrt(105)
-
-        xxxx *= 24.0 / sqrt(105)
-        yyyy *= 24.0 / sqrt(105)
-        zzzz *= 24.0 / sqrt(105)
-
-        xyr2 = xxxy + yyyx + zzxy
-        xzr2 = xxxz + yyxz + zzzx
-        yzr2 = xxyz + yyyz + zzzy
-        x2r2 = xxxx + xxyy + xxzz
-        y2r2 = xxyy + yyyy + yyzz
-        z2r2 = xxzz + yyzz + zzzz
-        r4 = x2r2 + y2r2 + z2r2
-
-        zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0
-        plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0
-        minus_1 = sqrt(10) * (7.0 * zzzy - 3.0 * yzr2) / 4.0
-        plus_2 = sqrt(5) * (7.0 * (xxzz - yyzz) - (x2r2 - y2r2)) / 4.0
-        minus_2 = sqrt(5) * (7.0 * zzxy - xyr2) / 2.0
-        plus_3 = sqrt(70) * (xxxz - 3.0 * yyxz) / 4.0
-        minus_3 = sqrt(70) * (3.0 * xxyz - yyyz) / 4.0
-        plus_4 = sqrt(35) * (xxxx - 6.0 * xxyy + yyyy) / 8.0
-        minus_4 = sqrt(35) * (xxxy - yyyx) / 2.0
-        return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3, plus_4, minus_4
+        norm = [24.0/sqrt(105)] * 3 + [6.0/sqrt(105)] * 6 + [4.0/sqrt(105)] * 3 + [2.0/sqrt(105)] * 3
+        return super(CFour, self).g_to_spherical(list_mul(norm, cartesian))
 
 
 class Orca(DefaultConverter):
@@ -962,6 +883,15 @@ class Orca(DefaultConverter):
     ORCA 3.X
     """
     title = "generated from Orca output data.\n"
+
+    def d_to_spherical(self, cartesian):
+        """
+        In ORCA spherical MOLDEN input expected.
+        """
+        raise RuntimeWarning("Cartesian input is not expected. Check that"
+                             " the quantum chemistry code is selected correctly")
+
+    g_to_spherical = f_to_spherical = d_to_spherical
 
     def atom_list_converter(self):
         """
@@ -1008,6 +938,15 @@ class PSI4(DefaultConverter):
     """
     title = "generated from PSI4 output data.\n"
 
+    def d_to_spherical(self, cartesian):
+        """
+        In PSI4 spherical MOLDEN input expected.
+        """
+        raise RuntimeWarning("Cartesian input is not expected. Check that"
+                             " the quantum chemistry code is selected correctly")
+
+    g_to_spherical = f_to_spherical = d_to_spherical
+
     def atom_list_converter(self):
         """
         PSI4 correctly normalized contraction coefficients
@@ -1020,6 +959,15 @@ class Dalton(DefaultConverter):
     DALTON 2013
     """
     title = "generated from Dalton output data.\n"
+
+    def d_to_spherical(self, cartesian):
+        """
+        In DALTON spherical MOLDEN input expected.
+        """
+        raise RuntimeWarning("Cartesian input is not expected. Check that"
+                             " the quantum chemistry code is selected correctly")
+
+    g_to_spherical = f_to_spherical = d_to_spherical
 
 
 class Molpro(DefaultConverter):
@@ -1036,24 +984,8 @@ class Molpro(DefaultConverter):
             5D: D 0, D+1, D-1, D+2, D-2
             6D: xx, yy, zz, xy, xz, yz
         """
-        xx, yy, zz, xy, xz, yz = cartesian
-
-        xy *= 1.0 / sqrt(3)
-        xz *= 1.0 / sqrt(3)
-        yz *= 1.0 / sqrt(3)
-
-        xx *= 2.0 / sqrt(3) / sqrt(3)
-        yy *= 2.0 / sqrt(3) / sqrt(3)
-        zz *= 2.0 / sqrt(3) / sqrt(3)
-
-        r2 = xx + yy + zz
-
-        zero = (3.0 * zz - r2) / 2.0
-        plus_1 = sqrt(3) * xz
-        minus_1 = sqrt(3) * yz
-        plus_2 = sqrt(3) * (xx - yy) / 2.0
-        minus_2 = sqrt(3) * xy
-        return zero, plus_1, minus_1, plus_2, minus_2
+        norm = [2.0/sqrt(3)/sqrt(3)] * 3 + [1.0/sqrt(3)] * 3
+        return super(Molpro, self).d_to_spherical(list_mul(norm, cartesian))
 
     def f_to_spherical(self, cartesian):
         """
@@ -1063,33 +995,8 @@ class Molpro(DefaultConverter):
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
         """
-        xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz = cartesian
-
-        xyz *= 1.0 / sqrt(15)
-
-        xxy *= 2.0 / sqrt(3) / sqrt(15)
-        xxz *= 2.0 / sqrt(3) / sqrt(15)
-        xyy *= 2.0 / sqrt(3) / sqrt(15)
-        yyz *= 2.0 / sqrt(3) / sqrt(15)
-        xzz *= 2.0 / sqrt(3) / sqrt(15)
-        yzz *= 2.0 / sqrt(3) / sqrt(15)
-
-        xxx *= 6.0 / sqrt(15) / sqrt(15)
-        yyy *= 6.0 / sqrt(15) / sqrt(15)
-        zzz *= 6.0 / sqrt(15) / sqrt(15)
-
-        xr2 = xxx + xyy + xzz
-        yr2 = xxy + yyy + yzz
-        zr2 = xxz + yyz + zzz
-
-        zero = (5.0 * zzz - 3.0 * zr2) / 2.0
-        plus_1 = sqrt(6) * (5.0 * xzz - xr2) / 4.0
-        minus_1 = sqrt(6) * (5.0 * yzz - yr2) / 4.0
-        plus_2 = sqrt(15) * (xxz - yyz) / 2.0
-        minus_2 = sqrt(15) * xyz
-        plus_3 = sqrt(10) * (xxx - 3.0 * xyy) / 4.0
-        minus_3 = sqrt(10) * (3.0 * xxy - yyy) / 4.0
-        return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3
+        norm = [6.0/sqrt(15)/sqrt(15)] * 3 + [2.0/sqrt(3)/sqrt(15)] * 6 + [1.0/sqrt(15)]
+        return super(Molpro, self).f_to_spherical(list_mul(norm, cartesian))
 
     def g_to_spherical(self, cartesian):
         """
@@ -1100,45 +1007,10 @@ class Molpro(DefaultConverter):
             15G: xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
                  xxyy xxzz yyzz xxyz yyxz zzxy
         """
-        xxxx, yyyy, zzzz, xxxy, xxxz, yyyx, yyyz, zzzx, zzzy, xxyy, xxzz, yyzz, xxyz, yyxz, zzxy = cartesian
+        norm = [24.0/sqrt(105)/sqrt(105)] * 3 + [6.0/sqrt(15)/sqrt(105)] * 6 +\
+               [4.0/3.0/sqrt(105)] * 3 + [2.0/sqrt(3)/sqrt(105)] * 3
 
-        xxyz *= 2.0 / sqrt(3) / sqrt(105)
-        yyxz *= 2.0 / sqrt(3) / sqrt(105)
-        zzxy *= 2.0 / sqrt(3) / sqrt(105)
-
-        xxyy *= 4.0 / 3.0 / sqrt(105)
-        xxzz *= 4.0 / 3.0 / sqrt(105)
-        yyzz *= 4.0 / 3.0 / sqrt(105)
-
-        xxxy *= 6.0 / sqrt(15) / sqrt(105)
-        xxxz *= 6.0 / sqrt(15) / sqrt(105)
-        yyyx *= 6.0 / sqrt(15) / sqrt(105)
-        yyyz *= 6.0 / sqrt(15) / sqrt(105)
-        zzzx *= 6.0 / sqrt(15) / sqrt(105)
-        zzzy *= 6.0 / sqrt(15) / sqrt(105)
-
-        xxxx *= 24.0 / sqrt(105) / sqrt(105)
-        yyyy *= 24.0 / sqrt(105) / sqrt(105)
-        zzzz *= 24.0 / sqrt(105) / sqrt(105)
-
-        xyr2 = xxxy + yyyx + zzxy
-        xzr2 = xxxz + yyxz + zzzx
-        yzr2 = xxyz + yyyz + zzzy
-        x2r2 = xxxx + xxyy + xxzz
-        y2r2 = xxyy + yyyy + yyzz
-        z2r2 = xxzz + yyzz + zzzz
-        r4 = x2r2 + y2r2 + z2r2
-
-        zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0
-        plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0
-        minus_1 = sqrt(10) * (7.0 * zzzy - 3.0 * yzr2) / 4.0
-        plus_2 = sqrt(5) * (7.0 * (xxzz - yyzz) - (x2r2 - y2r2)) / 4.0
-        minus_2 = sqrt(5) * (7.0 * zzxy - xyr2) / 2.0
-        plus_3 = sqrt(70) * (xxxz - 3.0 * yyxz) / 4.0
-        minus_3 = sqrt(70) * (3.0 * xxyz - yyyz) / 4.0
-        plus_4 = sqrt(35) * (xxxx - 6.0 * xxyy + yyyy) / 8.0
-        minus_4 = sqrt(35) * (xxxy - yyyx) / 2.0
-        return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3, plus_4, minus_4
+        return super(Molpro, self).g_to_spherical(list_mul(norm, cartesian))
 
 
 def main():
@@ -1184,10 +1056,10 @@ def main():
         Orca(input_file, pseudoatoms).gwfn()
     elif code == 4:
         Dalton(input_file, pseudoatoms).gwfn()
-    elif code == 5:
-        Molpro(input_file, pseudoatoms).gwfn()
         print ("In Dalton's MOLDEN file all occupation numbers of HF and DFT MOs are zero values by mistake\n"
                "So you should correct 'Number of electrons per primitive cell' in gwfn.data file by hand.")
+    elif code == 5:
+        Molpro(input_file, pseudoatoms).gwfn()
 
 if __name__ == "__main__":
     main()
