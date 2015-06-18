@@ -810,7 +810,7 @@ class Turbomole(DefaultConverter):
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
         """
-        norm = [6.0 / sqrt(15)] * 3 + [2.0 / sqrt(3)] * 6 + [1.0]
+        norm = [6.0/sqrt(15)] * 3 + [2.0/sqrt(3)] * 6 + [1.0]
         return super(Turbomole, self).f_to_spherical(list_mul(norm, cartesian))
 
     def g_to_spherical(self, cartesian):
