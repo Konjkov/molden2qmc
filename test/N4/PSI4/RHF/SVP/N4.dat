@@ -1,0 +1,20 @@
+#!n4 high ang. mo. test
+memory 1000 mb
+molecule n4 {
+symmetry = c1
+0 1
+N       0.5200      0.5300      0.5100
+N      -0.5200     -0.5200      0.5200
+N      -0.5200      0.5200     -0.5200
+N       0.5200     -0.5200     -0.5200
+}
+
+set {
+  basis def2-svp
+  scf_type pk
+  E_CONVERGENCE 10
+  D_CONVERGENCE 10
+  molden_write true
+}
+
+energy('scf')

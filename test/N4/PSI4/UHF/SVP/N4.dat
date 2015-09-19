@@ -1,0 +1,19 @@
+#!n4 high ang. mo. test
+memory 1000 mb
+molecule n4 {
+symmetry = c1
+1 2
+N       0.5200      0.5300      0.5100
+N      -0.5200     -0.5200      0.5200
+N      -0.5200      0.5200     -0.5200
+N       0.5200     -0.5200     -0.5200
+}
+
+set {
+  basis def2-svp
+  reference uhf
+  scf_type pk
+  molden_write true
+}
+
+energy('scf')
