@@ -1,12 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.6.0'
+__version__ = '2.7.0'
 
 """
 TODO:
-1. implement Nwchem
-2. implement QChem
+1. implement QChem
 """
 
 import os
@@ -1013,6 +1012,19 @@ class Molpro(DefaultConverter):
         return super(Molpro, self).g_to_spherical(list_mul(norm, cartesian))
 
 
+class NwChem(DefaultConverter):
+    """
+    NwChem
+    """
+    title = "generated from NwChem output data.\n"
+
+    def atom_list_converter(self):
+        """
+        NwChem correctly normalized contraction coefficients
+        in the MOLDEN file, so we don't need to modify them.
+        """
+
+
 def main():
     print ("Hello, you are converting a MOLDEN file to a CASINO gwfn.data file.\n")
 
@@ -1031,8 +1043,9 @@ def main():
                      "2 -- CFOUR 2.0beta\n"
                      "3 -- ORCA 3.X\n"
                      "4 -- DALTON2013\n"
-                     "5 -- MOLPRO\n")
-    while not code.isdigit() or int(code) > 5:
+                     "5 -- MOLPRO\n"
+                     "6 -- NWCHEM\n")
+    while not code.isdigit() or int(code) > 6:
         code = raw_input('Sorry,  try again.')
 
     code = int(code)
@@ -1060,6 +1073,8 @@ def main():
                "So you should correct 'Number of electrons per primitive cell' in gwfn.data file by hand.")
     elif code == 5:
         Molpro(input_file, pseudoatoms).gwfn()
+    elif code == 6:
+        NwChem(input_file, pseudoatoms).gwfn()
 
 if __name__ == "__main__":
     main()
