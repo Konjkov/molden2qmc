@@ -40,43 +40,43 @@ c         x, y, z
 c        D functions:
 c         xx, yy, zz, xy, xz, yz
           dout(1) = din(1)
-          dout(2) = din(2)
-          dout(3) = din(3)
-          dout(4) = din(4)
-          dout(5) = din(5)
-          dout(6) = din(6)
+          dout(2) = din(4)
+          dout(3) = din(6)
+          dout(4) = din(2)
+          dout(5) = din(3)
+          dout(6) = din(5)
         else if (type.eq.3) then
 c        F functions:
 c         xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
           dout(1) = din(1)
-          dout(2) = din(2)
-          dout(3) = din(3)
+          dout(2) = din(7)
+          dout(3) = din(10)
           dout(4) = din(4)
-          dout(5) = din(5)
-          dout(6) = din(6)
-          dout(7) = din(7)
-          dout(8) = din(8)
-          dout(9) = din(9)
-          dout(10) = din(10)
+          dout(5) = din(2)
+          dout(6) = din(2)
+          dout(7) = din(6)
+          dout(8) = din(9)
+          dout(9) = din(8)
+          dout(10) = din(5)
         else if (type.eq.4) then
 c        G functions:
 c         xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
 c         xxyy xxzz yyzz xxyz yyxz zzxy
           dout(1) = din(1)
-          dout(2) = din(2)
-          dout(3) = din(3)
-          dout(4) = din(4)
-          dout(5) = din(5)
-          dout(6) = din(6)
-          dout(7) = din(7)
-          dout(8) = din(8)
-          dout(9) = din(9)
-          dout(10) = din(10)
-          dout(11) = din(11)
-          dout(12) = din(12)
-          dout(13) = din(13)
-          dout(14) = din(14)
-          dout(15) = din(15)
+          dout(2) = din(11)
+          dout(3) = din(15)
+          dout(4) = din(2)
+          dout(5) = din(3)
+          dout(6) = din(7)
+          dout(7) = din(12)
+          dout(8) = din(10)
+          dout(9) = din(14)
+          dout(10) = din(4)
+          dout(11) = din(6)
+          dout(12) = din(13)
+          dout(13) = din(5)
+          dout(14) = din(8)
+          dout(15) = din(9)
         end if
       else
 c       In MOLDEN file the following order of
@@ -257,7 +257,7 @@ c
       logical status
 c
       integer max_prim
-      parameter (max_prim = 100)
+      parameter (max_prim = 1000)
       double precision exp(max_prim)
       double precision coeff(max_prim)
       character*3 ctype(0:6),cltype(2)
@@ -393,13 +393,6 @@ c
       if (scftype.eq.'DFT')   spinref = 1 ! ambiguous
       if (scftype.eq.'MCSCF') spinref = 1
 c
-      if (sphcart.eq.1) then
-        write(MOLDEN_UNIT,50) '[5D]'
-        write(MOLDEN_UNIT,50) '[9G]'
-      end if
-      write(MOLDEN_UNIT,50) '[MO]'
-  50  format(a4)
-c
 c     allocate local memory
 c
 c     TODO: this is not scalable and probably will not work in DDSCF scheme
@@ -410,7 +403,16 @@ c
       status = bas_numcont(basis, numcont)
       if (.not.status)
      1    call errquit('nwmolden_movecs: error code = ',3,BASIS_ERR)
-
+c
+      status = bas_continfo(basis,1,type,nprimo,ngeno,sphcart)
+c
+      if (sphcart.eq.1) then
+        write(MOLDEN_UNIT,50) '[5D]'
+        write(MOLDEN_UNIT,50) '[9G]'
+      end if
+      write(MOLDEN_UNIT,50) '[MO]'
+  50  format(a4)
+c
       do alfabeta = 1, spinref
          cspin = cspins(alfabeta)
          do orb = 1, nmo
@@ -465,4 +467,3 @@ c
 c ===========================================================================
 c
 
-c $Id: nwmolden.F 26739 2015-01-23 03:27:54Z jhammond $

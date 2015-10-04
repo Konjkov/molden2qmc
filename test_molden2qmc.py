@@ -25,10 +25,10 @@ def mo_matrix(m, col=0):
     :return: MO-coefficients without first four 1s-orbitals witch close to degenerate.
     """
     mo = np.empty((m.nbasis_functions(), m.nbasis_functions()), 'd')
-    for n, orbital1 in enumerate(m.mo_matrix):
+    for n, orbital in enumerate(m.mo_matrix):
         m = 0
-        for ao in orbital1['MO']:
-            mo[n,m:m+len(ao['DATA'])] = ao['DATA']
+        for ao in orbital['MO']:
+            mo[n, m:m+len(ao['DATA'])] = ao['DATA']
             m += len(ao['DATA'])
     return (mo.T*np.sign(mo[:, col])).T[4:, :]
 
