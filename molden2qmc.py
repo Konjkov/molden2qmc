@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.6.0'
+__version__ = '2.6.1'
 
 """
 TODO:
@@ -219,7 +219,6 @@ class Molden(object):
         """
         self.f.seek(0)
         for line in self.f:
-            line = line.upper()  # PSI4 requires case insensitive comparison
             if line.startswith("[5D]") or line.startswith("[5D7F]"):
                 self.D_orb_conversion_required = False
                 self.F_orb_conversion_required = False
@@ -946,12 +945,6 @@ class PSI4(DefaultConverter):
                              " the quantum chemistry code is selected correctly")
 
     g_to_spherical = f_to_spherical = d_to_spherical
-
-    def atom_list_converter(self):
-        """
-        PSI4 correctly normalized contraction coefficients
-        in the MOLDEN file, so we don't need to modify them.
-        """
 
 
 class Dalton(DefaultConverter):
