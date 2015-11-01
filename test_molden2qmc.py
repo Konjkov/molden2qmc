@@ -13,6 +13,8 @@ import molden2qmc
 
 molden2qmc.__version__ = __version__
 
+np.set_printoptions(threshold=np.nan, suppress=True, linewidth=10000)
+
 
 def mo_matrix(m, col=0):
     """
@@ -20,13 +22,13 @@ def mo_matrix(m, col=0):
 
     :param m: Molden converter class i.e. Orca, CFour, Turbomole, ...
     :param col: column which sign set to '+'
-    :return: MO-coefficients with out first four 1s-orbitals witch close to degenerate.
+    :return: MO-coefficients without first four 1s-orbitals witch close to degenerate.
     """
     mo = np.empty((m.nbasis_functions(), m.nbasis_functions()), 'd')
-    for n, orbital1 in enumerate(m.mo_matrix):
+    for n, orbital in enumerate(m.mo_matrix):
         m = 0
-        for ao in orbital1['MO']:
-            mo[n,m:m+len(ao['DATA'])] = ao['DATA']
+        for ao in orbital['MO']:
+            mo[n, m:m+len(ao['DATA'])] = ao['DATA']
             m += len(ao['DATA'])
     return (mo.T*np.sign(mo[:, col])).T[4:, :]
 
@@ -272,7 +274,35 @@ class test_Molpro(unittest.TestCase):
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
 
+class test_NwChem(unittest.TestCase):
+    base_dir = 'test/N4/NWCHEM/'
+    molden_file = 'N4.molden'
+
+    def test_RHF_SVP(self):
+        test_dir = 'RHF/SVP/'
+        nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
+        nwchem.gwfn()
+        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP_NwChem/N4.molden.input', "r"))
+        self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
+
+    def test_RHF_TZVP(self):
+        test_dir = 'RHF/TZVP/'
+        nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
+        nwchem.gwfn()
+        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP_NwChem/N4.molden.input', "r"))
+        self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
+
+    def test_RHF_QZVP(self):
+        test_dir = 'RHF/QZVP/'
+        nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
+        nwchem.gwfn()
+        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP_NwChem/N4.molden.input', "r"))
+        self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
+
 if __name__ == '__main__':
     unittest.main()
-    #suite = unittest.TestLoader().loadTestsFromTestCase(test_PSI4)
+    #suite = unittest.TestLoader().loadTestsFromTestCase(test_NwChem)
     #unittest.TextTestRunner(verbosity=2).run(suite)
