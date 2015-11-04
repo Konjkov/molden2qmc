@@ -297,8 +297,7 @@ class Molden(object):
         """
         :return: True when wfn is unrestricted or False elsewhere.
         """
-        return reduce(bool.__or__, [(mo_orbital_block['SPIN'] == 'Beta')
-                                    for mo_orbital_block in self.mo_matrix], False)
+        return any(mo_orbital_block['SPIN'] == 'Beta' for mo_orbital_block in self.mo_matrix)
 
     def charge(self, atom):
         """
