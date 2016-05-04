@@ -39,25 +39,25 @@ c         x, y, z
         else if (type.eq.2) then
 c        D functions:
 c         xx, yy, zz, xy, xz, yz
-          dout(1) = din(1)
-          dout(2) = din(4)
-          dout(3) = din(6)
-          dout(4) = din(2)
-          dout(5) = din(3)
-          dout(6) = din(5)
+          dout(1) = din(1)/sqrt(3.0)
+          dout(2) = din(4)/sqrt(3.0)
+          dout(3) = din(6)/sqrt(3.0)
+          dout(4) = din(2)/3.0
+          dout(5) = din(3)/3.0
+          dout(6) = din(5)/3.0
         else if (type.eq.3) then
 c        F functions:
 c         xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
-          dout(1) = din(1)
-          dout(2) = din(7)
-          dout(3) = din(10)
-          dout(4) = din(4)
-          dout(5) = din(2)
-          dout(6) = din(2)
-          dout(7) = din(6)
-          dout(8) = din(9)
-          dout(9) = din(8)
-          dout(10) = din(5)
+          dout(1) = din(1)/sqrt(15.0)
+          dout(2) = din(7)/sqrt(15.0)
+          dout(3) = din(10)/sqrt(15.0)
+          dout(4) = din(4)/sqrt(3.0)/5.0
+          dout(5) = din(2)/sqrt(3.0)/5.0
+          dout(6) = din(2)/sqrt(3.0)/5.0
+          dout(7) = din(6)/sqrt(3.0)/5.0
+          dout(8) = din(9)/sqrt(3.0)/5.0
+          dout(9) = din(8)/sqrt(3.0)/5.0
+          dout(10) = din(5)/15.0
         else if (type.eq.4) then
 c        G functions:
 c         xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
@@ -447,7 +447,6 @@ c
      2            'Spin= ', a11/
      3            'Occup= ', f10.5)
            do aof = 1, nbf
-c              write(MOLDEN_UNIT,200) aof,dbl_mb(k_vec + aof - 1)
               write(MOLDEN_UNIT,200) aof,reordered_mo(aof)
  200          format(i6,f18.12)
            enddo ! aof
