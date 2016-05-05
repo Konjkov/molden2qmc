@@ -23,7 +23,12 @@ c
       double precision dout(*)
       integer type              ! type (sp/s/p/d/..)
       integer sphcart           ! 0/1 for cartesian/spherical
+      double precision d3, d5, d7
 c
+      d3 = dsqrt(3.0d0)
+      d5 = dsqrt(5.0d0)
+      d7 = dsqrt(7.0d0)
+
       if (sphcart.eq.0) then
 c       In MOLDEN file the following order of
 c       cartesian functions is expected:
@@ -39,44 +44,44 @@ c         x, y, z
         else if (type.eq.2) then
 c        D functions:
 c         xx, yy, zz, xy, xz, yz
-          dout(1) = 2.0*din(1)/sqrt(3.0)
-          dout(2) = 2.0*din(4)/sqrt(3.0)
-          dout(3) = 2.0*din(6)/sqrt(3.0)
-          dout(4) = din(2)/3.0
-          dout(5) = din(3)/3.0
-          dout(6) = din(5)/3.0
+          dout(1) = 2.0*din(1)/d3
+          dout(2) = 2.0*din(4)/d3
+          dout(3) = 2.0*din(6)/d3
+          dout(4) = din(2)/d3/d3
+          dout(5) = din(3)/d3/d3
+          dout(6) = din(5)/d3/d3
         else if (type.eq.3) then
 c        F functions:
 c         xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
-          dout(1) = 6.0*din(1)/sqrt(15.0)
-          dout(2) = 6.0*din(7)/sqrt(15.0)
-          dout(3) = 6.0*din(10)/sqrt(15.0)
-          dout(4) = 2.0*din(4)/sqrt(3.0)/5.0
-          dout(5) = 2.0*din(2)/sqrt(3.0)/5.0
-          dout(6) = 2.0*din(2)/sqrt(3.0)/5.0
-          dout(7) = 2.0*din(6)/sqrt(3.0)/5.0
-          dout(8) = 2.0*din(9)/sqrt(3.0)/5.0
-          dout(9) = 2.0*din(8)/sqrt(3.0)/5.0
-          dout(10) = din(5)/15.0
+          dout(1) = din(1)/d3/d5
+          dout(2) = din(7)/d3/d5
+          dout(3) = din(10)/d3/d5
+          dout(4) = din(4)/d3/d5/d5
+          dout(5) = din(2)/d3/d5/d5
+          dout(6) = din(2)/d3/d5/d5
+          dout(7) = din(6)/d3/d5/d5
+          dout(8) = din(9)/d3/d5/d5
+          dout(9) = din(8)/d3/d5/d5
+          dout(10) = din(5)/d3/d3/d5/d5
         else if (type.eq.4) then
 c        G functions:
 c         xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
 c         xxyy xxzz yyzz xxyz yyxz zzxy
-          dout(1) = din(1)
-          dout(2) = din(11)
-          dout(3) = din(15)
-          dout(4) = din(2)
-          dout(5) = din(3)
-          dout(6) = din(7)
-          dout(7) = din(12)
-          dout(8) = din(10)
-          dout(9) = din(14)
-          dout(10) = din(4)
-          dout(11) = din(6)
-          dout(12) = din(13)
-          dout(13) = din(5)
-          dout(14) = din(8)
-          dout(15) = din(9)
+          dout(1) = din(1)/d3/d5/d7
+          dout(2) = din(11)/d3/d5/d7
+          dout(3) = din(15)/d3/d5/d7
+          dout(4) = din(2)/d3/d5/d7/d7
+          dout(5) = din(3)/d3/d5/d7/d7
+          dout(6) = din(7)/d3/d5/d7/d7
+          dout(7) = din(12)/d3/d5/d7/d7
+          dout(8) = din(10)/d3/d5/d7/d7
+          dout(9) = din(14)/d3/d5/d7/d7
+          dout(10) = din(4)/d5/d5/d7/d7
+          dout(11) = din(6)/d5/d5/d7/d7
+          dout(12) = din(13)/d5/d5/d7/d7
+          dout(13) = din(5)/d3/d5/d5/d7/d7
+          dout(14) = din(8)/d3/d5/d5/d7/d7
+          dout(15) = din(9)/d3/d5/d5/d7/d7
         end if
       else
 c       In MOLDEN file the following order of
@@ -465,4 +470,3 @@ c
 c
 c ===========================================================================
 c
-
