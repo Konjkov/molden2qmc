@@ -1010,12 +1010,6 @@ class NwChem(DefaultConverter):
     """
     title = "generated from NwChem output data.\n"
 
-    def atom_list_converter(self):
-        """
-        NwChem correctly normalized contraction coefficients
-        in the MOLDEN file, so we don't need to modify them.
-        """
-
     def d_to_spherical(self, cartesian):
         """
         Convert cartesian representation of d-orbital to spherical
