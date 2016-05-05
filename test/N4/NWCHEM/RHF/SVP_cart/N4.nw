@@ -1,0 +1,21 @@
+title "test HF/def2-SVP energy"
+
+geometry
+ symmetry C1
+ N       0.5200      0.5300      0.5100
+ N      -0.5200     -0.5200      0.5200
+ N      -0.5200      0.5200     -0.5200
+ N       0.5200     -0.5200     -0.5200
+end
+
+basis
+ N library def2-SVP
+end
+
+scf
+ thresh 1e-7
+end
+
+set lindep:n_dep 4
+
+task scf energy
