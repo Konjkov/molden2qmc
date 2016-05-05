@@ -1016,6 +1016,40 @@ class NwChem(DefaultConverter):
         in the MOLDEN file, so we don't need to modify them.
         """
 
+    def d_to_spherical(self, cartesian):
+        """
+        Convert cartesian representation of d-orbital to spherical
+        http://theochem.github.io/horton/tut_gaussian_basis.html
+        The following order of D functions is expected:
+            5D: D 0, D+1, D-1, D+2, D-2
+            6D: xx, yy, zz, xy, xz, yz
+        """
+        norm = [2.0/sqrt(3)] * 3 + [1.0] * 3
+        return super(NwChem, self).d_to_spherical(list_mul(norm, cartesian))
+
+    def f_to_spherical(self, cartesian):
+        """
+        Convert cartesian representation of f-orbital to spherical
+        http://theochem.github.io/horton/tut_gaussian_basis.html
+        The following order of F functions is expected:
+            7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
+            10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
+        """
+        norm = [6.0/sqrt(15)] * 3 + [2.0/sqrt(3)] * 6 + [1.0]
+        return super(NwChem, self).f_to_spherical(list_mul(norm, cartesian))
+
+    def g_to_spherical(self, cartesian):
+        """
+        Convert cartesian representation of g-orbital to spherical
+        http://theochem.github.io/horton/tut_gaussian_basis.html
+        The following order of G functions is expected:
+            9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
+            15G: xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
+                 xxyy xxzz yyzz xxyz yyxz zzxy
+        """
+        norm = [24.0/sqrt(105)] * 3 + [6.0/sqrt(15)] * 6 + [4.0/3.0] * 3 + [2.0/sqrt(3)] * 3
+        return super(NwChem, self).g_to_spherical(list_mul(norm, cartesian))
+
 
 def main():
     print ("Hello, you are converting a MOLDEN file to a CASINO gwfn.data file.\n")
