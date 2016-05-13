@@ -44,44 +44,44 @@ c         x, y, z
         else if (type.eq.2) then
 c        D functions:
 c         xx, yy, zz, xy, xz, yz
-          dout(1) = 2.0*din(1)/d3
-          dout(2) = 2.0*din(4)/d3
-          dout(3) = 2.0*din(6)/d3
-          dout(4) = din(2)/d3/d3
-          dout(5) = din(3)/d3/d3
-          dout(6) = din(5)/d3/d3
+          dout(1) = 2.0d0*din(1)/3.0d0
+          dout(2) = 2.0d0*din(4)/3.0d0
+          dout(3) = 2.0d0*din(6)/3.0d0
+          dout(4) = din(2)/3.0d0
+          dout(5) = din(3)/3.0d0
+          dout(6) = din(5)/3.0d0
         else if (type.eq.3) then
 c        F functions:
 c         xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
-          dout(1) = din(1)/d3/d5
-          dout(2) = din(7)/d3/d5
-          dout(3) = din(10)/d3/d5
-          dout(4) = din(4)/d3/d5/d5
-          dout(5) = din(2)/d3/d5/d5
-          dout(6) = din(2)/d3/d5/d5
-          dout(7) = din(6)/d3/d5/d5
-          dout(8) = din(9)/d3/d5/d5
-          dout(9) = din(8)/d3/d5/d5
-          dout(10) = din(5)/d3/d3/d5/d5
+          dout(1) = 6.0d0*din(1)/15.0d0
+          dout(2) = 6.0d0*din(7)/15.0d0
+          dout(3) = 6.0d0*din(10)/15.0d0
+          dout(4) = 2.0d0*din(4)/15.0d0
+          dout(5) = 2.0d0*din(2)/15.0d0
+          dout(6) = 2.0d0*din(2)/15.0d0
+          dout(7) = 2.0d0*din(6)/15.0d0
+          dout(8) = 2.0d0*din(9)/15.0d0
+          dout(9) = 2.0d0*din(8)/15.0d0
+          dout(10) = din(5)/15.0d0
         else if (type.eq.4) then
 c        G functions:
 c         xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
 c         xxyy xxzz yyzz xxyz yyxz zzxy
-          dout(1) = din(1)/d3/d5/d7
-          dout(2) = din(11)/d3/d5/d7
-          dout(3) = din(15)/d3/d5/d7
-          dout(4) = din(2)/d3/d5/d7/d7
-          dout(5) = din(3)/d3/d5/d7/d7
-          dout(6) = din(7)/d3/d5/d7/d7
-          dout(7) = din(12)/d3/d5/d7/d7
-          dout(8) = din(10)/d3/d5/d7/d7
-          dout(9) = din(14)/d3/d5/d7/d7
-          dout(10) = din(4)/d5/d5/d7/d7
-          dout(11) = din(6)/d5/d5/d7/d7
-          dout(12) = din(13)/d5/d5/d7/d7
-          dout(13) = din(5)/d3/d5/d5/d7/d7
-          dout(14) = din(8)/d3/d5/d5/d7/d7
-          dout(15) = din(9)/d3/d5/d5/d7/d7
+          dout(1) = 24.0d0*din(1)/105.0d0
+          dout(2) = 24.0d0*din(11)/105.0d0
+          dout(3) = 24.0d0*din(15)/105.0d0
+          dout(4) = 12.0d0*din(2)/105.0d0
+          dout(5) = 12.0d0*din(3)/105.0d0
+          dout(6) = 12.0d0*din(7)/105.0d0
+          dout(7) = 12.0d0*din(12)/105.0d0
+          dout(8) = 12.0d0*din(10)/105.0d0
+          dout(9) = 12.0d0*din(14)/105.0d0
+          dout(10) = 8.0d0*din(4)/105.0d0
+          dout(11) = 8.0d0*din(6)/105.0d0
+          dout(12) = 8.0d0*din(13)/105.0d0
+          dout(13) = 2.0d0*din(5)/105.0d0
+          dout(14) = 2.0d0*din(8)/105.0d0
+          dout(15) = 2.0d0*din(9)/105.0d0
         end if
       else
 c       In MOLDEN file the following order of
