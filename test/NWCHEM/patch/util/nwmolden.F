@@ -9,7 +9,7 @@ c     4. (optional) dump scf and geometry optimization convergence information
 c     5. (optional) dump normal modes from frequency calculation
 c
 c     This code was written on January 18th and 19th, 2009 by Jeff Hammond.
-c     Improved 2015 by Vladimir Konjkov.
+c     Improved 2016 by Vladimir Konjkov.
 c
 c ===========================================================================
 c
@@ -25,10 +25,6 @@ c
       integer sphcart           ! 0/1 for cartesian/spherical
       double precision d3, d5, d7
 c
-      d3 = dsqrt(3.0d0)
-      d5 = dsqrt(5.0d0)
-      d7 = dsqrt(7.0d0)
-
       if (sphcart.eq.0) then
 c       In MOLDEN file the following order of
 c       cartesian functions is expected:
@@ -70,15 +66,15 @@ c         xxyy xxzz yyzz xxyz yyxz zzxy
           dout(1) = 24.0d0*din(1)/105.0d0
           dout(2) = 24.0d0*din(11)/105.0d0
           dout(3) = 24.0d0*din(15)/105.0d0
-          dout(4) = 12.0d0*din(2)/105.0d0
-          dout(5) = 12.0d0*din(3)/105.0d0
-          dout(6) = 12.0d0*din(7)/105.0d0
-          dout(7) = 12.0d0*din(12)/105.0d0
-          dout(8) = 12.0d0*din(10)/105.0d0
-          dout(9) = 12.0d0*din(14)/105.0d0
-          dout(10) = 8.0d0*din(4)/105.0d0
-          dout(11) = 8.0d0*din(6)/105.0d0
-          dout(12) = 8.0d0*din(13)/105.0d0
+          dout(4) = 6.0d0*din(2)/105.0d0
+          dout(5) = 6.0d0*din(3)/105.0d0
+          dout(6) = 6.0d0*din(7)/105.0d0
+          dout(7) = 6.0d0*din(12)/105.0d0
+          dout(8) = 6.0d0*din(10)/105.0d0
+          dout(9) = 6.0d0*din(14)/105.0d0
+          dout(10) = 4.0d0*din(4)/105.0d0
+          dout(11) = 4.0d0*din(6)/105.0d0
+          dout(12) = 4.0d0*din(13)/105.0d0
           dout(13) = 2.0d0*din(5)/105.0d0
           dout(14) = 2.0d0*din(8)/105.0d0
           dout(15) = 2.0d0*din(9)/105.0d0
