@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.6.1'
+__version__ = '2.6.2'
 
 """
 TODO:
@@ -575,6 +575,8 @@ class DefaultConverter(Molden):
     in a spherical format and only m-dependent normalisation required.
     """
 
+    tolerance = 1e-5
+
     def __init__(self, f, pseudoatoms="none"):
         super(DefaultConverter, self).__init__(f, pseudoatoms)
         self.atom_list_converter()
@@ -652,6 +654,8 @@ class DefaultConverter(Molden):
 
         r2 = xx + yy + zz
 
+        assert abs(r2) < self.tolerance, "conversion of d-orbitals from cartesian to spherical failed"
+
         zero = (3.0 * zz - r2) / 2.0
         plus_1 = sqrt(3) * xz
         minus_1 = sqrt(3) * yz
@@ -672,6 +676,10 @@ class DefaultConverter(Molden):
         xr2 = xxx + xyy + xzz
         yr2 = xxy + yyy + yzz
         zr2 = xxz + yyz + zzz
+
+        assert abs(xr2) < self.tolerance, "conversion of f-orbitals from cartesian to spherical failed"
+        assert abs(yr2) < self.tolerance, "conversion of f-orbitals from cartesian to spherical failed"
+        assert abs(zr2) < self.tolerance, "conversion of f-orbitals from cartesian to spherical failed"
 
         zero = (5.0 * zzz - 3.0 * zr2) / 2.0
         plus_1 = sqrt(6) * (5.0 * xzz - xr2) / 4.0
@@ -700,6 +708,14 @@ class DefaultConverter(Molden):
         y2r2 = xxyy + yyyy + yyzz
         z2r2 = xxzz + yyzz + zzzz
         r4 = x2r2 + y2r2 + z2r2
+
+        assert abs(xyr2) < self.tolerance, "conversion of g-orbitals from cartesian to spherical failed"
+        assert abs(xzr2) < self.tolerance, "conversion of g-orbitals from cartesian to spherical failed"
+        assert abs(yzr2) < self.tolerance, "conversion of g-orbitals from cartesian to spherical failed"
+        assert abs(x2r2) < self.tolerance, "conversion of g-orbitals from cartesian to spherical failed"
+        assert abs(y2r2) < self.tolerance, "conversion of g-orbitals from cartesian to spherical failed"
+        assert abs(z2r2) < self.tolerance, "conversion of g-orbitals from cartesian to spherical failed"
+        assert abs(r4) < self.tolerance, "conversion of g-orbitals from cartesian to spherical failed"
 
         zero = (35.0 * zzzz - 30.0 * z2r2 + 3.0 * r4) / 8.0
         plus_1 = sqrt(10) * (7.0 * zzzx - 3.0 * xzr2) / 4.0

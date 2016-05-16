@@ -8,8 +8,6 @@ import unittest
 import filecmp
 import numpy as np
 import molden2qmc
-#from shutil import copyfile
-#        copyfile('gwfn.data', self.base_dir + test_dir + 'gwfn.data')
 
 molden2qmc.__version__ = __version__
 
@@ -304,11 +302,34 @@ class test_NwChem(unittest.TestCase):
 
     def test_UHF_SVP(self):
         test_dir = 'UHF/SVP/'
-        nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
+        molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+
+    def test_RHF_SVP_cart(self):
+        test_dir = 'RHF/SVP_cart/'
+        nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
+        nwchem.gwfn()
+        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP_NwChem/N4.molden.input', "r"))
+        self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
+
+    def test_RHF_TZVP_cart(self):
+        test_dir = 'RHF/TZVP_cart/'
+        nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
+        nwchem.gwfn()
+        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP_NwChem/N4.molden.input', "r"))
+        self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
+
+    def test_RHF_QZVP_cart(self):
+        test_dir = 'RHF/QZVP_cart/'
+        nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
+        nwchem.gwfn()
+        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP_NwChem/N4.molden.input', "r"))
+        self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
 
 
 if __name__ == '__main__':
     unittest.main()
-    #suite = unittest.TestLoader().loadTestsFromTestCase(test_NwChem)
-    #unittest.TextTestRunner(verbosity=2).run(suite)
+

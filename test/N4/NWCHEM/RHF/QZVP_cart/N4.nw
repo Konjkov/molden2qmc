@@ -8,7 +8,7 @@ geometry
  N       0.5200     -0.5200     -0.5200
 end
 
-basis
+basis cartesian
  N library def2-QZVP
 end
 
