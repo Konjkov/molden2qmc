@@ -1,8 +1,8 @@
     -----------------------------------------------------------------------
-          PSI4: An Open-Source Ab Initio Electronic Structure Package
-                              PSI 4.0 Driver
+          Psi4: An Open-Source Ab Initio Electronic Structure Package
+                              Psi4 0.4.156 Driver
 
-               Git: Rev {master} 521f06adb441ac1e2f1732eb1cd090190b409c49
+                          Git: Rev {master} 7783818 dirty
 
     J. M. Turney, A. C. Simmonett, R. M. Parrish, E. G. Hohenstein,
     F. A. Evangelista, J. T. Fermann, B. J. Mintz, L. A. Burns, J. J. Wilke,
@@ -16,10 +16,10 @@
     -----------------------------------------------------------------------
 
 
-    Psi4 started on: 06-16-2015  08:55:26 PM KRAT
+    Psi4 started on: Mon May 16 00:27:39 2016
 
-    Process ID:  16031
-    PSI4DATADIR: /home/kbob/git/psi4release/lib
+    Process ID:  11472
+    PSI4DATADIR: /usr/local/psi4/share/psi4
     Memory level set to 256.000 MB
 
   ==> Input File <==
@@ -49,8 +49,8 @@ energy('scf')
 
   Memory set to 1000.000 MiB by Python script.
 
-*** tstart() called on kbob-G41MT-S2
-*** at Tue Jun 16 20:55:27 2015
+*** tstart() called on vladimir-Aspire-E5-571G
+*** at Mon May 16 00:27:41 2016
 
 
          ---------------------------------------------------------
@@ -67,12 +67,12 @@ energy('scf')
 
     Geometry (in Angstrom), charge = 0, multiplicity = 1:
 
-       Center              X                  Y                   Z       
-    ------------   -----------------  -----------------  -----------------
-           N          0.520000000000     0.527500000000     0.512500000000
-           N         -0.520000000000    -0.522500000000     0.522500000000
-           N         -0.520000000000     0.517500000000    -0.517500000000
-           N          0.520000000000    -0.522500000000    -0.517500000000
+       Center              X                  Y                   Z               Mass       
+    ------------   -----------------  -----------------  -----------------  -----------------
+           N          0.520000000000     0.527500000000     0.512500000000    14.003074004780
+           N         -0.520000000000    -0.522500000000     0.522500000000    14.003074004780
+           N         -0.520000000000     0.517500000000    -0.517500000000    14.003074004780
+           N          0.520000000000    -0.522500000000    -0.517500000000    14.003074004780
 
   Running in c1 symmetry.
 
@@ -116,90 +116,7 @@ energy('scf')
     Total     120     120      14      14      14       0
    -------------------------------------------------------
 
-  Starting with a DF guess...
-
- OEINTS: Overlap, kinetic, potential, dipole, and quadrupole integrals
-         stored in file 35.
-
   ==> Integral Setup <==
-
-  ==> DFJK: Density-Fitted J/K Matrices <==
-
-    J tasked:                  Yes
-    K tasked:                  Yes
-    wK tasked:                  No
-    OpenMP threads:              1
-    Integrals threads:           1
-    Memory (MB):               715
-    Algorithm:                Core
-    Integral Cache:           NONE
-    Schwarz Cutoff:          1E-12
-    Fitting Condition:       1E-12
-
-   => Auxiliary Basis Set <=
-
-  Basis Set: 
-    Number of shells: 100
-    Number of basis function: 316
-    Number of Cartesian functions: 384
-    Spherical Harmonics?: true
-    Max angular momentum: 4
-
-  Minimum eigenvalue in the overlap matrix is 2.5917109146E-03.
-  Using Symmetric Orthogonalization.
-  SCF Guess: Core (One-Electron) Hamiltonian.
-
-  ==> Iterations <==
-
-                           Total Energy        Delta E     RMS |[F,P]|
-
-   @DF-RHF iter   1:  -190.09344039611071   -1.90093e+02   7.31942e-02 
-   @DF-RHF iter   2:  -194.16443296466687   -4.07099e+00   4.65257e-02 DIIS
-   @DF-RHF iter   3:  -214.47772327665339   -2.03133e+01   2.19420e-02 DIIS
-   @DF-RHF iter   4:  -216.95286225372311   -2.47514e+00   1.07745e-02 DIIS
-   @DF-RHF iter   5:  -217.47353599108200   -5.20674e-01   4.02827e-03 DIIS
-   @DF-RHF iter   6:  -217.58580666983315   -1.12271e-01   5.64301e-04 DIIS
-   @DF-RHF iter   7:  -217.59117882803034   -5.37216e-03   2.19158e-04 DIIS
-   @DF-RHF iter   8:  -217.59209600748264   -9.17179e-04   9.61177e-05 DIIS
-   @DF-RHF iter   9:  -217.59216929825894   -7.32908e-05   3.61603e-05 DIIS
-   @DF-RHF iter  10:  -217.59218122592861   -1.19277e-05   1.10138e-05 DIIS
-   @DF-RHF iter  11:  -217.59218274512315   -1.51919e-06   1.32069e-06 DIIS
-   @DF-RHF iter  12:  -217.59218278872706   -4.36039e-08   6.97210e-07 DIIS
-   @DF-RHF iter  13:  -217.59218280227796   -1.35509e-08   4.45697e-07 DIIS
-   @DF-RHF iter  14:  -217.59218280640303   -4.12507e-09   1.44448e-07 DIIS
-   @DF-RHF iter  15:  -217.59218280700250   -5.99471e-10   5.00247e-08 DIIS
-   @DF-RHF iter  16:  -217.59218280708038   -7.78755e-11   1.96108e-08 DIIS
-   @DF-RHF iter  17:  -217.59218280709231   -1.19371e-11   3.85548e-09 DIIS
-   @DF-RHF iter  18:  -217.59218280709248   -1.70530e-13   1.06496e-09 DIIS
-   @DF-RHF iter  19:  -217.59218280709243    5.68434e-14   3.45534e-10 DIIS
-   @DF-RHF iter  20:  -217.59218280709283   -3.97904e-13   1.06672e-10 DIIS
-   @DF-RHF iter  21:  -217.59218280709243    3.97904e-13   4.60627e-11 DIIS
-
-  DF guess converged.
-
-  ==> Integral Setup <==
-
- MINTS: Wrapper to libmints.
-   by Justin Turney
-
-   Calculation information:
-      Number of atoms:                   4
-      Number of AO shells:              40
-      Number of SO shells:              40
-      Number of primitives:            104
-      Number of atomic orbitals:       140
-      Number of basis functions:       120
-
-      Number of irreps:                  1
-      Integral cutoff                 0.00e+00
-      Number of functions per irrep: [ 120 ]
-
- OEINTS: Overlap, kinetic, potential, dipole, and quadrupole integrals
-         stored in file 35.
-
-      Computing two-electron integrals...done
-      Computed 25789101 non-zero two-electron integrals.
-        Stored in file 33.
 
 	Batch   1 pq = [       0,    3422] index = [             0,5856753]
 	Batch   2 pq = [    3422,    4840] index = [       5856753,11715220]
@@ -214,15 +131,35 @@ energy('scf')
     Memory (MB):               715
     Schwarz Cutoff:          1E-12
 
-   @RHF iter  22:  -217.59236019969504   -1.77393e-04   6.92920e-06 DIIS
-   @RHF iter  23:  -217.59236038634563   -1.86651e-07   1.13961e-06 DIIS
-   @RHF iter  24:  -217.59236039371203   -7.36640e-09   4.28797e-07 DIIS
-   @RHF iter  25:  -217.59236039474851   -1.03648e-09   8.56763e-08 DIIS
-   @RHF iter  26:  -217.59236039487817   -1.29660e-10   2.52789e-08 DIIS
-   @RHF iter  27:  -217.59236039489119   -1.30171e-11   8.17671e-09 DIIS
-   @RHF iter  28:  -217.59236039489124   -5.68434e-14   5.15255e-09 DIIS
-   @RHF iter  29:  -217.59236039489193   -6.82121e-13   5.30562e-10 DIIS
-   @RHF iter  30:  -217.59236039489147    4.54747e-13   7.26695e-11 DIIS
+  Minimum eigenvalue in the overlap matrix is 2.5917109146E-03.
+  Using Symmetric Orthogonalization.
+  SCF Guess: Core (One-Electron) Hamiltonian.
+
+  ==> Iterations <==
+
+                        Total Energy        Delta E     RMS |[F,P]|
+
+   @RHF iter   1:  -190.10814428992913   -1.90108e+02   7.30947e-02 
+   @RHF iter   2:  -194.16308119465870   -4.05494e+00   4.65282e-02 DIIS
+   @RHF iter   3:  -214.48892904236183   -2.03258e+01   2.19036e-02 DIIS
+   @RHF iter   4:  -216.95486395429126   -2.46593e+00   1.07600e-02 DIIS
+   @RHF iter   5:  -217.47420336936901   -5.19339e-01   4.01966e-03 DIIS
+   @RHF iter   6:  -217.58600476442430   -1.11801e-01   5.63674e-04 DIIS
+   @RHF iter   7:  -217.59136058637185   -5.35582e-03   2.18738e-04 DIIS
+   @RHF iter   8:  -217.59227415644645   -9.13570e-04   9.58655e-05 DIIS
+   @RHF iter   9:  -217.59234694891208   -7.27925e-05   3.60823e-05 DIIS
+   @RHF iter  10:  -217.59235882288888   -1.18740e-05   1.09752e-05 DIIS
+   @RHF iter  11:  -217.59236033342287   -1.51053e-06   1.31673e-06 DIIS
+   @RHF iter  12:  -217.59236037667935   -4.32565e-08   6.95840e-07 DIIS
+   @RHF iter  13:  -217.59236039007490   -1.33955e-08   4.45533e-07 DIIS
+   @RHF iter  14:  -217.59236039420361   -4.12871e-09   1.43817e-07 DIIS
+   @RHF iter  15:  -217.59236039480177   -5.98163e-10   4.99618e-08 DIIS
+   @RHF iter  16:  -217.59236039487959   -7.78186e-11   1.95780e-08 DIIS
+   @RHF iter  17:  -217.59236039489170   -1.21076e-11   3.84843e-09 DIIS
+   @RHF iter  18:  -217.59236039489176   -5.68434e-14   1.06618e-09 DIIS
+   @RHF iter  19:  -217.59236039489181   -5.68434e-14   3.45779e-10 DIIS
+   @RHF iter  20:  -217.59236039489204   -2.27374e-13   1.06098e-10 DIIS
+   @RHF iter  21:  -217.59236039489181    2.27374e-13   4.59130e-11 DIIS
 
   ==> Post-Iterations <==
 
@@ -282,18 +219,18 @@ energy('scf')
 
   Energy converged.
 
-  @RHF Final Energy:  -217.59236039489147
+  @RHF Final Energy:  -217.59236039489181
 
    => Energetics <=
 
     Nuclear Repulsion Energy =            105.7779400203376952
-    One-Electron Energy =                -504.2752937670064739
-    Two-Electron Energy =                 180.9049933517772502
+    One-Electron Energy =                -504.2752937540562925
+    Two-Electron Energy =                 180.9049933388265572
     DFT Exchange-Correlation Energy =       0.0000000000000000
     Empirical Dispersion Energy =           0.0000000000000000
     PCM Polarization Energy =               0.0000000000000000
     EFP Energy =                            0.0000000000000000
-    Total Energy =                       -217.5923603948915002
+    Total Energy =                       -217.5923603948920118
 
     Alert: EFP and PCM quantities not currently incorporated into SCF psivars.
 
@@ -318,14 +255,14 @@ Properties computed using the SCF density matrix
 
   Saving occupied orbitals to File 180.
 
-*** tstop() called on kbob-G41MT-S2 at Tue Jun 16 20:56:07 2015
+*** tstop() called on vladimir-Aspire-E5-571G at Mon May 16 00:28:07 2016
 Module time:
-	user time   =      23.30 seconds =       0.39 minutes
-	system time =      12.48 seconds =       0.21 minutes
-	total time  =         40 seconds =       0.67 minutes
+	user time   =      13.91 seconds =       0.23 minutes
+	system time =      18.35 seconds =       0.31 minutes
+	total time  =         26 seconds =       0.43 minutes
 Total time:
-	user time   =      23.30 seconds =       0.39 minutes
-	system time =      12.48 seconds =       0.21 minutes
-	total time  =         40 seconds =       0.67 minutes
+	user time   =      13.91 seconds =       0.23 minutes
+	system time =      18.35 seconds =       0.31 minutes
+	total time  =         26 seconds =       0.43 minutes
 
 *** PSI4 exiting successfully. Buy a developer a beer!
