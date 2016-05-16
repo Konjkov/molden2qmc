@@ -1,0 +1,24 @@
+title "test HF/def2-SVP energy"
+
+geometry
+ symmetry C1
+ N       0.5200      0.5300      0.5100
+ N      -0.5200     -0.5200      0.5200
+ N      -0.5200      0.5200     -0.5200
+ N       0.5200     -0.5200     -0.5200
+end
+
+basis spherical
+ N library def2-SVP
+end
+
+charge 1
+
+scf
+ uhf
+ doublet
+ thresh 1e-7
+ maxiter 100
+end
+
+task scf energy

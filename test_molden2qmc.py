@@ -69,7 +69,7 @@ class test_Turbomole(unittest.TestCase):
 
 class test_PSI4(unittest.TestCase):
     base_dir = 'test/N4/PSI4/'
-    molden_file = 'N4.out.n4.molden'
+    molden_file = 'N4.n4.molden'
 
     def test_RHF_SVP(self):
         test_dir = 'RHF/SVP/'
@@ -301,6 +301,12 @@ class test_NwChem(unittest.TestCase):
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
         orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP_NwChem/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
+
+    def test_UHF_SVP(self):
+        test_dir = 'UHF/SVP/'
+        nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
+        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+
 
 if __name__ == '__main__':
     unittest.main()
