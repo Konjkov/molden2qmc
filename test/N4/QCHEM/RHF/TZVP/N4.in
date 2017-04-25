@@ -1,0 +1,19 @@
+$comment0
+$end
+
+$rem
+SYMMETRY              off
+BASIS                 def2-TZVP
+METHOD                HF
+SCF_CONVERGENCE       8
+MOLDEN_FORMAT         true
+PRINT_ORBITALS        true
+$end
+
+$molecule
+   0 1
+   N       0.5200      0.5300      0.5100
+   N      -0.5200     -0.5200      0.5200
+   N      -0.5200      0.5200     -0.5200
+   N       0.5200     -0.5200     -0.5200
+$end
