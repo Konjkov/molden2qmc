@@ -14,7 +14,7 @@ molden2qmc.__version__ = __version__
 np.set_printoptions(threshold=np.nan, suppress=True, linewidth=10000)
 
 
-def mo_matrix(m, col=0):
+def mo_matrix(m, col=0, skip=4):
     """
     Convert MO-coefficients to numpy array, remove first four MO witch is 1s of N atoms.
 
@@ -28,7 +28,7 @@ def mo_matrix(m, col=0):
         for ao in orbital['MO']:
             mo[n, m:m+len(ao['DATA'])] = ao['DATA']
             m += len(ao['DATA'])
-    return (mo.T*np.sign(mo[:, col])).T[4:, :]
+    return (mo.T*np.sign(mo[:, col])).T[skip:, :]
 
 
 class test_Turbomole(unittest.TestCase):
@@ -329,7 +329,19 @@ class test_NwChem(unittest.TestCase):
         orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP_NwChem/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
 
+class test_QChem(unittest.TestCase):
+    base_dir = 'test/N4/QCHEM/'
+    molden_file = 'N4.molden'
+
+    def test_RHF_TZVP(self):
+        test_dir = 'RHF/TZVP/'
+        qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
+        qchem.gwfn()
+#        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        dalton = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP_Dalton/N4.molden.input', "r"))
+        print(mo_matrix(qchem, skip=0)/mo_matrix(dalton, skip=0))
+#        self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(dalton), atol=0.001))
+
 
 if __name__ == '__main__':
     unittest.main()
-
