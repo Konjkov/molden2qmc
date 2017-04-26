@@ -338,9 +338,9 @@ class test_QChem(unittest.TestCase):
         qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
         qchem.gwfn()
 #        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        dalton = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP_QChem/N4.molden.input', "r"))
-        print(mo_matrix(qchem, skip=0)/mo_matrix(dalton, skip=0))
-#        self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(dalton), atol=0.001))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP_QChem/N4.molden.input', "r"))
+        print(mo_matrix(qchem, skip=0)/mo_matrix(orca, skip=0))
+#        self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(orca), atol=0.001))
 
 
 if __name__ == '__main__':
