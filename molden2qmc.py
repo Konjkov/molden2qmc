@@ -1058,9 +1058,19 @@ class NwChem(DefaultConverter):
 
 class QChem(DefaultConverter):
     """
-    QChem 4.3
+    QChem 4.4
     """
     title = "generated from QChem output data.\n"
+
+
+    def nelec(self):
+        """
+        in CFOUR occupation number sometimes takes value from list (0, 1)
+        """
+        if self.spin_unrestricted():
+            return super(QChem, self).nelec()
+        else:
+            return 2 * super(QChem, self).nelec()
 
     def d_to_spherical(self, cartesian):
         """
