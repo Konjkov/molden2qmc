@@ -6,7 +6,7 @@
 
 # SYSTEM
 neu               : 14             #*! Number of up electrons (Integer)
-ned               : 13             #*! Number of down electrons (Integer)
+ned               : 14             #*! Number of down electrons (Integer)
 periodic          : F              #*! Periodic boundary conditions (Boolean)
 atom_basis_type   : gaussian       #*! Basis set type (text)
 

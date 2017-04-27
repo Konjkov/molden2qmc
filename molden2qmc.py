@@ -1067,7 +1067,7 @@ class QChem(DefaultConverter):
 
     def nelec(self):
         """
-        in CFOUR occupation number sometimes takes value from list (0, 1)
+        in QChem occupation number sometimes takes value from list (0, 1)
         """
         if self.spin_unrestricted():
             return super(QChem, self).nelec()
