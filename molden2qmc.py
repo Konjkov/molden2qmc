@@ -261,7 +261,9 @@ class Molden(object):
 
         section_body = self.molden_section("MO")[1:]
         for line in section_body:
-            if line.strip().startswith('Sym='):
+            if line.isspace():
+                break
+            elif line.strip().startswith('Sym='):
                 # Dalton remove lines with zero coefficients, restoring them
                 mo_orbital_block = {'raw_data': [0.0] * nbasisfunctions}
                 self.mo_matrix.append(mo_orbital_block)
