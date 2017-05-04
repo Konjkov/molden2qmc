@@ -333,13 +333,41 @@ class test_QChem(unittest.TestCase):
     base_dir = 'test/N4/QCHEM/'
     molden_file = 'N4.molden'
 
+    def test_RHF_cc_pVDZ(self):
+        test_dir = 'RHF/cc-pVDZ/'
+        qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
+        qchem.gwfn()
+        #self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVDZ_QChem/N4.molden.input', "r"))
+#        print(mo_matrix(qchem, skip=4)/mo_matrix(orca, skip=4))
+        self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(orca), atol=0.001))
+
     def test_RHF_TZVP(self):
         test_dir = 'RHF/TZVP/'
         qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
         qchem.gwfn()
         #self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
         orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP_QChem/N4.molden.input', "r"))
+        #print(mo_matrix(qchem, skip=0)/mo_matrix(orca, skip=0))
+        self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(orca), atol=0.001))
+
+    def test_RHF_cc_pVTZ(self):
+        test_dir = 'RHF/cc-pVTZ/'
+        qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
+        qchem.gwfn()
+        #self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVTZ_QChem/N4.molden.input', "r"))
         print(mo_matrix(qchem, skip=0)/mo_matrix(orca, skip=0))
+        #print(mo_matrix(qchem, skip=0)/mo_matrix(orca, skip=0))
+        self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(orca), atol=0.001))
+
+    def test_RHF_cc_pVQZ(self):
+        test_dir = 'RHF/cc-pVQZ/'
+        qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
+        qchem.gwfn()
+        #self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVQZ_QChem/N4.molden.input', "r"))
+        #print(mo_matrix(qchem, skip=0)/mo_matrix(orca, skip=0))
         self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(orca), atol=0.001))
 
     def test_UHF_TZVP(self):

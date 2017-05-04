@@ -1064,6 +1064,10 @@ class QChem(DefaultConverter):
     """
     title = "generated from QChem output data.\n"
 
+    def molden_spherical_cartesian(self):
+        self.D_orb_conversion_required = False
+        self.F_orb_conversion_required = False
+        self.G_orb_conversion_required = False
 
     def nelec(self):
         """
