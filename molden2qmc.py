@@ -890,7 +890,7 @@ class CFour(DefaultConverter):
 
 class Orca(DefaultConverter):
     """
-    ORCA 3.X
+    ORCA 3.X / 4.X
     """
     title = "generated from Orca output data.\n"
 
@@ -1104,11 +1104,11 @@ def main():
                      "0 -- TURBOMOLE\n"
                      "1 -- PSI4\n"
                      "2 -- CFOUR 2.0beta\n"
-                     "3 -- ORCA 3.X\n"
+                     "3 -- ORCA 3.X - 4.X\n"
                      "4 -- DALTON2013\n"
                      "5 -- MOLPRO\n"
                      "6 -- NWCHEM\n"
-                     "7 -- QCHEM\n")
+                     "7 -- QCHEM 4.X\n")
     while not code.isdigit() or int(code) > 7:
         code = raw_input('Sorry,  try again.')
 
