@@ -137,18 +137,8 @@ class test_Orca(unittest.TestCase):
     base_dir = 'test/N4/ORCA/'
     molden_file = 'N4.molden.input'
 
-    def test_RHF_SVP_Molpro(self):
-        test_dir = 'RHF/SVP/'
-        molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
-        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-
     def test_RHF_SVP_Dalton(self):
         test_dir = 'RHF/SVP_Dalton/'
-        molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
-        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-
-    def test_RHF_SVP_PSI4(self):
-        test_dir = 'RHF/SVP_Psi4/'
         molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
@@ -157,18 +147,8 @@ class test_Orca(unittest.TestCase):
         molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
-    def test_RHF_TZVP_Molpro(self):
-        test_dir = 'RHF/TZVP/'
-        molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
-        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-
     def test_RHF_TZVP_Dalton(self):
         test_dir = 'RHF/TZVP_Dalton/'
-        molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
-        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-
-    def test_RHF_QZVP_Molpro(self):
-        test_dir = 'RHF/QZVP/'
         molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
@@ -177,23 +157,28 @@ class test_Orca(unittest.TestCase):
         molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
-    def test_RHF_cc_pVTZ(self):
+    def test_RHF_cc_pVDZ(self):
+        test_dir = 'RHF/cc-pVDZ/'
+        molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
+        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+
+    def test_RHF_cc_pVTZ_Turbomole(self):
         test_dir = 'RHF/cc-pVTZ_Turbomole/'
         molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
-    def test_RHF_cc_pVTZ_PSI4(self):
-        test_dir = 'RHF/cc-pVTZ_Psi4/'
+    def test_RHF_cc_pVTZ(self):
+        test_dir = 'RHF/cc-pVTZ/'
         molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
-    def test_RHF_cc_pVQZ(self):
+    def test_RHF_cc_pVQZ_Turbomole(self):
         test_dir = 'RHF/cc-pVQZ_Turbomole/'
         molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
-    def test_RHF_cc_pVQZ_PSI4(self):
-        test_dir = 'RHF/cc-pVQZ_Psi4/'
+    def test_RHF_cc_pVQZ(self):
+        test_dir = 'RHF/cc-pVQZ/'
         molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
@@ -305,6 +290,7 @@ class test_NwChem(unittest.TestCase):
         molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
+    @unittest.skip("Cartesian basis not supported in NWChem")
     def test_RHF_SVP_cart(self):
         test_dir = 'RHF/SVP_cart/'
         nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
@@ -313,6 +299,7 @@ class test_NwChem(unittest.TestCase):
         orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
 
+    @unittest.skip("Cartesian basis not supported in NWChem")
     def test_RHF_TZVP_cart(self):
         test_dir = 'RHF/TZVP_cart/'
         nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
@@ -321,6 +308,7 @@ class test_NwChem(unittest.TestCase):
         orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
 
+    @unittest.skip("Cartesian basis not supported in NWChem")
     def test_RHF_QZVP_cart(self):
         test_dir = 'RHF/QZVP_cart/'
         nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
@@ -357,6 +345,7 @@ class test_QChem(unittest.TestCase):
         orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(orca), atol=0.001))
 
+    @unittest.skip("This basis is segmented contracted in QChem")
     def test_RHF_cc_pVDZ(self):
         test_dir = 'RHF/cc-pVDZ/'
         qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
@@ -366,7 +355,7 @@ class test_QChem(unittest.TestCase):
         #print(mo_matrix(qchem, skip=4)/mo_matrix(orca, skip=4))
         self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(orca), atol=0.001))
 
-
+    @unittest.skip("This basis is segmented contracted in QChem")
     def test_RHF_cc_pVTZ(self):
         test_dir = 'RHF/cc-pVTZ/'
         qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
