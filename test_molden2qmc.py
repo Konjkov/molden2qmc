@@ -74,7 +74,7 @@ class test_PSI4(unittest.TestCase):
         psi4 = molden2qmc.PSI4(open(self.base_dir + test_dir + self.molden_file, "r"))
         psi4.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP_Psi4/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(psi4), mo_matrix(orca), atol=0.0001))
 
     def test_RHF_cc_pVTZ(self):
@@ -82,7 +82,7 @@ class test_PSI4(unittest.TestCase):
         psi4 = molden2qmc.PSI4(open(self.base_dir + test_dir + self.molden_file, "r"))
         psi4.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVTZ_Psi4/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVTZ/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(psi4), mo_matrix(orca), atol=0.001))
 
     def test_RHF_cc_pVQZ(self):
@@ -90,7 +90,7 @@ class test_PSI4(unittest.TestCase):
         psi4 = molden2qmc.PSI4(open(self.base_dir + test_dir + self.molden_file, "r"))
         psi4.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVQZ_Psi4/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVQZ/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(psi4), mo_matrix(orca), atol=0.001))
 
     def test_UHF_SVP(self):
