@@ -1,12 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.6.2'
-
-"""
-TODO:
-1. implement QChem
-"""
+__version__ = '2.7.0'
 
 import os
 from math import pi, sqrt, factorial, fabs
@@ -140,7 +135,7 @@ class Molden(object):
 
         for line in section_body:
             split_line = line.split()
-            if section_header.split()[1] == 'Angs':
+            if section_header.split()[1] in ('Angs', '(Angs)'): # QCHEM uses (Angs)
                 atom = {'N': int(split_line[2]),  # atomic number
                         'X': float(split_line[3]) * self.Ang2Bohr,
                         'Y': float(split_line[4]) * self.Ang2Bohr,
@@ -198,7 +193,7 @@ class Molden(object):
                 atom = self.atom_list[int(split_line[0])-1]
                 atom['SHELLS'] = []
             elif len(split_line) == 3:   # new shell
-                shell = {'TYPE': split_line[0], 'DATA': []}
+                shell = {'TYPE': split_line[0].lower(), 'DATA': []} # QCHEM uses an upper case
                 atom['SHELLS'].append(shell)
             else:
                 if smart_float(split_line[1]) != 0.0:  # non zero contraction coefficient
@@ -266,7 +261,9 @@ class Molden(object):
 
         section_body = self.molden_section("MO")[1:]
         for line in section_body:
-            if line.strip().startswith('Sym='):
+            if line.isspace():
+                break
+            elif line.strip().startswith('Sym='):
                 # Dalton remove lines with zero coefficients, restoring them
                 mo_orbital_block = {'raw_data': [0.0] * nbasisfunctions}
                 self.mo_matrix.append(mo_orbital_block)
@@ -893,7 +890,7 @@ class CFour(DefaultConverter):
 
 class Orca(DefaultConverter):
     """
-    ORCA 3.X
+    ORCA 3.X / 4.X
     """
     title = "generated from Orca output data.\n"
 
@@ -1061,6 +1058,36 @@ class NwChem(DefaultConverter):
         return super(NwChem, self).g_to_spherical(list_mul(norm, cartesian))
 
 
+class QChem(DefaultConverter):
+    """
+    QChem 4.4
+    """
+    title = "generated from QChem output data.\n"
+
+    def molden_spherical_cartesian(self):
+        self.D_orb_conversion_required = False
+        self.F_orb_conversion_required = False
+        self.G_orb_conversion_required = False
+
+    def nelec(self):
+        """
+        in QChem occupation number sometimes takes value from list (0, 1)
+        """
+        if self.spin_unrestricted():
+            return super(QChem, self).nelec()
+        else:
+            return 2 * super(QChem, self).nelec()
+
+    def d_to_spherical(self, cartesian):
+        """
+        In QChem spherical MOLDEN input expected.
+        """
+        raise RuntimeWarning("Cartesian input is not expected. Check that"
+                             " the quantum chemistry code is selected correctly")
+
+    g_to_spherical = f_to_spherical = d_to_spherical
+
+
 def main():
     print ("Hello, you are converting a MOLDEN file to a CASINO gwfn.data file.\n")
 
@@ -1077,11 +1104,12 @@ def main():
                      "0 -- TURBOMOLE\n"
                      "1 -- PSI4\n"
                      "2 -- CFOUR 2.0beta\n"
-                     "3 -- ORCA 3.X\n"
+                     "3 -- ORCA 3.X - 4.X\n"
                      "4 -- DALTON2013\n"
                      "5 -- MOLPRO\n"
-                     "6 -- NWCHEM\n")
-    while not code.isdigit() or int(code) > 6:
+                     "6 -- NWCHEM\n"
+                     "7 -- QCHEM 4.X\n")
+    while not code.isdigit() or int(code) > 7:
         code = raw_input('Sorry,  try again.')
 
     code = int(code)
@@ -1111,6 +1139,8 @@ def main():
         Molpro(input_file, pseudoatoms).gwfn()
     elif code == 6:
         NwChem(input_file, pseudoatoms).gwfn()
+    elif code == 7:
+        QChem(input_file, pseudoatoms).gwfn()
 
 if __name__ == "__main__":
     main()
