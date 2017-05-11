@@ -2,7 +2,8 @@ $comment0
 $end
 
 $rem
-SYMMETRY              off
+SYMMETRY              false
+SYM_IGNORE            true
 BASIS                 cc-pVQZ
 METHOD                HF
 SCF_CONVERGENCE       8
