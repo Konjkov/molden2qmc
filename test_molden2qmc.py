@@ -138,7 +138,7 @@ class test_Orca(unittest.TestCase):
     molden_file = 'N4.molden.input'
 
     def test_RHF_SVP_Molpro(self):
-        test_dir = 'RHF/SVP_Molpro/'
+        test_dir = 'RHF/SVP/'
         molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
@@ -158,7 +158,7 @@ class test_Orca(unittest.TestCase):
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
     def test_RHF_TZVP_Molpro(self):
-        test_dir = 'RHF/TZVP_Molpro/'
+        test_dir = 'RHF/TZVP/'
         molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
@@ -168,7 +168,7 @@ class test_Orca(unittest.TestCase):
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
     def test_RHF_QZVP_Molpro(self):
-        test_dir = 'RHF/QZVP_Molpro/'
+        test_dir = 'RHF/QZVP/'
         molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
@@ -246,7 +246,7 @@ class test_Molpro(unittest.TestCase):
         molpro = molden2qmc.Molpro(open(self.base_dir + test_dir + self.molden_file, "r"))
         molpro.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP_Molpro/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(molpro), mo_matrix(orca), atol=0.001))
 
     def test_RHF_TZVP(self):
@@ -254,7 +254,7 @@ class test_Molpro(unittest.TestCase):
         molpro = molden2qmc.Molpro(open(self.base_dir + test_dir + self.molden_file, "r"))
         molpro.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP_Molpro/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(molpro), mo_matrix(orca), atol=0.01))
 
     def test_RHF_QZVP(self):
@@ -262,7 +262,7 @@ class test_Molpro(unittest.TestCase):
         molpro = molden2qmc.Molpro(open(self.base_dir + test_dir + self.molden_file, "r"))
         molpro.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP_Molpro/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(molpro), mo_matrix(orca), atol=0.01))
 
     @unittest.skip("Not implemented")
@@ -281,7 +281,7 @@ class test_NwChem(unittest.TestCase):
         nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
         nwchem.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP_NwChem/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
 
     def test_RHF_TZVP(self):
@@ -289,7 +289,7 @@ class test_NwChem(unittest.TestCase):
         nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
         nwchem.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP_NwChem/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
 
     def test_RHF_QZVP(self):
@@ -297,7 +297,7 @@ class test_NwChem(unittest.TestCase):
         nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
         nwchem.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP_NwChem/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
 
     def test_UHF_SVP(self):
@@ -310,7 +310,7 @@ class test_NwChem(unittest.TestCase):
         nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
         nwchem.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP_NwChem/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
 
     def test_RHF_TZVP_cart(self):
@@ -318,7 +318,7 @@ class test_NwChem(unittest.TestCase):
         nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
         nwchem.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP_NwChem/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
 
     def test_RHF_QZVP_cart(self):
@@ -326,38 +326,53 @@ class test_NwChem(unittest.TestCase):
         nwchem = molden2qmc.NwChem(open(self.base_dir + test_dir + self.molden_file, "r"))
         nwchem.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP_NwChem/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
 
 class test_QChem(unittest.TestCase):
     base_dir = 'test/N4/QCHEM/'
     molden_file = 'N4.molden'
 
-    def test_RHF_cc_pVDZ(self):
-        test_dir = 'RHF/cc-pVDZ/'
+    def test_RHF_SVP(self):
+        test_dir = 'RHF/SVP/'
         qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
         qchem.gwfn()
-        #self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVDZ_QChem/N4.molden.input', "r"))
-#        print(mo_matrix(qchem, skip=4)/mo_matrix(orca, skip=4))
+        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(orca), atol=0.001))
 
     def test_RHF_TZVP(self):
         test_dir = 'RHF/TZVP/'
         qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
         qchem.gwfn()
-        #self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP_QChem/N4.molden.input', "r"))
-        #print(mo_matrix(qchem, skip=0)/mo_matrix(orca, skip=0))
+        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(orca), atol=0.001))
+
+    def test_RHF_QZVP(self):
+        test_dir = 'RHF/QZVP/'
+        qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
+        qchem.gwfn()
+        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP/N4.molden.input', "r"))
+        self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(orca), atol=0.001))
+
+    def test_RHF_cc_pVDZ(self):
+        test_dir = 'RHF/cc-pVDZ/'
+        qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
+        qchem.gwfn()
+        #self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVDZ/N4.molden.input', "r"))
+        #print(mo_matrix(qchem, skip=4)/mo_matrix(orca, skip=4))
+        self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(orca), atol=0.001))
+
 
     def test_RHF_cc_pVTZ(self):
         test_dir = 'RHF/cc-pVTZ/'
         qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
         qchem.gwfn()
         #self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVTZ_QChem/N4.molden.input', "r"))
-        print(mo_matrix(qchem, skip=0)/mo_matrix(orca, skip=0))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVTZ/N4.molden.input', "r"))
         #print(mo_matrix(qchem, skip=0)/mo_matrix(orca, skip=0))
         self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(orca), atol=0.001))
 
@@ -365,15 +380,15 @@ class test_QChem(unittest.TestCase):
         test_dir = 'RHF/cc-pVQZ/'
         qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
         qchem.gwfn()
-        #self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVQZ_QChem/N4.molden.input', "r"))
-        #print(mo_matrix(qchem, skip=0)/mo_matrix(orca, skip=0))
+        self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVQZ/N4.molden.input', "r"))
         self.assertTrue(np.allclose(mo_matrix(qchem), mo_matrix(orca), atol=0.001))
 
-    def test_UHF_TZVP(self):
-        test_dir = 'UHF/TZVP/'
+    def test_UHF_cc_pVDZ(self):
+        test_dir = 'UHF/cc-pVDZ/'
         qchem = molden2qmc.QChem(open(self.base_dir + test_dir + self.molden_file, "r"))
         qchem.gwfn()
+
 
 class test_Orca4(unittest.TestCase):
     base_dir = 'test/N4/ORCA4/'
@@ -384,7 +399,7 @@ class test_Orca4(unittest.TestCase):
         orca4 = molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r"))
         orca4.gwfn()
         #self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP_Molpro/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP/N4.molden.input', "r"))
         #print(mo_matrix(qchem, skip=0)/mo_matrix(orca, skip=0))
         self.assertTrue(np.allclose(mo_matrix(orca4), mo_matrix(orca), atol=0.001))
 
@@ -393,7 +408,7 @@ class test_Orca4(unittest.TestCase):
         orca4 = molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r"))
         orca4.gwfn()
         #self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP_Molpro/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/TZVP/N4.molden.input', "r"))
         #print(mo_matrix(qchem, skip=0)/mo_matrix(orca, skip=0))
         self.assertTrue(np.allclose(mo_matrix(orca4), mo_matrix(orca), atol=0.001))
 
@@ -402,7 +417,7 @@ class test_Orca4(unittest.TestCase):
         orca4 = molden2qmc.Orca(open(self.base_dir + test_dir + self.molden_file, "r"))
         orca4.gwfn()
         #self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP_Molpro/N4.molden.input', "r"))
+        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP/N4.molden.input', "r"))
         #print(mo_matrix(qchem, skip=0)/mo_matrix(orca, skip=0))
         self.assertTrue(np.allclose(mo_matrix(orca4), mo_matrix(orca), atol=0.001))
 
