@@ -3,6 +3,7 @@
 
 __version__ = '2.7.0'
 
+import argparse
 import os
 from math import pi, sqrt, factorial, fabs
 from itertools import combinations
@@ -1089,6 +1090,28 @@ class QChem(DefaultConverter):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="This script converts a MOLDEN file to a CASINO gwfn.data file.",
+formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('code', type=int, nargs=1, help=(
+                            "NUMBER corresponding to the quantum chemistry code used to produce this MOLDEN file:"
+                            "0 -- TURBOMOLE\n"
+                            "1 -- PSI4\n"
+                            "2 -- CFOUR 2.0beta\n"
+                            "3 -- ORCA 3.X - 4.X\n"
+                            "4 -- DALTON2013\n"
+                            "5 -- MOLPRO\n"
+                            "6 -- NWCHEM\n"
+                            "7 -- QCHEM 4.X\n"))
+    parser.add_argument('input_file', type=str, nargs=1, help="name of MOLDEN file")
+    parser.add_argument('--pseudoatoms', type=list, nargs=1, help=(
+                            "This script did not detect if a pseudopotential was used."
+                            "Please eneter the list of atoms for thouse pseudopotential was used:"
+                            "none = a pseudopotential was not used for any atoms in this calculation."
+                            "all = a pseudopotential was used for all atoms in this calculation."
+                            "white space separated numbers = number of pseudoatoms (started from 1)."))
+
+    args = parser.parse_args()
+
     print ("Hello, you are converting a MOLDEN file to a CASINO gwfn.data file.\n")
 
     while True:
