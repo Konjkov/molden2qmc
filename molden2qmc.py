@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 __version__ = '3.0.0'
@@ -8,6 +8,9 @@ import os, sys
 from math import pi, sqrt, factorial, fabs
 from itertools import combinations
 from operator import itemgetter
+
+if sys.version_info > (3, 0):
+    from functools import reduce
 
 
 def fact2(k):
@@ -393,13 +396,13 @@ class Molden(object):
         """
         write out gwfn.data file
         """
-        gwfn = open('gwfn.data', 'w')
-        gwfn.write(self.gwfn_title())
-        gwfn.write(self.gwfn_basic_info())
-        gwfn.write(self.gwfn_geometry())
-        gwfn.write(self.gwfn_basis_set())
-        gwfn.write(self.gwfn_multideterminant_information())
-        gwfn.write(self.gwfn_orbital_coefficients())
+        with open('gwfn.data', 'w') as gwfn:
+            gwfn.write(self.gwfn_title())
+            gwfn.write(self.gwfn_basic_info())
+            gwfn.write(self.gwfn_geometry())
+            gwfn.write(self.gwfn_basis_set())
+            gwfn.write(self.gwfn_multideterminant_information())
+            gwfn.write(self.gwfn_orbital_coefficients())
 
     def gwfn_title(self):
         """
@@ -425,7 +428,7 @@ class Molden(object):
                 "Spin unrestricted:\n"
                 "          %s\n"
                 "nuclear-nuclear repulsion energy (au/atom):\n"
-                "          %s\n"
+                "          %.10f\n"
                 "Number of electrons per primitive cell:\n"
                 "          %s\n"
                 "\n") % (__version__,

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 __author__ = 'Vladimir Konjkov'
@@ -37,31 +37,38 @@ class test_Turbomole(unittest.TestCase):
 
     def test_RHF_SVP(self):
         test_dir = 'RHF/SVP/'
-        turbomole = molden2qmc.Turbomole(open(self.base_dir + test_dir + self.molden_file, "r"))
+        with open(self.base_dir + test_dir + self.molden_file, "r") as f:
+            turbomole = molden2qmc.Turbomole(f)
         turbomole.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP_Turbomole/N4.molden.input', "r"))
+        with open('test/N4/ORCA/RHF/SVP_Turbomole/N4.molden.input', "r") as f:
+            orca = molden2qmc.Orca(f)
         self.assertTrue(np.allclose(mo_matrix(turbomole), mo_matrix(orca), atol=0.0001))
 
     def test_RHF_cc_pVTZ(self):
         test_dir = 'RHF/cc-pVTZ/'
-        turbomole = molden2qmc.Turbomole(open(self.base_dir + test_dir + self.molden_file, "r"))
-        turbomole.gwfn()
+        with open(self.base_dir + test_dir + self.molden_file, "r") as f:
+            turbomole = molden2qmc.Turbomole(f)
+            turbomole.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVTZ_Turbomole/N4.molden.input', "r"))
+        with open('test/N4/ORCA/RHF/cc-pVTZ_Turbomole/N4.molden.input', "r") as f:
+            orca = molden2qmc.Orca(f)
         self.assertTrue(np.allclose(mo_matrix(turbomole), mo_matrix(orca), atol=0.002))
 
     def test_RHF_cc_pVQZ(self):
         test_dir = 'RHF/cc-pVQZ/'
-        turbomole = molden2qmc.Turbomole(open(self.base_dir + test_dir + self.molden_file, "r"))
-        turbomole.gwfn()
+        with open(self.base_dir + test_dir + self.molden_file, "r") as f:
+            turbomole = molden2qmc.Turbomole(f)
+            turbomole.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVQZ_Turbomole/N4.molden.input', "r"))
+        with open('test/N4/ORCA/RHF/cc-pVQZ_Turbomole/N4.molden.input', "r") as f:
+            orca = molden2qmc.Orca(f)
         self.assertTrue(np.allclose(mo_matrix(turbomole), mo_matrix(orca), atol=0.001))
 
     def test_UHF_SVP(self):
         test_dir = 'UHF/SVP/'
-        molden2qmc.Turbomole(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
+        with open(self.base_dir + test_dir + self.molden_file, "r") as f:
+            turbomole = molden2qmc.Turbomole(f).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
 
@@ -71,31 +78,38 @@ class test_PSI4(unittest.TestCase):
 
     def test_RHF_SVP(self):
         test_dir = 'RHF/SVP/'
-        psi4 = molden2qmc.PSI4(open(self.base_dir + test_dir + self.molden_file, "r"))
+        with open(self.base_dir + test_dir + self.molden_file, "r") as f:
+            psi4 = molden2qmc.PSI4(f)
         psi4.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/SVP/N4.molden.input', "r"))
+        with open('test/N4/ORCA/RHF/SVP/N4.molden.input', "r") as f:
+            orca = molden2qmc.Orca(f)
         self.assertTrue(np.allclose(mo_matrix(psi4), mo_matrix(orca), atol=0.0001))
 
     def test_RHF_cc_pVTZ(self):
         test_dir = 'RHF/cc-pVTZ/'
-        psi4 = molden2qmc.PSI4(open(self.base_dir + test_dir + self.molden_file, "r"))
+        with open(self.base_dir + test_dir + self.molden_file, "r") as f:
+            psi4 = molden2qmc.PSI4(f)
         psi4.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVTZ/N4.molden.input', "r"))
+        with open('test/N4/ORCA/RHF/cc-pVTZ/N4.molden.input', "r") as f:
+            orca = molden2qmc.Orca(f)
         self.assertTrue(np.allclose(mo_matrix(psi4), mo_matrix(orca), atol=0.001))
 
     def test_RHF_cc_pVQZ(self):
         test_dir = 'RHF/cc-pVQZ/'
-        psi4 = molden2qmc.PSI4(open(self.base_dir + test_dir + self.molden_file, "r"))
+        with open(self.base_dir + test_dir + self.molden_file, "r") as f:
+            psi4 = molden2qmc.PSI4(f)
         psi4.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/cc-pVQZ/N4.molden.input', "r"))
+        with open('test/N4/ORCA/RHF/cc-pVQZ/N4.molden.input', "r") as f:
+            orca = molden2qmc.Orca(f)
         self.assertTrue(np.allclose(mo_matrix(psi4), mo_matrix(orca), atol=0.001))
 
     def test_UHF_SVP(self):
         test_dir = 'UHF/SVP/'
-        molden2qmc.PSI4(open(self.base_dir + test_dir + self.molden_file, "r")).gwfn()
+        with open(self.base_dir + test_dir + self.molden_file, "r") as f:
+            molden2qmc.PSI4(f).gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
 
 
@@ -409,7 +423,6 @@ class test_Orca4(unittest.TestCase):
         orca = molden2qmc.Orca(open('test/N4/ORCA/RHF/QZVP/N4.molden.input', "r"))
         #print(mo_matrix(qchem, skip=0)/mo_matrix(orca, skip=0))
         self.assertTrue(np.allclose(mo_matrix(orca4), mo_matrix(orca), atol=0.001))
-
 
 
 if __name__ == '__main__':
