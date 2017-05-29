@@ -1092,27 +1092,27 @@ class QChem(DefaultConverter):
 def main():
     parser = argparse.ArgumentParser(
         description="This script converts a MOLDEN file to a CASINO gwfn.data file.",
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument(
         'code', type=int, help=(
-            "number corresponding to the quantum chemistry code used to produce this MOLDEN file:"
-            "0 -- TURBOMOLE"
-            "1 -- PSI4"
-            "2 -- CFOUR 2.0beta"
-            "3 -- ORCA 3.X - 4.X"
-            "4 -- DALTON2013"
-            "5 -- MOLPRO"
-            "6 -- NWCHEM"
+            "number corresponding to the quantum chemistry code used to produce this MOLDEN file:\n"
+            "0 -- TURBOMOLE\n"
+            "1 -- PSI4\n"
+            "2 -- CFOUR 2.0beta\n"
+            "3 -- ORCA 3.X - 4.X\n"
+            "4 -- DALTON2013\n"
+            "5 -- MOLPRO\n"
+            "6 -- NWCHEM\n"
             "7 -- QCHEM 4.X"
         )
     )
     parser.add_argument('input_file', type=str, help="name of MOLDEN file")
     parser.add_argument('--pseudoatoms', type=str, help=(
-        "This script did not detect if a pseudopotential was used."
-        "Please enter the list of atoms for those pseudopotential was used:"
-        "none = pseudopotential was not used for any atoms in this calculation."
-        "all = pseudopotential was used for all atoms in this calculation."
+        "This script did not detect if a pseudopotential was used.\n"
+        "Please enter the list of atoms for those pseudopotential was used:\n"
+        "none = pseudopotential was not used for any atoms in this calculation.\n"
+        "all = pseudopotential was used for all atoms in this calculation.\n"
         "white space separated numbers = number of pseudoatoms (started from 1)."))
 
     args = parser.parse_args()
