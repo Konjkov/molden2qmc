@@ -1,12 +1,16 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__version__ = '2.7.0'
+__version__ = '3.0.0'
 
-import os
+import argparse
+import os, sys
 from math import pi, sqrt, factorial, fabs
 from itertools import combinations
 from operator import itemgetter
+
+if sys.version_info > (3, 0):
+    from functools import reduce
 
 
 def fact2(k):
@@ -87,7 +91,7 @@ class Molden(object):
     ang_momentum_map = {'s': 0, 'p': 1, 'd': 2, 'f': 3, 'g': 4, 'sp': 1}
     title = "Insert Your Title Here\n"
 
-    def __init__(self, f, pseudoatoms="none"):
+    def __init__(self, f, pseudoatoms=None):
         """ Create instance that represent MOLDEN file data
         http://www.cmbi.ru.nl/molden/molden_format.html
 
@@ -152,7 +156,7 @@ class Molden(object):
         set pseudopotential for atoms
         """
 
-        if self.pseudoatoms == "none":
+        if self.pseudoatoms is None:
             for atom in self.atom_list:
                 atom['pseudo'] = False
         elif self.pseudoatoms == "all":
@@ -392,13 +396,13 @@ class Molden(object):
         """
         write out gwfn.data file
         """
-        gwfn = open('gwfn.data', 'w')
-        gwfn.write(self.gwfn_title())
-        gwfn.write(self.gwfn_basic_info())
-        gwfn.write(self.gwfn_geometry())
-        gwfn.write(self.gwfn_basis_set())
-        gwfn.write(self.gwfn_multideterminant_information())
-        gwfn.write(self.gwfn_orbital_coefficients())
+        with open('gwfn.data', 'w') as gwfn:
+            gwfn.write(self.gwfn_title())
+            gwfn.write(self.gwfn_basic_info())
+            gwfn.write(self.gwfn_geometry())
+            gwfn.write(self.gwfn_basis_set())
+            gwfn.write(self.gwfn_multideterminant_information())
+            gwfn.write(self.gwfn_orbital_coefficients())
 
     def gwfn_title(self):
         """
@@ -424,7 +428,7 @@ class Molden(object):
                 "Spin unrestricted:\n"
                 "          %s\n"
                 "nuclear-nuclear repulsion energy (au/atom):\n"
-                "          %s\n"
+                "          %.10f\n"
                 "Number of electrons per primitive cell:\n"
                 "          %s\n"
                 "\n") % (__version__,
@@ -1089,58 +1093,57 @@ class QChem(DefaultConverter):
 
 
 def main():
-    print ("Hello, you are converting a MOLDEN file to a CASINO gwfn.data file.\n")
+    parser = argparse.ArgumentParser(
+        description="This script converts a MOLDEN file to a CASINO gwfn.data file.",
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+    parser.add_argument(
+        'code', type=int, help=(
+            "number corresponding to the quantum chemistry code used to produce this MOLDEN file:\n"
+            "0 -- TURBOMOLE\n"
+            "1 -- PSI4\n"
+            "2 -- CFOUR 2.0beta\n"
+            "3 -- ORCA 3.X - 4.X\n"
+            "4 -- DALTON2013\n"
+            "5 -- MOLPRO\n"
+            "6 -- NWCHEM\n"
+            "7 -- QCHEM 4.X"
+        )
+    )
+    parser.add_argument('input_file', type=str, help="name of MOLDEN file")
+    parser.add_argument('--pseudoatoms', type=str, help=(
+        "This script did not detect if a pseudopotential was used.\n"
+        "Please enter the list of atoms for those pseudopotential was used:\n"
+        "none = pseudopotential was not used for any atoms in this calculation.\n"
+        "all = pseudopotential was used for all atoms in this calculation.\n"
+        "white space separated numbers = number of pseudoatoms (started from 1)."))
 
-    while True:
-        input_file_name = raw_input("Enter the name of your MOLDEN file: ")
-        if os.path.exists(str(input_file_name)):
-            break
-        print ("File not found...")
+    args = parser.parse_args()
 
-    input_file = open(str(input_file_name), "r")
+    if not os.path.exists(str(args.input_file)):
+        print ("File %s not found..." % args.input_file)
+        sys.exit(1)
 
-    code = raw_input("\nEnter the NUMBER corresponding to the quantum chemistry "
-                     "code used to produce this MOLDEN file:\n"
-                     "0 -- TURBOMOLE\n"
-                     "1 -- PSI4\n"
-                     "2 -- CFOUR 2.0beta\n"
-                     "3 -- ORCA 3.X - 4.X\n"
-                     "4 -- DALTON2013\n"
-                     "5 -- MOLPRO\n"
-                     "6 -- NWCHEM\n"
-                     "7 -- QCHEM 4.X\n")
-    while not code.isdigit() or int(code) > 7:
-        code = raw_input('Sorry,  try again.')
+    input_file = open(str(args.input_file), "r")
 
-    code = int(code)
-    print "You have entered NUMBER ", code, "\n"
-
-    pseudoatoms = raw_input("This script did not detect if a pseudopotential was used.\n"
-                            "Please eneter the list of atoms for thouse pseudopotential was used:\n\n"
-                            "none = a pseudopotential was not used for any atoms in this calculation.\n"
-                            "all = a pseudopotential was used for all atoms in this calculation.\n"
-                            "white space separated numbers = number of pseudoatoms (started from 1).\n\n").lower()
-
-    print "You have entered ", pseudoatoms, "\n"
-
-    if code == 0:
-        Turbomole(input_file, pseudoatoms).gwfn()
-    elif code == 1:
-        PSI4(input_file, pseudoatoms).gwfn()
-    elif code == 2:
-        CFour(input_file, pseudoatoms).gwfn()
-    elif code == 3:
-        Orca(input_file, pseudoatoms).gwfn()
-    elif code == 4:
-        Dalton(input_file, pseudoatoms).gwfn()
+    if args.code == 0:
+        Turbomole(input_file, args.pseudoatoms).gwfn()
+    elif args.code == 1:
+        PSI4(input_file, args.pseudoatoms).gwfn()
+    elif args.code == 2:
+        CFour(input_file, args.pseudoatoms).gwfn()
+    elif args.code == 3:
+        Orca(input_file, args.pseudoatoms).gwfn()
+    elif args.code == 4:
+        Dalton(input_file, args.pseudoatoms).gwfn()
         print ("In Dalton's MOLDEN file all occupation numbers of HF and DFT MOs are zero values by mistake\n"
                "So you should correct 'Number of electrons per primitive cell' in gwfn.data file by hand.")
-    elif code == 5:
-        Molpro(input_file, pseudoatoms).gwfn()
-    elif code == 6:
-        NwChem(input_file, pseudoatoms).gwfn()
-    elif code == 7:
-        QChem(input_file, pseudoatoms).gwfn()
+    elif args.code == 5:
+        Molpro(input_file, args.pseudoatoms).gwfn()
+    elif args.code == 6:
+        NwChem(input_file, args.pseudoatoms).gwfn()
+    elif args.code == 7:
+        QChem(input_file, args.pseudoatoms).gwfn()
 
 if __name__ == "__main__":
     main()
