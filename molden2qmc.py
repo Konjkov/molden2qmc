@@ -42,7 +42,7 @@ def list_mul(list_a, list_b):
 
 
 class SectionNotFound(Exception):
-    """Section is not found in MOLDEN file."""
+    """Section not found in MOLDEN file."""
     def __init__(self, section_name):
         self.section_name = section_name
     def __str__(self):
@@ -402,11 +402,11 @@ class Molden(object):
         return sum(self.charge(atom1) * self.charge(atom2)/self.distance(atom1, atom2)
                    for atom1, atom2 in combinations(self.atom_list, 2))
 
-    def gwfn(self):
+    def gwfn(self, f='gwfn.data'):
         """
         write out gwfn.data file
         """
-        with open('gwfn.data', 'w') as gwfn:
+        with open(f, 'w') as gwfn:
             gwfn.write(self.gwfn_title())
             gwfn.write(self.gwfn_basic_info())
             gwfn.write(self.gwfn_geometry())
@@ -1120,7 +1120,8 @@ def main():
             "7 -- QCHEM 4.X"
         )
     )
-    parser.add_argument('input_file', type=str, help="name of MOLDEN file")
+    parser.add_argument('input_file', type=str, help="path to MOLDEN file")
+    parser.add_argument('output_file', type=str, default='gwfn.data', nargs='?', help="path to output file")
     parser.add_argument('--pseudoatoms', type=str, help=(
         "This script did not detect if a pseudopotential was used.\n"
         "Please enter the list of atoms for those pseudopotential was used:\n"
@@ -1130,30 +1131,30 @@ def main():
 
     args = parser.parse_args()
 
-    if not os.path.exists(str(args.input_file)):
+    if not os.path.exists(args.input_file):
         print ("File %s not found..." % args.input_file)
         sys.exit(1)
 
-    input_file = open(str(args.input_file), "r")
+    input_file = open(args.input_file, "r")
 
     if args.code == 0:
-        Turbomole(input_file, args.pseudoatoms).gwfn()
+        Turbomole(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 1:
-        PSI4(input_file, args.pseudoatoms).gwfn()
+        PSI4(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 2:
-        CFour(input_file, args.pseudoatoms).gwfn()
+        CFour(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 3:
-        Orca(input_file, args.pseudoatoms).gwfn()
+        Orca(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 4:
-        Dalton(input_file, args.pseudoatoms).gwfn()
+        Dalton(input_file, args.pseudoatoms).gwfn(args.output_file)
         print ("In Dalton's MOLDEN file all occupation numbers of HF and DFT MOs are zero values by mistake\n"
                "So you should correct 'Number of electrons per primitive cell' in gwfn.data file by hand.")
     elif args.code == 5:
-        Molpro(input_file, args.pseudoatoms).gwfn()
+        Molpro(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 6:
-        NwChem(input_file, args.pseudoatoms).gwfn()
+        NwChem(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 7:
-        QChem(input_file, args.pseudoatoms).gwfn()
+        QChem(input_file, args.pseudoatoms).gwfn(args.output_file)
 
 if __name__ == "__main__":
     main()
