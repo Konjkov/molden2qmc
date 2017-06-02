@@ -41,6 +41,14 @@ def list_mul(list_a, list_b):
     return [a*b for a, b in zip(list_a, list_b)]
 
 
+class SectionNotFound(Exception):
+    """Section is not found in MOLDEN file."""
+    def __init__(self, section_name):
+        self.section_name = section_name
+    def __str__(self):
+        return repr(self.section_name)
+
+
 class Molden(object):
     """
     Data structures used in Molden Class:
@@ -119,6 +127,8 @@ class Molden(object):
         # CFOUR requires case insensitive comparison
         while line and not line.upper().startswith("[%s]" % section_name.upper()):
             line = self.f.readline()
+        if not line:
+            raise SectionNotFound(section_name)
         result = [line]
         line = self.f.readline()
         while line and not line.startswith('['):
