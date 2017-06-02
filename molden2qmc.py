@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__version__ = '3.0.0'
-
 import argparse
-import os, sys
+import os
+import sys
 from math import pi, sqrt, factorial, fabs
 from itertools import combinations
 from operator import itemgetter
 
 if sys.version_info > (3, 0):
     from functools import reduce
+
+__version__ = '3.0.1'
 
 
 def fact2(k):
@@ -43,8 +44,10 @@ def list_mul(list_a, list_b):
 
 class SectionNotFound(Exception):
     """Section not found in MOLDEN file."""
+
     def __init__(self, section_name):
         self.section_name = section_name
+
     def __str__(self):
         return repr(self.section_name)
 
