@@ -11,7 +11,7 @@ from operator import itemgetter
 if sys.version_info > (3, 0):
     from functools import reduce
 
-__version__ = '3.0.1'
+__version__ = '3.0.2'
 
 
 def fact2(k):
@@ -202,6 +202,7 @@ class Molden(object):
         Lines with zero contraction coefficients are skipped.
         """
         section_body = self.molden_section("GTO")[1:]
+        sp_flag = None
         for line in section_body:
             split_line = line.split()
             if len(split_line) < 2:  # empty line
@@ -209,12 +210,25 @@ class Molden(object):
             elif len(split_line) == 2 and split_line[-1] == '0':  # new atom
                 atom = self.atom_list[int(split_line[0])-1]
                 atom['SHELLS'] = []
-            elif len(split_line) == 3:   # new shell
+            elif split_line[0].lower() in ('s', 'p', 'd', 'f', 'g'):   # new shell
+                sp_flag = False
                 shell = {'TYPE': split_line[0].lower(), 'DATA': []} # QCHEM uses an upper case
                 atom['SHELLS'].append(shell)
+            elif split_line[0].lower() == 'sp':   # new shell
+                sp_flag = True
+                s_shell = {'TYPE': 's', 'DATA': []}
+                atom['SHELLS'].append(s_shell)
+                p_shell = {'TYPE': 'p', 'DATA': []}
+                atom['SHELLS'].append(p_shell)
             else:
-                if smart_float(split_line[1]) != 0.0:  # non zero contraction coefficient
-                    shell['DATA'].append([smart_float(split_line[0]), smart_float(split_line[1])])
+                if sp_flag:
+                    if smart_float(split_line[1]) != 0.0:  # non zero contraction coefficient
+                        s_shell['DATA'].append([smart_float(split_line[0]), smart_float(split_line[1])])
+                    if smart_float(split_line[2]) != 0.0:  # non zero contraction coefficient
+                        p_shell['DATA'].append([smart_float(split_line[0]), smart_float(split_line[2])])
+                else:
+                    if smart_float(split_line[1]) != 0.0:  # non zero contraction coefficient
+                        shell['DATA'].append([smart_float(split_line[0]), smart_float(split_line[1])])
 
     def molden_spherical_cartesian(self):
         """

@@ -1,0 +1,16 @@
+$comment0
+$end
+
+$rem
+SYMMETRY              true
+BASIS                 G3LARGE
+METHOD                HF
+SCF_CONVERGENCE       8
+MOLDEN_FORMAT         true
+PRINT_ORBITALS        2000
+$end
+
+$molecule
+   0 2
+   K       0.000000      0.000000      0.000000
+$end
