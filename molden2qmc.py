@@ -7,7 +7,6 @@ import sys
 from math import pi, sqrt, factorial, fabs
 from itertools import combinations
 from operator import itemgetter
-from collections import OrderedDict
 
 if sys.version_info > (3, 0):
     from functools import reduce
@@ -45,6 +44,16 @@ def list_mul(list_a, list_b):
 
 class SectionNotFound(Exception):
     """Section not found in MOLDEN file."""
+
+    def __init__(self, section_name):
+        self.section_name = section_name
+
+    def __str__(self):
+        return repr(self.section_name)
+
+
+class ORCAOutputNotFound(Exception):
+    """Section not found in ORCA Output file."""
 
     def __init__(self, section_name):
         self.section_name = section_name
@@ -930,11 +939,14 @@ class Orca(DefaultConverter):
     title = "generated from Orca output data.\n"
 
     def __init__(self, f, pseudoatoms="none", orca_input_path=None):
+        """Initialise multi-determinant support."""
+
         self.orca_input_path = orca_input_path
-        self.internal = 0  # CASSCF internal orbitals
-        self.active = 0  # CASSCF active orbitals
-        self.spin_determinants = []  # CASSCF spin-determinants
-        self.parse_output()
+        if orca_input_path:
+            self.internal = 0  # CASSCF internal orbitals
+            self.active = 0  # CASSCF active orbitals
+            self.spin_determinants = []  # CASSCF spin-determinants
+            self.parse_output()
 
         super(Orca, self).__init__(f, pseudoatoms)
 
@@ -1037,7 +1049,7 @@ class Orca(DefaultConverter):
                 if line.startswith('   Active'):
                     self.active = int(line.split()[5])
             if not line:
-                raise Exception
+                raise ORCAOutputNotFound('Spin-Determinant CI Printing')
             line = gwfn.readline()
             while line and not line.startswith('DENSITY MATRIX'):
                 if line.startswith('CFG['):
@@ -1054,7 +1066,7 @@ class Orca(DefaultConverter):
             while line and not line.startswith('  Extended CI Printing'):
                 line = gwfn.readline()
             if not line:
-                raise Exception
+                raise ORCAOutputNotFound('Extended CI Printing')
             line = gwfn.readline()
             while line and not line.startswith('DENSITY MATRIX'):
                 if line.startswith(' CFG['):
@@ -1117,20 +1129,23 @@ class Orca(DefaultConverter):
         """
         :returns: MULTIDETERMINANT INFORMATION section of gwfn.data file
         """
-        result = ("MULTIDETERMINANT INFORMATION\n"
-                  "----------------------------\n"
-                  " MD\n")
+        if self.orca_input_path:
+            result = ("MULTIDETERMINANT INFORMATION\n"
+                      "----------------------------\n"
+                      " MD\n")
 
-        result += '  %i\n' % len(self.spin_determinants)
-        for _, weight in self.spin_determinants:
-            result += ' %9.6f\n' % weight
+            result += '  %i\n' % len(self.spin_determinants)
+            for _, weight in self.spin_determinants:
+                result += ' %9.6f\n' % weight
 
-        for i, (spin_det, _) in enumerate(self.spin_determinants):
-            if self.ground_state != spin_det:
-                for s, f, t in self.get_promotion_rules(self.ground_state, spin_det):
-                    result += '  DET %i %i PR %i 1 %i 1\n' % (i+1, s, f + self.internal, t + self.internal)
+            for i, (spin_det, _) in enumerate(self.spin_determinants):
+                if self.ground_state != spin_det:
+                    for s, f, t in self.get_promotion_rules(self.ground_state, spin_det):
+                        result += '  DET %i %i PR %i 1 %i 1\n' % (i+1, s, f + self.internal, t + self.internal)
 
-        return result + "\n"
+            return result + "\n"
+        else:
+            return super(Orca, self).gwfn_multideterminant_information()
 
 
 class PSI4(DefaultConverter):
@@ -1305,7 +1320,7 @@ def main():
         "none = pseudopotential was not used for any atoms in this calculation.\n"
         "all = pseudopotential was used for all atoms in this calculation.\n"
         "white space separated numbers = number of pseudoatoms (started from 1)."))
-    parser.add_argument('prefix', type=str, default='mol', nargs='?', help="prefix of ORCA task")
+    parser.add_argument('--multideterminant', type=str, const='mol', nargs='?', help="prefix of ORCA CASSCF output")
 
     args = parser.parse_args()
 
@@ -1313,7 +1328,10 @@ def main():
         print("File %s not found..." % args.input_file)
         sys.exit(1)
 
-    orca_input_path = os.path.join(os.path.dirname(args.input_file), args.prefix + '.out')
+    if args.multideterminant:
+        orca_input_path = os.path.join(os.path.dirname(args.multideterminant), args.multideterminant + '.out')
+    else:
+        orca_input_path = None
 
     input_file = open(args.input_file, "r")
 
