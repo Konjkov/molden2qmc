@@ -931,6 +931,11 @@ class Orca(DefaultConverter):
 
     def __init__(self, f, pseudoatoms="none", orca_input_path=None):
         self.orca_input_path = orca_input_path
+        self.internal = 0  # CASSCF internal orbitals
+        self.active = 0  # CASSCF active orbitals
+        self.spin_determinants = []  # CASSCF spin-determinants
+        self.parse_output()
+
         super(Orca, self).__init__(f, pseudoatoms)
 
     def d_to_spherical(self, cartesian):
@@ -984,6 +989,8 @@ class Orca(DefaultConverter):
         """Retrive from ORCA output:
             Spin-Determinant information
             number of active & internal orbitals in CASSCF
+
+        because of this issue https://orcaforum.cec.mpg.de/viewtopic.php?f=8&t=3212
         ORCA input should be:
         ! CASSCF cc-pVQZ
 
@@ -1004,13 +1011,21 @@ class Orca(DefaultConverter):
 
         * xyzfile 0 2 ../../mol.xyz
 
+        Keep your attention on not using symmetry because of this issue
+        https://orcaforum.cec.mpg.de/viewtopic.php?f=11&t=3254
+
         :param prefix: ORCA input file prefix.
         :return: list of spin-determinants, number of internal orbitals
         """
 
-        determinants = OrderedDict()
-        internal = 0
-        active = 0
+        determinants = {}
+
+        def ternary2decimal(ternary):
+            """Convert ternary string to decimal.
+            '001122' = 1 * 2 + 3 * 2 + 9 * 1 + 27 * 1 = 44
+            '21102' -> 200
+            """
+            return reduce(lambda x, y: x * 3 + int(y), ternary, 0)
 
         with open(self.orca_input_path, "r") as gwfn:
             line = gwfn.readline()
@@ -1018,9 +1033,9 @@ class Orca(DefaultConverter):
             while line and not line.startswith('  Spin-Determinant CI Printing'):
                 line = gwfn.readline()
                 if line.startswith('   Internal'):
-                    internal = int(line.split()[5])
+                    self.internal = int(line.split()[5])
                 if line.startswith('   Active'):
-                    active = int(line.split()[5])
+                    self.active = int(line.split()[5])
             if not line:
                 raise Exception
             line = gwfn.readline()
@@ -1050,15 +1065,14 @@ class Orca(DefaultConverter):
                     key = None
                 line = gwfn.readline()
 
-        result = []
-        for k, v in determinants.items():
+        self.spin_determinants = []
+        # Sort spin-determinants by increasing occupation levels
+        for k, v in sorted(determinants.items(), key=lambda x: ternary2decimal(x[0][::-1])):
             if isinstance(v, list):
                 for v1 in v:
-                    result += [v1.items()[0]]
+                    self.spin_determinants += [v1.items()[0]]
             else:
-                result += [(k, v)]
-
-        return result, internal
+                self.spin_determinants += [(k, v)]
 
     @staticmethod
     def get_promotion_rules(spin_det_1, spin_det_2):
@@ -1094,27 +1108,27 @@ class Orca(DefaultConverter):
             [(2, fr, to) for fr, to in zip(spin_det_1_down_indexes, spin_det_2_down_indexes)]
         )
 
+    @property
+    def ground_state(self):
+        """Lowest occupation spin-determinant"""
+        return self.spin_determinants[0][0]
+
     def gwfn_multideterminant_information(self):
         """
         :returns: MULTIDETERMINANT INFORMATION section of gwfn.data file
         """
+        result = ("MULTIDETERMINANT INFORMATION\n"
+                  "----------------------------\n"
+                  " MD\n")
 
-        dets, internal = self.parse_output()
+        result += '  %i\n' % len(self.spin_determinants)
+        for _, weight in self.spin_determinants:
+            result += ' %9.6f\n' % weight
 
-        first_c = dets[0][0]
-
-        result =("MULTIDETERMINANT INFORMATION\n"
-                 "----------------------------\n"
-                 " MD\n")
-
-        result += '  %i\n' % len(dets)
-        for _, b in dets:
-            result += ' %9.6f\n' % b
-
-        for i, (a, _) in enumerate(dets):
-            if first_c != a:
-                for s, f, t in self.get_promotion_rules(first_c, a):
-                    result += '  DET %i %i PR %i 1 %i 1\n' % (i+1, s, f + internal, t + internal)
+        for i, (spin_det, _) in enumerate(self.spin_determinants):
+            if self.ground_state != spin_det:
+                for s, f, t in self.get_promotion_rules(self.ground_state, spin_det):
+                    result += '  DET %i %i PR %i 1 %i 1\n' % (i+1, s, f + self.internal, t + self.internal)
 
         return result + "\n"
 
