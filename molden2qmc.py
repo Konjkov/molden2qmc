@@ -52,7 +52,7 @@ class SectionNotFound(Exception):
         return repr(self.section_name)
 
 
-class ORCAOutputNotFound(Exception):
+class ORCASectionNotFound(Exception):
     """Section not found in ORCA Output file."""
 
     def __init__(self, section_name):
@@ -595,7 +595,8 @@ class Molden(object):
 
         # (Number of basis functions) ** 2 coefficients
         num = 0
-        for orbital in sorted(self.mo_matrix, key=itemgetter('SPIN', 'ENERGY')):
+        # for orbital in sorted(self.mo_matrix, key=itemgetter('SPIN', 'ENERGY')):
+        for orbital in sorted(self.mo_matrix, key=itemgetter('SPIN',)):
             for ao in orbital['MO']:
                 for coefficient in ao['DATA']:
                     if num % 4 == 0:
@@ -947,6 +948,8 @@ class Orca(DefaultConverter):
             self.active = 0  # CASSCF active orbitals
             self.spin_determinants = []  # CASSCF spin-determinants
             self.parse_output()
+            # self.f = open(self.orca_input_path, "r")
+            # self.check_monotonic()
 
         super(Orca, self).__init__(f, pseudoatoms)
 
@@ -997,6 +1000,24 @@ class Orca(DefaultConverter):
         coefficient[8] *= -1
         return super(Orca, self).g_normalize(coefficient)
 
+    def orca_section(self, section_name):
+        """
+        :returns: content of named section
+        """
+        self.f.seek(0)
+        line = self.f.readline()
+        while line and not line.startswith(section_name):
+            line = self.f.readline()
+        if not line:
+            raise SectionNotFound(section_name)
+        result = [line]
+        line = self.f.readline()
+        line = self.f.readline()
+        while line and not line.startswith('-------'):
+            result.append(line)
+            line = self.f.readline()
+        return result
+
     def parse_output(self):
         """Retrive from ORCA output:
             Spin-Determinant information
@@ -1039,18 +1060,18 @@ class Orca(DefaultConverter):
             """
             return reduce(lambda x, y: x * 3 + int(y), ternary, 0)
 
-        with open(self.orca_input_path, "r") as gwfn:
-            line = gwfn.readline()
+        with open(self.orca_input_path, "r") as orca_input:
+            line = orca_input.readline()
             key = None
             while line and not line.startswith('  Spin-Determinant CI Printing'):
-                line = gwfn.readline()
+                line = orca_input.readline()
                 if line.startswith('   Internal'):
                     self.internal = int(line.split()[5])
                 if line.startswith('   Active'):
                     self.active = int(line.split()[5])
             if not line:
-                raise ORCAOutputNotFound('Spin-Determinant CI Printing')
-            line = gwfn.readline()
+                raise ORCASectionNotFound('Spin-Determinant CI Printing')
+            line = orca_input.readline()
             while line and not line.startswith('DENSITY MATRIX'):
                 if line.startswith('CFG['):
                     key = line.split()[0][4:-1]
@@ -1058,16 +1079,16 @@ class Orca(DefaultConverter):
                 elif line.startswith('   ['):
                     det, val = line.split()
                     determinants[key].append({det[1:-1]: float(val)})
-                line = gwfn.readline()
+                line = orca_input.readline()
 
-        with open(self.orca_input_path, "r") as gwfn:
-            line = gwfn.readline()
+        with open(self.orca_input_path, "r") as orca_input:
+            line = orca_input.readline()
             key = None
             while line and not line.startswith('  Extended CI Printing'):
-                line = gwfn.readline()
+                line = orca_input.readline()
             if not line:
-                raise ORCAOutputNotFound('Extended CI Printing')
-            line = gwfn.readline()
+                raise ORCASectionNotFound('Extended CI Printing')
+            line = orca_input.readline()
             while line and not line.startswith('DENSITY MATRIX'):
                 if line.startswith(' CFG['):
                     if determinants.get(line.split()[1]) == []:
@@ -1075,7 +1096,7 @@ class Orca(DefaultConverter):
                 elif key and line.startswith(' \tCSF['):
                     determinants[key] = float(line.split()[1])
                     key = None
-                line = gwfn.readline()
+                line = orca_input.readline()
 
         self.spin_determinants = []
         # Sort spin-determinants by increasing occupation levels
@@ -1086,6 +1107,19 @@ class Orca(DefaultConverter):
             else:
                 self.spin_determinants += [(k, v)]
 
+    def check_monotonic(self):
+        """Check if energy of orbitals increases monotonically."""
+        section_body = self.orca_section("ORBITAL ENERGIES")[3:]
+        energy = None
+        for line in section_body:
+            split_line = line.split()
+            if line.isspace():
+                break
+            elif len(split_line) == 4:
+                if energy and float(split_line[2]) < energy:
+                    print(line, energy)
+                energy = float(split_line[2])
+
     @staticmethod
     def get_promotion_rules(spin_det_1, spin_det_2):
         """Creates promotions rules for two spin-determinants
@@ -1095,20 +1129,22 @@ class Orca(DefaultConverter):
             [(1, 1, 3), (2, 1, 3)]
         for rule (1, 1, 3)
             first is spin (1=up/2=down)
-            second is from orbital in active space
-            third is to orbital in active space
+            second is number of orbital in active space electron promote from
+            third is of orbital in active space electron promote to
         orbital numeration starting from 1.
         """
-
+        # divide spin-determinants into spin parts
         spin_det_1_up = [e in ('2', 'u') for e in spin_det_1]
         spin_det_1_down = [e in ('2', 'd') for e in spin_det_1]
 
         spin_det_2_up = [e in ('2', 'u') for e in spin_det_2]
         spin_det_2_down = [e in ('2', 'd') for e in spin_det_2]
 
+        # get difference between initial and final spin-det
         spin_det_up = [x - y for x, y in zip(spin_det_1_up, spin_det_2_up)]
         spin_det_down = [x - y for x, y in zip(spin_det_1_down, spin_det_2_down)]
 
+        # get indexes of releasing and filling orbitals
         spin_det_1_up_indexes = [i+1 for i, x in enumerate(spin_det_up) if x == 1]
         spin_det_2_up_indexes = [i+1 for i, x in enumerate(spin_det_up) if x == -1]
 
@@ -1329,7 +1365,7 @@ def main():
         sys.exit(1)
 
     if args.multideterminant:
-        orca_input_path = os.path.join(os.path.dirname(args.multideterminant), args.multideterminant + '.out')
+        orca_input_path = os.path.join(os.path.dirname(args.input_file), args.multideterminant + '.out')
     else:
         orca_input_path = None
 
