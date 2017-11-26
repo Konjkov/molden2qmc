@@ -4,6 +4,7 @@
 import argparse
 import os
 import sys
+import re
 from math import pi, sqrt, factorial, fabs
 from itertools import combinations
 from operator import itemgetter
@@ -44,6 +45,16 @@ def list_mul(list_a, list_b):
 
 class SectionNotFound(Exception):
     """Section not found in MOLDEN file."""
+
+    def __init__(self, section_name):
+        self.section_name = section_name
+
+    def __str__(self):
+        return repr(self.section_name)
+
+
+class QChemSectionNotFound(Exception):
+    """Section not found in QChem Output file."""
 
     def __init__(self, section_name):
         self.section_name = section_name
@@ -1095,6 +1106,90 @@ class QChem(DefaultConverter):
     """
     title = "generated from QChem output data.\n"
 
+    def __init__(self, f, pseudoatoms="none", output_file=None):
+        """Initialise multi-determinant support."""
+
+        self.output_file = output_file
+        if output_file:
+            self.active = {'alpha': 0, 'beta': 0}
+            self.determinants = []
+            self.parse_output()
+        super(QChem, self).__init__(f, pseudoatoms)
+
+    def parse_output(self):
+        """Retrieve from QChem output:
+            T2-amplitudes information form VOD output in following format:
+        -0.1500      5( Ag  ) A,   5( Ag  ) B  ->   1( B2u ) A,   1( B2u ) B  (VV)
+        :return: list of spin-determinants, number of internal orbitals
+        """
+        electron_regexp = re.compile(
+            'There are\s+(?P<alpha>\d+) alpha '
+            'and\s+(?P<beta>\d+) beta electrons'
+        )
+        amplitude_regexp = re.compile(
+            '(?P<weight>[-+]?\d+\.\d+)\s+'
+            '(?P<first_from>\d+)\(.{5}\) '
+            '(?P<first_from_spin>[AB]),\s+'
+            '(?P<second_from>\d+)\(.{5}\) '
+            '(?P<second_from_spin>[AB])  ->\s+'
+            '(?P<first_to>\d+)\(.{5}\) '
+            '(?P<first_to_spin>[AB]),\s+'
+            '(?P<second_to>\d+)\(.{5}\) '
+            '(?P<second_to_spin>[AB])'
+        )
+        spin_map = {'A': 1, 'B': 2}
+        with open(self.output_file, "r") as qchem_output:
+            line = qchem_output.readline()
+            while line and not line.startswith('       Value      i             j           ->   a             b'):
+                m = re.search(electron_regexp, line)
+                if m:
+                    neu = int(m.group('alpha'))
+                    ned = int(m.group('beta'))
+                    print(neu, ned)
+                line = qchem_output.readline()
+            if not line:
+                raise QChemSectionNotFound('T2-amplitudes')
+            line = qchem_output.readline()
+            while line and not line == '\n':
+                m = re.search(amplitude_regexp, line)
+                self.determinants.append({
+                    'weight': float(m.group('weight')),
+                    'promotions': (
+                        {'from': int(m.group('first_from')) + 1,
+                         'spin': spin_map[m.group('first_from_spin')],
+                         'to': int(m.group('first_to')) + neu + 1}
+                        ,
+                        {'from': int(m.group('second_from')) + 1,
+                         'spin': spin_map[m.group('second_from_spin')],
+                         'to': int(m.group('second_to')) + ned + 1}
+                    )
+                })
+                line = qchem_output.readline()
+
+    def gwfn_multideterminant_information(self):
+        """
+        :returns: MULTIDETERMINANT INFORMATION section of gwfn.data file
+        """
+        if self.output_file:
+            result = ("MULTIDETERMINANT INFORMATION\n"
+                      "----------------------------\n"
+                      " MD\n")
+
+            result += '  %i\n' % (len(self.determinants) + 1)
+            # first determinant
+            result += ' %9.6f\n' % 1.0
+            for det in self.determinants:
+                result += ' %9.6f\n' % det['weight']
+
+            for i, det in enumerate(self.determinants):
+                for p in det['promotions']:
+                    # starting from 2-nd determinant
+                    result += '  DET %i %i PR %i 1 %i 1\n' % (i + 2, p['spin'], p['from'], p['to'])
+
+            return result + "\n"
+        else:
+            return super(QChem, self).gwfn_multideterminant_information()
+
     def molden_spherical_cartesian(self):
         self.D_orb_conversion_required = False
         self.F_orb_conversion_required = False
@@ -1145,12 +1240,21 @@ def main():
         "none = pseudopotential was not used for any atoms in this calculation.\n"
         "all = pseudopotential was used for all atoms in this calculation.\n"
         "white space separated numbers = number of pseudoatoms (started from 1)."))
+    # default output file name is mol.out
+    parser.add_argument('--multideterminant', type=str, const='mol', nargs='?', help="prefix of output file")
 
     args = parser.parse_args()
 
     if not os.path.exists(args.input_file):
-        print ("File %s not found..." % args.input_file)
+        print("File %s not found..." % args.input_file)
         sys.exit(1)
+
+    if args.multideterminant:
+        output_file = os.path.join(
+            os.path.dirname(args.input_file), args.multideterminant + '.out'
+        )
+    else:
+        output_file = None
 
     input_file = open(args.input_file, "r")
 
@@ -1164,14 +1268,15 @@ def main():
         Orca(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 4:
         Dalton(input_file, args.pseudoatoms).gwfn(args.output_file)
-        print ("In Dalton's MOLDEN file all occupation numbers of HF and DFT MOs are zero values by mistake\n"
-               "So you should correct 'Number of electrons per primitive cell' in gwfn.data file by hand.")
+        print("In Dalton's MOLDEN file all occupation numbers of HF and DFT MOs are zero values by mistake\n"
+              "So you should correct 'Number of electrons per primitive cell' in gwfn.data file by hand.")
     elif args.code == 5:
         Molpro(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 6:
         NwChem(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 7:
-        QChem(input_file, args.pseudoatoms).gwfn(args.output_file)
+        QChem(input_file, args.pseudoatoms, output_file).gwfn(args.output_file)
+
 
 if __name__ == "__main__":
     main()
