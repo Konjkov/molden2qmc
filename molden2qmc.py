@@ -5,6 +5,7 @@ import argparse
 import os
 import sys
 import re
+from decimal import Decimal
 from math import pi, sqrt, factorial, fabs
 from itertools import combinations
 from operator import itemgetter
@@ -1114,6 +1115,7 @@ class QChem(DefaultConverter):
             self.active = {'alpha': 0, 'beta': 0}
             self.determinants = []
             self.parse_output()
+            # self.truncate_determinants()
         super(QChem, self).__init__(f, pseudoatoms)
 
     def parse_output(self):
@@ -1145,32 +1147,44 @@ class QChem(DefaultConverter):
                 if m:
                     neu = int(m.group('alpha'))
                     ned = int(m.group('beta'))
-                    print(neu, ned)
                 line = qchem_output.readline()
             if not line:
                 raise QChemSectionNotFound('T2-amplitudes')
             line = qchem_output.readline()
+            virtual_map = {'A': neu, 'B': ned}
             while line and not line == '\n':
                 m = re.search(amplitude_regexp, line)
                 self.determinants.append({
-                    'weight': float(m.group('weight')),
+                    'weight': Decimal(m.group('weight')),
                     'promotions': (
                         {'from': int(m.group('first_from')) + 1,
                          'spin': spin_map[m.group('first_from_spin')],
-                         'to': int(m.group('first_to')) + neu + 1}
+                         'to': int(m.group('first_to')) + 1 + virtual_map[m.group('first_from_spin')]}
                         ,
                         {'from': int(m.group('second_from')) + 1,
                          'spin': spin_map[m.group('second_from_spin')],
-                         'to': int(m.group('second_to')) + ned + 1}
+                         'to': int(m.group('second_to')) + 1 + virtual_map[m.group('second_from_spin')]}
                     )
                 })
                 line = qchem_output.readline()
+
+    def truncate_determinants(self):
+        """Leave only biggest weight determinants."""
+        determinants = []
+        weight = None
+        for det in self.determinants:
+            if not weight:
+                weight = det['weight']
+            if weight and abs(weight) > abs(det['weight']):
+                break
+            determinants.append(det)
+        self.determinants = determinants
 
     def gwfn_multideterminant_information(self):
         """
         :returns: MULTIDETERMINANT INFORMATION section of gwfn.data file
         """
-        if self.output_file:
+        if self.output_file and len(self.determinants) > 0:
             result = ("MULTIDETERMINANT INFORMATION\n"
                       "----------------------------\n"
                       " MD\n")
