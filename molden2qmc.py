@@ -5,7 +5,6 @@ import argparse
 import os
 import sys
 import re
-from decimal import Decimal
 from math import pi, sqrt, factorial, fabs
 from itertools import combinations
 from operator import itemgetter
@@ -13,7 +12,7 @@ from operator import itemgetter
 if sys.version_info > (3, 0):
     from functools import reduce
 
-__version__ = '3.0.2'
+__version__ = '3.1.0'
 
 
 def fact2(k):
@@ -1115,7 +1114,7 @@ class QChem(DefaultConverter):
             self.active = {'alpha': 0, 'beta': 0}
             self.determinants = []
             self.parse_output()
-            # self.truncate_determinants()
+            self.truncate_determinants(0.05)
         super(QChem, self).__init__(f, pseudoatoms)
 
     def parse_output(self):
@@ -1155,7 +1154,7 @@ class QChem(DefaultConverter):
             while line and not line == '\n':
                 m = re.search(amplitude_regexp, line)
                 self.determinants.append({
-                    'weight': Decimal(m.group('weight')),
+                    'weight': float(m.group('weight')),
                     'promotions': (
                         {'from': int(m.group('first_from')) + 1,
                          'spin': spin_map[m.group('first_from_spin')],
@@ -1168,14 +1167,11 @@ class QChem(DefaultConverter):
                 })
                 line = qchem_output.readline()
 
-    def truncate_determinants(self):
-        """Leave only biggest weight determinants."""
+    def truncate_determinants(self, tol=0.0):
+        """Leave only determinants with weight bigger then tol."""
         determinants = []
-        weight = None
         for det in self.determinants:
-            if not weight:
-                weight = det['weight']
-            if weight and abs(weight) > abs(det['weight']):
+            if abs(det['weight']) < tol:
                 break
             determinants.append(det)
         self.determinants = determinants
