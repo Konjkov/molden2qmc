@@ -483,4 +483,5 @@ class test_Orca4(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    """python -m unittest test_molden2qmc.test_QChem"""
     unittest.main()
