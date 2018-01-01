@@ -1106,15 +1106,16 @@ class QChem(DefaultConverter):
     """
     title = "generated from QChem output data.\n"
 
-    def __init__(self, f, pseudoatoms="none", output_file=None):
+    def __init__(self, f, pseudoatoms="none", output_file=None, order=0):
         """Initialise multi-determinant support."""
 
         self.output_file = output_file
         if output_file:
+            self.occupied = {'alpha': 0, 'beta': 0}
             self.active = {'alpha': 0, 'beta': 0}
             self.determinants = []
             self.parse_output()
-            self.truncate_determinants(0.05)
+            self.truncate(order)
         super(QChem, self).__init__(f, pseudoatoms)
 
     def parse_output(self):
@@ -1144,13 +1145,13 @@ class QChem(DefaultConverter):
             while line and not line.startswith('       Value      i             j           ->   a             b'):
                 m = re.search(electron_regexp, line)
                 if m:
-                    neu = int(m.group('alpha'))
-                    ned = int(m.group('beta'))
+                    self.occupied['alpha'] = int(m.group('alpha'))
+                    self.occupied['beta'] = int(m.group('beta'))
                 line = qchem_output.readline()
             if not line:
                 raise QChemSectionNotFound('T2-amplitudes')
             line = qchem_output.readline()
-            virtual_map = {'A': neu, 'B': ned}
+            virtual_map = {'A': self.occupied['alpha'], 'B': self.occupied['beta']}
             while line and not line == '\n':
                 m = re.search(amplitude_regexp, line)
                 self.determinants.append({
@@ -1167,10 +1168,13 @@ class QChem(DefaultConverter):
                 })
                 line = qchem_output.readline()
 
-    def truncate_determinants(self, tol=0.0):
-        """Leave only determinants with weight bigger then tol."""
+    def truncate(self, order, tol=0.01):
+        """Leave only determinants with active space orbital number not greater then order."""
         determinants = []
+        limit = order + self.occupied['alpha']
         for det in self.determinants:
+            if det['promotions'][0]['to'] > limit or det['promotions'][1]['to'] > limit:
+                continue
             if abs(det['weight']) < tol:
                 break
             determinants.append(det)
@@ -1252,6 +1256,8 @@ def main():
         "white space separated numbers = number of pseudoatoms (started from 1)."))
     # default output file name is mol.out
     parser.add_argument('--multideterminant', type=str, const='mol', nargs='?', help="prefix of output file")
+    # truncation order for multideterminant extension
+    parser.add_argument('--truncate', type=int, const='20', nargs='?', help="truncation order")
 
     args = parser.parse_args()
 
@@ -1285,7 +1291,7 @@ def main():
     elif args.code == 6:
         NwChem(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 7:
-        QChem(input_file, args.pseudoatoms, output_file).gwfn(args.output_file)
+        QChem(input_file, args.pseudoatoms, output_file, args.truncate).gwfn(args.output_file)
 
 
 if __name__ == "__main__":
