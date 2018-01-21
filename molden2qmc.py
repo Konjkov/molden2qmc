@@ -11,7 +11,7 @@ from operator import itemgetter
 if sys.version_info > (3, 0):
     from functools import reduce
 
-__version__ = '3.0.2'
+__version__ = '3.0.3'
 
 
 def fact2(k):
@@ -991,7 +991,7 @@ class PSI4(DefaultConverter):
 
 class Dalton(DefaultConverter):
     """
-    DALTON 2013
+    DALTON 2016
     """
     title = "generated from Dalton output data.\n"
 
@@ -1131,7 +1131,7 @@ def main():
             "1 -- PSI4\n"
             "2 -- CFOUR 2.0beta\n"
             "3 -- ORCA 3.X - 4.X\n"
-            "4 -- DALTON2013\n"
+            "4 -- DALTON2016\n"
             "5 -- MOLPRO\n"
             "6 -- NWCHEM\n"
             "7 -- QCHEM 4.X"
@@ -1164,8 +1164,6 @@ def main():
         Orca(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 4:
         Dalton(input_file, args.pseudoatoms).gwfn(args.output_file)
-        print ("In Dalton's MOLDEN file all occupation numbers of HF and DFT MOs are zero values by mistake\n"
-               "So you should correct 'Number of electrons per primitive cell' in gwfn.data file by hand.")
     elif args.code == 5:
         Molpro(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 6:

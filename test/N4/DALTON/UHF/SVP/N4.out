@@ -4,8 +4,11 @@
      *************** Dalton - An Electronic Structure Program ***************
      ************************************************************************
 
-    This is output from DALTON (Release Dalton2013 patch 0)
+    This is output from DALTON release Dalton2017.alpha (2017)
+         ( Web site: http://daltonprogram.org )
+
    ----------------------------------------------------------------------------
+
     NOTE:
      
     Dalton is an experimental code for the evaluation of molecular
@@ -24,32 +27,33 @@
      
        K. Aidas, C. Angeli, K. L. Bak, V. Bakken, R. Bast,
        L. Boman, O. Christiansen, R. Cimiraglia, S. Coriani,
-       P. Dahle, E. K. Dalskov, U. Ekstroem, T. Enevoldsen,
-       J. J. Eriksen, P. Ettenhuber, B. Fernandez, L. Ferrighi,
-       H. Fliegl, L. Frediani, K. Hald, A. Halkier, C. Haettig,
-       H. Heiberg, T. Helgaker, A. C. Hennum, H. Hettema,
-       E. Hjertenaes, S. Hoest, I.-M. Hoeyvik, M. F. Iozzi,
-       B. Jansik, H. J. Aa. Jensen, D. Jonsson, P. Joergensen,
-       J. Kauczor, S. Kirpekar, T. Kjaergaard, W. Klopper,
-       S. Knecht, R. Kobayashi, H. Koch, J. Kongsted, A. Krapp,
-       K. Kristensen, A. Ligabue, O. B. Lutnaes, J. I. Melo,
-       K. V. Mikkelsen, R. H. Myhre, C. Neiss, C. B. Nielsen,
-       P. Norman, J. Olsen, J. M. H. Olsen, A. Osted,
-       M. J. Packer, F. Pawlowski, T. B. Pedersen, P. F. Provasi,
-       S. Reine, Z. Rinkevicius, T. A. Ruden, K. Ruud, V. Rybkin,
-       P. Salek, C. C. M. Samson, A. Sanchez de Meras, T. Saue,
-       S. P. A. Sauer, B. Schimmelpfennig, K. Sneskov,
-       A. H. Steindal, K. O. Sylvester-Hvid, P. R. Taylor,
-       A. M. Teale, E. I. Tellgren, D. P. Tew, A. J. Thorvaldsen,
-       L. Thoegersen, O. Vahtras, M. A. Watson, D. J. D. Wilson,
-       M. Ziolkowski and H. Aagren,
+       P. Dahle, E. K. Dalskov, U. Ekstroem,
+       T. Enevoldsen, J. J. Eriksen, P. Ettenhuber, B. Fernandez,
+       L. Ferrighi, H. Fliegl, L. Frediani, K. Hald, A. Halkier,
+       C. Haettig, H. Heiberg, T. Helgaker, A. C. Hennum,
+       H. Hettema, E. Hjertenaes, S. Hoest, I.-M. Hoeyvik,
+       M. F. Iozzi, B. Jansik, H. J. Aa. Jensen, D. Jonsson,
+       P. Joergensen, J. Kauczor, S. Kirpekar,
+       T. Kjaergaard, W. Klopper, S. Knecht, R. Kobayashi, H. Koch,
+       J. Kongsted, A. Krapp, K. Kristensen, A. Ligabue,
+       O. B. Lutnaes, J. I. Melo, K. V. Mikkelsen, R. H. Myhre,
+       C. Neiss, C. B. Nielsen, P. Norman, J. Olsen,
+       J. M. H. Olsen, A. Osted, M. J. Packer, F. Pawlowski,
+       T. B. Pedersen, P. F. Provasi, S. Reine, Z. Rinkevicius,
+       T. A. Ruden, K. Ruud, V. Rybkin, P. Salek, C. C. M. Samson,
+       A. Sanchez de Meras, T. Saue, S. P. A. Sauer,
+       B. Schimmelpfennig, K. Sneskov, A. H. Steindal,
+       K. O. Sylvester-Hvid, P. R. Taylor, A. M. Teale,
+       E. I. Tellgren, D. P. Tew, A. J. Thorvaldsen, L. Thoegersen,
+       O. Vahtras, M. A. Watson, D. J. D. Wilson, M. Ziolkowski
+       and H. Agren,
        "The Dalton quantum chemistry program system",
-       WIREs Comput. Mol. Sci. 2013. (doi: 10.1002/wcms.1172)
-    
+       WIREs Comput. Mol. Sci. 2014, 4:269–284 (doi: 10.1002/wcms.1172)
+     
     and
-    
+     
        Dalton, a Molecular Electronic Structure Program,
-       Release DALTON2013.0 (2013), see http://daltonprogram.org
+       Release Dalton2017.alpha (2017), see http://daltonprogram.org
    ----------------------------------------------------------------------------
 
     Authors in alphabetical order (major contribution(s) in parenthesis):
@@ -58,15 +62,18 @@
   Celestino Angeli,         University of Ferrara,        Italy       (NEVPT2)
   Keld L. Bak,              UNI-C,                        Denmark     (AOSOPPA, non-adiabatic coupling, magnetic properties)
   Vebjoern Bakken,          University of Oslo,           Norway      (DALTON; geometry optimizer, symmetry detection)
-  Radovan Bast,             KTH Stockholm,                Sweden      (DALTON installation and execution frameworks)
+  Radovan Bast,             UiT The Arctic U. of Norway,  Norway      (DALTON installation and execution frameworks)
+  Pablo Baudin,             University of Valencia,       Spain       (Cholesky excitation energies)
   Linus Boman,              NTNU,                         Norway      (Cholesky decomposition and subsystems)
   Ove Christiansen,         Aarhus University,            Denmark     (CC module)
   Renzo Cimiraglia,         University of Ferrara,        Italy       (NEVPT2)
   Sonia Coriani,            University of Trieste,        Italy       (CC module, MCD in RESPONS)
+  Janusz Cukras,            University of Trieste,        Italy       (MChD in RESPONS)
   Paal Dahle,               University of Oslo,           Norway      (Parallelization)
   Erik K. Dalskov,          UNI-C,                        Denmark     (SOPPA)
   Thomas Enevoldsen,        Univ. of Southern Denmark,    Denmark     (SOPPA)
-  Janus J. Eriksen,         Aarhus University,            Denmark     (PE-MP2/SOPPA, TDA)
+  Janus J. Eriksen,         Aarhus University,            Denmark     (Polarizable embedding model, TDA)
+  Rasmus Faber,             University of Copenhagen,     Denmark     (Vib.avg. NMR with SOPPA, parallel AO-SOPPA)
   Berta Fernandez,          U. of Santiago de Compostela, Spain       (doublet spin, ESR in RESPONS)
   Lara Ferrighi,            Aarhus University,            Denmark     (PCM Cubic response)
   Heike Fliegl,             University of Oslo,           Norway      (CCSD(R12))
@@ -75,50 +82,57 @@
   Christof Haettig,         Ruhr-University Bochum,       Germany     (CC module)
   Kasper Hald,              Aarhus University,            Denmark     (CC module)
   Asger Halkier,            Aarhus University,            Denmark     (CC module)
+  Frederik Beyer Hansen,    University of Copenhagen,     Denmark     (Parallel AO-SOPPA)
+  Erik D. Hedegaard,        Univ. of Southern Denmark,    Denmark     (Polarizable embedding model, QM/MM)
   Hanne Heiberg,            University of Oslo,           Norway      (geometry analysis, selected one-electron integrals)
   Trygve Helgaker,          University of Oslo,           Norway      (DALTON; ABACUS, ERI, DFT modules, London, and much more)
   Alf Christian Hennum,     University of Oslo,           Norway      (Parity violation)
   Hinne Hettema,            University of Auckland,       New Zealand (quadratic response in RESPONS; SIRIUS supersymmetry)
   Eirik Hjertenaes,         NTNU,                         Norway      (Cholesky decomposition)
+  Pi A. B. Haase,           University of Copenhagen,     Denmark     (Triplet AO-SOPPA)
   Maria Francesca Iozzi,    University of Oslo,           Norway      (RPA)
   Brano Jansik              Technical Univ. of Ostrava    Czech Rep.  (DFT cubic response)
   Hans Joergen Aa. Jensen,  Univ. of Southern Denmark,    Denmark     (DALTON; SIRIUS, RESPONS, ABACUS modules, London, and much more)
   Dan Jonsson,              UiT The Arctic U. of Norway,  Norway      (cubic response in RESPONS module)
   Poul Joergensen,          Aarhus University,            Denmark     (RESPONS, ABACUS, and CC modules)
+  Maciej Kaminski,          University of Warsaw,         Poland      (CPPh in RESPONS)
   Joanna Kauczor,           Linkoeping University,        Sweden      (Complex polarization propagator (CPP) module)
   Sheela Kirpekar,          Univ. of Southern Denmark,    Denmark     (Mass-velocity & Darwin integrals)
   Wim Klopper,              KIT Karlsruhe,                Germany     (R12 code in CC, SIRIUS, and ABACUS modules)
   Stefan Knecht,            ETH Zurich,                   Switzerland (Parallel CI and MCSCF)
   Rika Kobayashi,           Australian National Univ.,    Australia   (DIIS in CC, London in MCSCF)
   Henrik Koch,              NTNU,                         Norway      (CC module, Cholesky decomposition)
-  Jacob Kongsted,           Univ. of Southern Denmark,    Denmark     (Polarizable embedding, QM/MM)
+  Jacob Kongsted,           Univ. of Southern Denmark,    Denmark     (Polarizable embedding model, QM/MM)
   Andrea Ligabue,           University of Modena,         Italy       (CTOCD, AOSOPPA)
+  Nanna H. List             Univ. of Southern Denmark,    Denmark     (Polarizable embedding model)
   Ola B. Lutnaes,           University of Oslo,           Norway      (DFT Hessian)
   Juan I. Melo,             University of Buenos Aires,   Argentina   (LRESC, Relativistic Effects on NMR Shieldings)
   Kurt V. Mikkelsen,        University of Copenhagen,     Denmark     (MC-SCRF and QM/MM)
   Rolf H. Myhre,            NTNU,                         Norway      (Cholesky, subsystems and ECC2)
   Christian Neiss,          Univ. Erlangen-Nuernberg,     Germany     (CCSD(R12))
   Christian B. Nielsen,     University of Copenhagen,     Denmark     (QM/MM)
-  Patrick Norman,           Linkoeping University,        Sweden      (Cubic response and complex response in RESPONS)
+  Patrick Norman,           Linkoeping University,        Sweden      (Cubic response and complex frequency response in RESPONS)
   Jeppe Olsen,              Aarhus University,            Denmark     (SIRIUS CI/density modules)
-  Jogvan Magnus H. Olsen,   Univ. of Southern Denmark,    Denmark     (Polarizable embedding, PE library, QM/MM)
+  Jogvan Magnus H. Olsen,   Univ. of Southern Denmark,    Denmark     (Polarizable embedding model, QM/MM)
   Anders Osted,             Copenhagen University,        Denmark     (QM/MM)
   Martin J. Packer,         University of Sheffield,      UK          (SOPPA)
   Filip Pawlowski,          Kazimierz Wielki University,  Poland      (CC3)
+  Morten N. Pedersen,       Univ. of Southern Denmark,    Denmark     (Polarizable embedding model)
   Thomas B. Pedersen,       University of Oslo,           Norway      (Cholesky decomposition)
   Patricio F. Provasi,      University of Northeastern,   Argentina   (Analysis of coupling constants in localized orbitals)
   Zilvinas Rinkevicius,     KTH Stockholm,                Sweden      (open-shell DFT, ESR)
   Elias Rudberg,            KTH Stockholm,                Sweden      (DFT grid and basis info)
   Torgeir A. Ruden,         University of Oslo,           Norway      (Numerical derivatives in ABACUS)
-  Kenneth Ruud,             UiT The Arctic U. of Norway,  Norway      (DALTON; ABACUS magnetic properties and  much more)
+  Kenneth Ruud,             UiT The Arctic U. of Norway,  Norway      (DALTON; ABACUS magnetic properties and much more)
   Pawel Salek,              KTH Stockholm,                Sweden      (DALTON; DFT code)
   Claire C. M. Samson       University of Karlsruhe       Germany     (Boys localization, r12 integrals in ERI)
   Alfredo Sanchez de Meras, University of Valencia,       Spain       (CC module, Cholesky decomposition)
   Trond Saue,               Paul Sabatier University,     France      (direct Fock matrix construction)
   Stephan P. A. Sauer,      University of Copenhagen,     Denmark     (SOPPA(CCSD), SOPPA prop., AOSOPPA, vibrational g-factors)
   Bernd Schimmelpfennig,    Forschungszentrum Karlsruhe,  Germany     (AMFI module)
-  Kristian Sneskov,         Aarhus University,            Denmark     (QM/MM, PE-CC)
-  Arnfinn H. Steindal,      UiT The Arctic U. of Norway,  Norway      (parallel QM/MM)
+  Kristian Sneskov,         Aarhus University,            Denmark     (Polarizable embedding model, QM/MM)
+  Arnfinn H. Steindal,      UiT The Arctic U. of Norway,  Norway      (parallel QM/MM, Polarizable embedding model)
+  Casper Steinmann,         Univ. of Southern Denmark,    Denmark     (QFIT, Polarizable embedding model)
   K. O. Sylvester-Hvid,     University of Copenhagen,     Denmark     (MC-SCRF)
   Peter R. Taylor,          VLSCI/Univ. of Melbourne,     Australia   (Symmetry handling ABACUS, integral transformation)
   Andrew M. Teale,          University of Nottingham,     England     (DFT-AC, DFT-D)
@@ -128,67 +142,67 @@
   Hans Agren,               KTH Stockholm,                Sweden      (SIRIUS module, RESPONS, MC-SCRF solvation model)
  --------------------------------------------------------------------------------
 
-     Date and time (Linux)  : Tue Jun  2 21:56:31 2015
-     Host name              : kbob-G41MT-S2                           
+     Date and time (Linux)  : Sun Jan 21 19:06:50 2018
+     Host name              : vladimir-Kubuntu-16                     
 
  * Work memory size             :    64000000 =  488.28 megabytes.
 
  * Directories for basis set searches:
-   1) /home/kbob/git/molden2qmc/test/N4/DALTON/UHF/SVP
-   2) /opt/DALTON-2013.0-Source/build/basis
+   1) /home/vladimir/git/molden2qmc/test/N4/DALTON/UHF/SVP
+   2) /home/vladimir/git/dalton/build/basis
 
 
 Compilation information
 -----------------------
 
- Who compiled             | kbob
- Host                     | kbob-G41MT-S2
- System                   | Linux-3.8.0-31-generic
+ Who compiled             | vladimir
+ Host                     | vladimir-Kubuntu-16
+ System                   | Linux-4.10.0-42-generic
  CMake generator          | Unix Makefiles
  Processor                | x86_64
  64-bit integers          | OFF
- MPI                      | ON
- Fortran compiler         | /usr/bin/mpif90
- Fortran compiler version | GNU Fortran (Ubuntu/Linaro 4.7.3-1ubuntu1) 4.7.3
- C compiler               | /usr/bin/mpicc
- C compiler version       | gcc (Ubuntu/Linaro 4.7.3-1ubuntu1) 4.7.3
- C++ compiler             | /usr/bin/mpicxx
- C++ compiler version     | unknown
- BLAS                     | /usr/lib/atlas-base/libf77blas.so;/usr/lib/atlas-b
-                          | ase/libcblas.so;/usr/lib/atlas-base/libatlas.so
- LAPACK                   | /usr/lib/atlas-base/libatlas.so;/usr/lib/atlas-bas
-                          | e/atlas/liblapack.so
+ MPI                      | OFF
+ Fortran compiler         | /usr/bin/gfortran
+ Fortran compiler version | GNU Fortran (Ubuntu 6.3.0-12ubuntu2) 6.3.0 2017040
+                          | 6
+ C compiler               | /usr/bin/gcc
+ C compiler version       | gcc (Ubuntu 6.3.0-12ubuntu2) 6.3.0 20170406
+ C++ compiler             | /usr/bin/g++
+ C++ compiler version     | g++ (Ubuntu 6.3.0-12ubuntu2) 6.3.0 20170406
+ BLAS                     | /usr/lib/libopenblas.so
+ LAPACK                   | /usr/lib/liblapack.so
  Static linking           | OFF
- Last Git revision        | 575a5cf6d2c5c3776735f11fa026dbfca0382455
- Configuration time       | 2013-11-24 20:48:58.598358
-
- * Sequential calculation using 1 CPU
+ Last Git revision        | 9303ffee678b31bc7478a34c517e03bc6fdd0083
+ Git branch               | master
+ Configuration time       | 2018-01-21 17:35:12.315804
 
 
    Content of the .dal input file
  ----------------------------------
 
-**DALTON INPUT                                    
-.RUN WAVE FUNCTIONS                               
-**WAVE FUNCTIONS                                  
-.HF                                               
-*END OF INPUT                                     
-                                                  
+**DALTON INPUT
+.RUN WAVE FUNCTIONS
+**WAVE FUNCTIONS
+.HF
+*SCF INPUT
+.C2DIIS
+*END OF INPUT
+
 
 
    Content of the .mol file
  ----------------------------
 
-BASIS                                                                          
-def2_svp                                                                       
-N4 molecule                                                                    
----------------------------                                                    
-Atomtypes=1 Charge=1 Angstrom                                                  
-Atoms=4 Charge=7                                                               
-N       0.5200      0.5300      0.5100                                         
-N      -0.5200     -0.5200      0.5200                                         
-N      -0.5200      0.5200     -0.5200                                         
-N       0.5200     -0.5200     -0.5200                                         
+BASIS
+def2_svp
+N4 molecule
+---------------------------
+Atomtypes=1 Charge=1 Angstrom
+Atoms=4 Charge=7
+N       0.5200      0.5300      0.5100
+N      -0.5200     -0.5200      0.5200
+N      -0.5200      0.5200     -0.5200
+N       0.5200     -0.5200     -0.5200
 
 
        *******************************************************************
@@ -225,7 +239,7 @@ N       0.5200     -0.5200     -0.5200
   Number of symmetry independent centers:    4
   Number of basis sets to read;    2
   Basis set file used for this atomic type with Z =   7 :
-     "/opt/DALTON-2013.0-Source/build/basis/def2_svp"
+     "/home/vladimir/git/dalton/build/basis/def2_svp"
 
   Info about the basis set file: your basis has no documentation.
   Basis set: def2_svp                                                                        
@@ -236,8 +250,8 @@ N       0.5200     -0.5200     -0.5200
 
  Symmetry test threshold:  5.00E-06
 
- - molecule centered at center of mass and rotated so
-   principal axes of inertia are along coordinate axes.
+@   The molecule is centered at center of mass and rotated
+@   so principal axes of inertia are along coordinate axes.
 
  Symmetry class found: C(1)           
 
@@ -254,8 +268,8 @@ N       0.5200     -0.5200     -0.5200
                          SYMGRP: Point group information
                          -------------------------------
 
-Full point group is: C(1)           
-Represented as:      C1 
+@    Full point group is: C(1)           
+@    Represented as:      C1 
 
 
                                  Isotopic Masses
@@ -378,10 +392,23 @@ Represented as:      C1
 
 
 
-    *************************************************************************
-    ****************** Output from HERMIT input processing ******************
-    *************************************************************************
+ ***************************************************************************************
+ ****************** Output from **INTEGRALS input processing (HERMIT) ******************
+ ***************************************************************************************
 
+
+ - Using defaults, no **INTEGRALS input found
+
+ Default print level:        1
+
+ * Nuclear model: Point charge
+
+ Calculation of one- and two-electron Hamiltonian integrals.
+
+ Center of mass  (bohr):     -0.000000000000      0.000000000000     -0.000000000000
+ Operator center (bohr):      0.000000000000      0.000000000000      0.000000000000
+ Gauge origin    (bohr):     -0.000000000000      0.000000000000     -0.000000000000
+ Dipole origin   (bohr):     -0.000000000000      0.000000000000     -0.000000000000
 
 
      ************************************************************************
@@ -389,13 +416,25 @@ Represented as:      C1
      ************************************************************************
 
 
- Threshold for neglecting two-electron integrals:  1.00D-12
- Number of two-electron integrals written:     1219327 ( 95.7% )
- Megabytes written:                             13.967
 
- >>>  Time used in TWOINT     is   0.87 seconds
- >>>> Total CPU  time used in HERMIT:   0.93 seconds
- >>>> Total wall time used in HERMIT:   1.09 seconds
+                      Nuclear contribution to dipole moments
+                      --------------------------------------
+
+                 au               Debye          C m (/(10**-30)
+
+      x      0.00000000         0.00000000         0.00000000
+      y      0.00000000         0.00000000         0.00000000
+      z     -0.00000000        -0.00000000        -0.00000000
+
+
+
+ Threshold for neglecting two-electron integrals:  1.00D-12
+ HERMIT - Number of two-electron integrals written:     1219327 ( 95.7% )
+ HERMIT - Megabytes written:                             13.967
+
+  Time used in TWOINT     is       0.42 seconds
+  Total CPU  time used in HERMIT:   0.45 seconds
+  Total wall time used in HERMIT:   0.45 seconds
 
 
                         .----------------------------------.
@@ -430,8 +469,8 @@ Represented as:      C1
  **********************************************************************
 
  
-     Date and time (Linux)  : Tue Jun  2 21:56:32 2015
-     Host name              : kbob-G41MT-S2                           
+     Date and time (Linux)  : Sun Jan 21 19:06:51 2018
+     Host name              : vladimir-Kubuntu-16                     
 
  Title lines from ".mol" input file:
      N4 molecule                                                             
@@ -447,24 +486,25 @@ Represented as:      C1
 
      Wave function specification
      ============================
-@    For the wave function of type :      >>> HF <<<
+@    Wave function type        --- HF ---
 @    Number of closed shell electrons          26
 @    Number of electrons in active shells       1
 @    Total charge of the molecule               1
 
 @    Spin multiplicity and 2 M_S                2         1
-     Total number of symmetries                 1
-@    Reference state symmetry                   1
+@    Total number of symmetries                 1 (point group: C1 )
+@    Reference state symmetry                   1 (irrep name : A  )
 
      Orbital specifications
      ======================
-     Abelian symmetry species          All |    1
+@    Abelian symmetry species          All |    1
+@                                          |  A  
                                        --- |  ---
 @    Occupied SCF orbitals              13 |   13
 @    Open shell SCF orbitals             1 |    1
-     Secondary orbitals                 42 |   42
-     Total number of orbitals           56 |   56
-     Number of basis functions          56 |   56
+@    Secondary orbitals                 42 |   42
+@    Total number of orbitals           56 |   56
+@    Number of basis functions          56 |   56
 
      Optimization information
      ========================
@@ -479,416 +519,1084 @@ Represented as:      C1
      Threshold for SCF convergence     1.00D-05
 
 
- >>>>> DIIS optimization of Hartree-Fock <<<<<
+ ***********************************************
+ ***** DIIS acceleration of SCF iterations *****
+ ***********************************************
 
- C1-DIIS algorithm; max error vectors =    5
+ C2-DIIS algorithm; max error vectors =    8
 
  Iter      Total energy        Error norm    Delta(E)  DIIS dim.
  -----------------------------------------------------------------------------
 @  1    -215.845808183        4.09392D+00   -2.16D+02    1
       Virial theorem: -V/T =      2.018655
-@      MULPOP N       0.25; N       0.25; N       0.25; N       0.25; 
+@    MULPOP   N       0.25; N       0.25; N       0.25; N       0.25; 
+   1  Level shift: doubly occupied orbital energies shifted by -2.00D-01
+               and singly occupied orbital energies shifted by -1.00D-01
  -----------------------------------------------------------------------------
-@  2    -216.717129784        1.32452D+00   -8.71D-01    2
-      Virial theorem: -V/T =      1.990686
-@      MULPOP N       0.25; N       0.26; N       0.24; N       0.25; 
+@  2    -216.754481198        9.55191D-01   -9.09D-01    2
+      Virial theorem: -V/T =      1.994476
+@    MULPOP   N       0.25; N       0.26; N       0.24; N       0.25; 
+   2  Level shift: doubly occupied orbital energies shifted by -5.00D-02
+               and singly occupied orbital energies shifted by -2.50D-02
  -----------------------------------------------------------------------------
-@  3    -216.804330436        1.32141D-01   -8.72D-02    3
-      Virial theorem: -V/T =      2.000999
-@      MULPOP N       0.25; N       0.25; N       0.25; N       0.25; 
+@  3    -216.803598815        1.49324D-01   -4.91D-02    3
+      Virial theorem: -V/T =      2.001055
+@    MULPOP   N       0.25; N       0.25; N       0.25; N       0.25; 
+   3  Level shift: doubly occupied orbital energies shifted by -1.25D-02
+               and singly occupied orbital energies shifted by -6.25D-03
  -----------------------------------------------------------------------------
-@  4    -216.806221085        4.00516D-02   -1.89D-03    4
-      Virial theorem: -V/T =      2.000591
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
+@  4    -216.806209125        3.77119D-02   -2.61D-03    4
+      Virial theorem: -V/T =      2.000570
+@    MULPOP   N       0.25; N       0.26; N       0.24; N       0.25; 
  -----------------------------------------------------------------------------
-@  5    -216.806341606        3.00536D-02   -1.21D-04    5
-      Virial theorem: -V/T =      2.000628
-@      MULPOP N       0.25; N       0.25; N       0.25; N       0.25; 
+@  5    -216.806330702        3.51223D-02   -1.22D-04    5
+      Virial theorem: -V/T =      2.000637
+@    MULPOP   N       0.25; N       0.24; N       0.26; N       0.25; 
  -----------------------------------------------------------------------------
-@  6    -216.806420686        8.62131D-03   -7.91D-05    5
-      Virial theorem: -V/T =      2.000652
-@      MULPOP N       0.25; N       0.25; N       0.25; N       0.25; 
+@  6    -216.806415685        7.96276D-03   -8.50D-05    6
+      Virial theorem: -V/T =      2.000651
+@    MULPOP   N       0.25; N       0.25; N       0.25; N       0.25; 
  -----------------------------------------------------------------------------
-@  7    -216.806441819        5.17688D-03   -2.11D-05    5
-      Virial theorem: -V/T =      2.000668
-@      MULPOP N       0.25; N       0.25; N       0.25; N       0.25; 
+@  7    -216.806438682        4.59531D-03   -2.30D-05    7
+      Virial theorem: -V/T =      2.000672
+@    MULPOP   N       0.25; N       0.25; N       0.25; N       0.25; 
  -----------------------------------------------------------------------------
-@  8    -216.806453157        5.25819D-03   -1.13D-05    5
+@  8    -216.806468437        8.61695D-03   -2.98D-05    8
+
+Info: SCF gradient has been lower than now,
+      therefore  2 old iterations are removed from DIIS.
+      Virial theorem: -V/T =      2.000683
+@    MULPOP   N       0.26; N       0.25; N       0.25; N       0.24; 
+ -----------------------------------------------------------------------------
+@  9    -216.806477376        6.53213D-03   -8.94D-06    7
+      Virial theorem: -V/T =      2.000677
+@    MULPOP   N       0.25; N       0.26; N       0.24; N       0.25; 
+ -----------------------------------------------------------------------------
+@ 10    -216.806490375        5.94807D-03   -1.30D-05    8
+      Virial theorem: -V/T =      2.000678
+@    MULPOP   N       0.25; N       0.26; N       0.24; N       0.25; 
+ -----------------------------------------------------------------------------
+@ 11    -216.806335817        4.69739D-03    1.55D-04    8
 
 !!! Info: DIIS restarted because it was stalled ...
- - energy changed by   -1.134E-05
- - gradient changed by  8.132E-05
- - or strange C vector coeff. for current index (=  3) :
-   -0.313922    0.379562    0.846930   -0.006742    0.094171
-      Virial theorem: -V/T =      2.000672
-@      MULPOP N       0.25; N       0.25; N       0.25; N       0.25; 
- -----------------------------------------------------------------------------
-@  9    -216.806466524        3.45337D-03   -1.34D-05    2
-      Virial theorem: -V/T =      2.000675
-@      MULPOP N       0.25; N       0.25; N       0.25; N       0.25; 
- -----------------------------------------------------------------------------
-@ 10    -216.806478945        5.43937D-03   -1.24D-05    3
+ - energy changed by    1.546E-04
+ - gradient changed by -1.251E-03
+ - or strange C vector coeff. for current index (=  1) :
+   -2.818072   -0.002379   -0.057822    0.145760    0.365873   32.647485   27.478830  -56.759676
 
-Info: SCF gradient has been lower than now,
-      therefore  2 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000676
-@      MULPOP N       0.25; N       0.25; N       0.25; N       0.25; 
+! Backstep to previous Fock matrix because energy increased.
+      Virial theorem: -V/T =      2.000677
+@    MULPOP   N       0.25; N       0.26; N       0.24; N       0.25; 
+  11  Level shift: doubly occupied orbital energies shifted by -1.55D-03
+               and singly occupied orbital energies shifted by -7.73D-04
  -----------------------------------------------------------------------------
-@ 11    -216.806495085        3.69341D-03   -1.61D-05    2
-      Virial theorem: -V/T =      2.000676
-@      MULPOP N       0.25; N       0.25; N       0.25; N       0.25; 
+@ 12    -207.307293029        1.05583D+01    9.50D+00    2
+      Virial theorem: -V/T =      1.849568
+@    MULPOP   N       0.24; N       0.28; N       0.22; N       0.27; 
  -----------------------------------------------------------------------------
-@ 12    -216.806511144        6.00489D-03   -1.61D-05    3
+@ 13    -207.307293029        1.05583D+01    0.00D+00    3
 
-Info: SCF gradient has been lower than now,
-      therefore  2 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000676
-@      MULPOP N       0.25; N       0.26; N       0.24; N       0.24; 
- -----------------------------------------------------------------------------
-@ 13    -216.806530845        4.07415D-03   -1.97D-05    2
-      Virial theorem: -V/T =      2.000676
-@      MULPOP N       0.25; N       0.26; N       0.24; N       0.25; 
- -----------------------------------------------------------------------------
-@ 14    -216.806550470        6.63765D-03   -1.96D-05    3
 
-Info: SCF gradient has been lower than now,
-      therefore  2 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000676
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
- -----------------------------------------------------------------------------
-@ 15    -216.806574448        4.49364D-03   -2.40D-05    2
-      Virial theorem: -V/T =      2.000676
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
- -----------------------------------------------------------------------------
-@ 16    -216.806598222        7.30918D-03   -2.38D-05    3
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    2
 
-Info: SCF gradient has been lower than now,
-      therefore  2 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000676
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
+               Column   1     Column   2     Column   3
+       1      -0.00000000     0.00003538   222.95506803
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849568
+@    MULPOP   N       0.24; N       0.28; N       0.22; N       0.27; 
  -----------------------------------------------------------------------------
-@ 17    -216.806627236        4.94114D-03   -2.90D-05    2
-      Virial theorem: -V/T =      2.000676
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
- -----------------------------------------------------------------------------
-@ 18    -216.806655861        8.01423D-03   -2.86D-05    3
+@ 14    -207.307293029        1.05583D+01    0.00D+00    4
 
-Info: SCF gradient has been lower than now,
-      therefore  2 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000676
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
- -----------------------------------------------------------------------------
-@ 19    -216.806690693        5.41090D-03   -3.48D-05    2
-      Virial theorem: -V/T =      2.000676
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
- -----------------------------------------------------------------------------
-@ 20    -216.806724859        8.74291D-03   -3.42D-05    3
 
-Info: SCF gradient has been lower than now,
-      therefore  2 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000676
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
- -----------------------------------------------------------------------------
-@ 21    -216.806766258        5.89461D-03   -4.14D-05    2
-      Virial theorem: -V/T =      2.000676
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
- -----------------------------------------------------------------------------
-@ 22    -216.806806575        9.47849D-03   -4.03D-05    3
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    3
 
-Info: SCF gradient has been lower than now,
-      therefore  2 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000676
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
+               Column   1     Column   2     Column   3     Column   4
+       1      -0.00000000     0.00000000     0.00003538   334.43260204
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849568
+@    MULPOP   N       0.24; N       0.28; N       0.22; N       0.27; 
  -----------------------------------------------------------------------------
-@ 23    -216.806855161        6.38016D-03   -4.86D-05    2
-      Virial theorem: -V/T =      2.000675
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
- -----------------------------------------------------------------------------
-@ 24    -216.806902058        1.01973D-02   -4.69D-05    3
+@ 15    -207.307293029        1.05583D+01    0.00D+00    5
 
-Info: SCF gradient has been lower than now,
-      therefore  2 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000675
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
- -----------------------------------------------------------------------------
-@ 25    -216.806958195        6.85123D-03   -5.61D-05    2
-      Virial theorem: -V/T =      2.000675
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
- -----------------------------------------------------------------------------
-@ 26    -216.807011800        1.08690D-02   -5.36D-05    3
 
-Info: SCF gradient has been lower than now,
-      therefore  2 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000675
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
- -----------------------------------------------------------------------------
-@ 27    -216.807075451        7.28739D-03   -6.37D-05    2
-      Virial theorem: -V/T =      2.000674
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
- -----------------------------------------------------------------------------
-@ 28    -216.807135452        1.14572D-02   -6.00D-05    3
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    4
 
-Info: SCF gradient has been lower than now,
-      therefore  2 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000675
-@      MULPOP N       0.27; N       0.27; N       0.23; N       0.23; 
+               Column   1     Column   2     Column   3     Column   4     Column   5
+       1      -0.00000000    -0.00000000     0.00000000     0.00003538   445.91013605
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849568
+@    MULPOP   N       0.24; N       0.28; N       0.22; N       0.27; 
  -----------------------------------------------------------------------------
-@ 29    -216.807206031        7.66498D-03   -7.06D-05    2
-      Virial theorem: -V/T =      2.000673
-@      MULPOP N       0.26; N       0.26; N       0.24; N       0.24; 
- -----------------------------------------------------------------------------
-@ 30    -216.807271568        1.19222D-02   -6.55D-05    3
+@ 16    -207.307293029        1.05583D+01    0.00D+00    6
 
-Info: SCF gradient has been lower than now,
-      therefore  2 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000674
-@      MULPOP N       0.27; N       0.27; N       0.23; N       0.23; 
- -----------------------------------------------------------------------------
-@ 31    -216.807347833        7.95890D-03   -7.63D-05    2
-      Virial theorem: -V/T =      2.000672
-@      MULPOP N       0.27; N       0.27; N       0.23; N       0.23; 
- -----------------------------------------------------------------------------
-@ 32    -216.807417444        1.22253D-02   -6.96D-05    3
 
-Info: SCF gradient has been lower than now,
-      therefore  2 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000673
-@      MULPOP N       0.27; N       0.27; N       0.23; N       0.23; 
- -----------------------------------------------------------------------------
-@ 33    -216.807497484        8.14542D-03   -8.00D-05    2
-      Virial theorem: -V/T =      2.000671
-@      MULPOP N       0.27; N       0.27; N       0.23; N       0.23; 
- -----------------------------------------------------------------------------
-@ 34    -216.807569163        1.23340D-02   -7.17D-05    3
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    5
 
-Info: SCF gradient has been lower than now,
-      therefore  2 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000672
-@      MULPOP N       0.27; N       0.27; N       0.23; N       0.23; 
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6
+       1      -0.00000000    -0.00000000    -0.00000000     0.00000000     0.00003538   557.38767007
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849568
+@    MULPOP   N       0.24; N       0.28; N       0.22; N       0.27; 
  -----------------------------------------------------------------------------
-@ 35    -216.807650520        8.20566D-03   -8.14D-05    2
-      Virial theorem: -V/T =      2.000671
-@      MULPOP N       0.27; N       0.27; N       0.23; N       0.23; 
- -----------------------------------------------------------------------------
-@ 36    -216.807721898        1.22281D-02   -7.14D-05    3
+@ 17    -207.307293029        1.05583D+01    0.00D+00    7
 
-Info: SCF gradient has been lower than now,
-      therefore  1 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000672
-@      MULPOP N       0.27; N       0.27; N       0.23; N       0.23; 
- -----------------------------------------------------------------------------
-@ 37    -216.808497781        2.69228D-02   -7.76D-04    3
 
-Info: SCF gradient has been lower than now,
-      therefore  2 old iterations are removed from DIIS.
-      Virial theorem: -V/T =      2.000657
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    6
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7
+       1      -0.00000000    -0.00000000    -0.00000000    -0.00000000     0.00000000     0.00003538   668.86520408
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849568
+@    MULPOP   N       0.24; N       0.28; N       0.22; N       0.27; 
  -----------------------------------------------------------------------------
-@ 38    -216.808570355        2.36316D-02   -7.26D-05    2
-      Virial theorem: -V/T =      2.000667
-@      MULPOP N       0.29; N       0.29; N       0.21; N       0.21; 
+@ 18    -207.307293029        1.05583D+01    0.00D+00    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    7
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000    -0.00000000    -0.00000000    -0.00000000     0.00000000     0.00000000     0.00003538   780.34273809
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849568
+@    MULPOP   N       0.24; N       0.28; N       0.22; N       0.27; 
  -----------------------------------------------------------------------------
-@ 39    -216.808612164        5.89572D-03   -4.18D-05    3
+@ 19    -207.307293029        1.05583D+01    0.00D+00    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    8
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000    -0.00000000    -0.00000000    -0.00000000     0.00000000     0.00000000     0.00000000   891.82027211
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849568
+@    MULPOP   N       0.24; N       0.28; N       0.22; N       0.27; 
+ -----------------------------------------------------------------------------
+@ 20    -213.207006799        7.75404D+00   -5.90D+00    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    7
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000    -0.00000000    -0.00000000     0.00000000     0.00000000     0.00000000    32.68264758   807.78524425
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      2.049499
+@    MULPOP   N       0.30; N       0.14; N       0.37; N       0.19; 
+ -----------------------------------------------------------------------------
+@ 21    -216.668255327        9.18695D-01   -3.46D+00    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    6
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000     0.00000000     0.00000000     0.00000000     0.00000000     0.67398154    32.52954573   696.63083136
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.996703
+@    MULPOP   N       0.12; N       0.42; N       0.09; N       0.37; 
+ -----------------------------------------------------------------------------
+@ 22    -216.734607444        7.49150D-01   -6.64D-02    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    5
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000     0.00000000     0.00000000     0.00000000     0.35500108     0.86858338    32.26869969   585.42576604
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      2.000378
+@    MULPOP   N       0.39; N       0.06; N       0.41; N       0.14; 
+ -----------------------------------------------------------------------------
+@ 23    -216.768154843        1.83728D-01   -3.35D-02    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    4
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000     0.00000000     0.00000000     0.01099723     0.35776538     0.88461511    31.86497926   474.35591525
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      2.001320
+@    MULPOP   N       0.25; N       0.28; N       0.24; N       0.23; 
+ -----------------------------------------------------------------------------
+@ 24    -216.773094421        9.26071D-02   -4.94D-03    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    3
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000     0.00000000     0.00730393     0.01146524     0.35830905     0.88454057    31.18969126   363.55400424
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      2.001870
+@    MULPOP   N       0.28; N       0.21; N       0.26; N       0.25; 
+ -----------------------------------------------------------------------------
+@ 25    -216.773589111        8.73532D-02   -4.95D-04    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    2
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000     0.00054461     0.00818736     0.01759595     0.35821726     0.88440895    29.84307347   253.42338326
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      2.002051
+@    MULPOP   N       0.28; N       0.26; N       0.27; N       0.20; 
+ -----------------------------------------------------------------------------
+@ 26    -216.774294830        2.09176D-02   -7.06D-04    8
+      Virial theorem: -V/T =      2.002202
+@    MULPOP   N       0.28; N       0.24; N       0.26; N       0.22; 
+ -----------------------------------------------------------------------------
+@ 27    -216.775591684        4.50912D-02   -1.30D-03    8
+      Virial theorem: -V/T =      2.002176
+@    MULPOP   N       0.29; N       0.25; N       0.26; N       0.20; 
+ -----------------------------------------------------------------------------
+@ 28    -216.773831545        1.35956D-02    1.76D-03    8
+
+!!! Info: DIIS restarted because it was stalled ...
+ - energy changed by    1.760E-03
+ - gradient changed by -3.150E-02
+ - or strange C vector coeff. for current index (=  2) :
+   -2.156264   -1.162213   -0.001181    0.060150    0.188506   -0.952830   -1.036608    6.060439
+
+! Backstep to previous Fock matrix because energy increased.
+      Virial theorem: -V/T =      2.002168
+@    MULPOP   N       0.29; N       0.25; N       0.26; N       0.20; 
+  28  Level shift: doubly occupied orbital energies shifted by -1.76D-02
+               and singly occupied orbital energies shifted by -8.80D-03
+ -----------------------------------------------------------------------------
+@ 29    -207.307440816        1.05136D+01    9.47D+00    2
+      Virial theorem: -V/T =      1.849710
+@    MULPOP   N       0.31; N       0.18; N       0.32; N       0.19; 
+  29  Level shift: doubly occupied orbital energies shifted by -1.76D-02
+               and singly occupied orbital energies shifted by -8.80D-03
+ -----------------------------------------------------------------------------
+@ 30    -207.246039997        1.05296D+01    6.14D-02    3
+      Virial theorem: -V/T =      1.849313
+@    MULPOP   N       0.31; N       0.18; N       0.32; N       0.19; 
+  30  Level shift: doubly occupied orbital energies shifted by -1.76D-02
+               and singly occupied orbital energies shifted by -8.80D-03
+ -----------------------------------------------------------------------------
+@ 31    -207.246039997        1.05296D+01   -5.68D-14    4
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    2
+
+               Column   1     Column   2     Column   3     Column   4
+       1       0.00000000     0.00202658     0.00445037   332.27508665
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849313
+@    MULPOP   N       0.31; N       0.18; N       0.32; N       0.19; 
+  31  Level shift: doubly occupied orbital energies shifted by -1.76D-02
+               and singly occupied orbital energies shifted by -8.80D-03
+ -----------------------------------------------------------------------------
+@ 32    -207.246039997        1.05296D+01    5.68D-14    5
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    3
+
+               Column   1     Column   2     Column   3     Column   4     Column   5
+       1      -0.00000000     0.00000000     0.00202659     0.00500536   443.14624243
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849313
+@    MULPOP   N       0.31; N       0.18; N       0.32; N       0.19; 
+  32  Level shift: doubly occupied orbital energies shifted by -1.76D-02
+               and singly occupied orbital energies shifted by -8.80D-03
+ -----------------------------------------------------------------------------
+@ 33    -207.246039997        1.05296D+01    5.68D-14    6
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    4
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6
+       1      -0.00000000    -0.00000000     0.00000000     0.00202660     0.00533821   554.01762035
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849313
+@    MULPOP   N       0.31; N       0.18; N       0.32; N       0.19; 
+  33  Level shift: doubly occupied orbital energies shifted by -1.76D-02
+               and singly occupied orbital energies shifted by -8.80D-03
+ -----------------------------------------------------------------------------
+@ 34    -207.246039997        1.05296D+01   -5.68D-14    7
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    5
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7
+       1      -0.00000000     0.00000000     0.00000000     0.00000000     0.00202660     0.00556006   664.88910929
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849313
+@    MULPOP   N       0.31; N       0.18; N       0.32; N       0.19; 
+  34  Level shift: doubly occupied orbital energies shifted by -1.76D-02
+               and singly occupied orbital energies shifted by -8.80D-03
+ -----------------------------------------------------------------------------
+@ 35    -207.246039997        1.05296D+01    1.14D-13    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    6
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000     0.00000000     0.00000000     0.00000000     0.00000000     0.00202661     0.00571849   775.76066163
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849313
+@    MULPOP   N       0.31; N       0.18; N       0.32; N       0.19; 
+  35  Level shift: doubly occupied orbital energies shifted by -1.76D-02
+               and singly occupied orbital energies shifted by -8.80D-03
+ -----------------------------------------------------------------------------
+@ 36    -207.246039997        1.05296D+01   -5.68D-14    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    8
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000     0.00000000     0.00000000     0.00000000     0.00000000     0.00000000     0.00583718   886.63224712
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849313
+@    MULPOP   N       0.31; N       0.18; N       0.32; N       0.19; 
+  36  Level shift: doubly occupied orbital energies shifted by -1.76D-02
+               and singly occupied orbital energies shifted by -8.80D-03
+ -----------------------------------------------------------------------------
+@ 37    -213.267224230        7.70330D+00   -6.02D+00    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    7
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000     0.00000000     0.00000000     0.00000000     0.00000000     0.00000000    32.64820457   802.79461857
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      2.049298
+@    MULPOP   N       0.13; N       0.42; N       0.10; N       0.35; 
+  37  Level shift: doubly occupied orbital energies shifted by -1.76D-02
+               and singly occupied orbital energies shifted by -8.80D-03
+ -----------------------------------------------------------------------------
+@ 38    -216.682232220        8.26491D-01   -3.42D+00    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    6
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1       0.00000000     0.00000000     0.00000000     0.00000000     0.00000000     0.53017356    32.54940790   692.17461761
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.997376
+@    MULPOP   N       0.26; N       0.47; N       0.19; N       0.08; 
+ -----------------------------------------------------------------------------
+@ 39    -216.752482683        6.49681D-01   -7.03D-02    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    5
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1       0.00000000     0.00000000     0.00000000     0.00000000     0.37423742     0.56716145    32.29012036   581.57305394
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      2.000220
+@    MULPOP   N       0.26; N       0.09; N       0.28; N       0.38; 
+ -----------------------------------------------------------------------------
+@ 40    -216.778921719        3.79105D-01   -2.64D-02    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    4
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1       0.00000000     0.00000000     0.00000000     0.02723480     0.38583881     0.66787099    31.89499281   471.10064534
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      2.001212
+@    MULPOP   N       0.28; N       0.40; N       0.19; N       0.13; 
+ -----------------------------------------------------------------------------
+@ 41    -216.792999463        8.63446D-02   -1.41D-02    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    3
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000    -0.00000000     0.00375158     0.02934646     0.38604792     0.66872219    31.23328008   360.89117914
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      2.001766
+@    MULPOP   N       0.30; N       0.26; N       0.23; N       0.20; 
+ -----------------------------------------------------------------------------
+@ 42    -216.794608551        8.02364D-02   -1.61D-03    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    2
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000     0.00206708     0.00740759     0.02977483     0.38623302     0.66859523    29.91086796   251.34210875
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      2.002196
+@    MULPOP   N       0.28; N       0.27; N       0.21; N       0.24; 
+ -----------------------------------------------------------------------------
+@ 43    -216.795056532        1.92456D-02   -4.48D-04    8
+      Virial theorem: -V/T =      2.002175
+@    MULPOP   N       0.30; N       0.25; N       0.23; N       0.22; 
+ -----------------------------------------------------------------------------
+@ 44    -216.795211217        1.05396D-02   -1.55D-04    8
+      Virial theorem: -V/T =      2.002136
+@    MULPOP   N       0.30; N       0.25; N       0.23; N       0.22; 
+ -----------------------------------------------------------------------------
+@ 45    -216.795366348        1.27186D-02   -1.55D-04    8
+      Virial theorem: -V/T =      2.002081
+@    MULPOP   N       0.30; N       0.25; N       0.23; N       0.22; 
+ -----------------------------------------------------------------------------
+@ 46    -216.794710685        2.31599D-02    6.56D-04    8
+      Virial theorem: -V/T =      2.002263
+@    MULPOP   N       0.29; N       0.25; N       0.24; N       0.22; 
+ -----------------------------------------------------------------------------
+@ 47    -216.794328746        2.81285D-02    3.82D-04    8
+
+!!! Info: DIIS restarted because it was stalled ...
+ - energy changed by    3.819E-04
+ - gradient changed by  4.969E-03
+ - or strange C vector coeff. for current index (=  4) :
+    6.094360   -5.987099    1.349372   -0.012347    0.057367    0.114676   -0.307779   -0.308552
+
+! Backstep to previous Fock matrix because energy increased.
+      Virial theorem: -V/T =      2.002262
+@    MULPOP   N       0.29; N       0.25; N       0.24; N       0.22; 
+  47  Level shift: doubly occupied orbital energies shifted by -3.82D-03
+               and singly occupied orbital energies shifted by -1.91D-03
+ -----------------------------------------------------------------------------
+@ 48    -207.202589460        1.05091D+01    9.59D+00    2
+      Virial theorem: -V/T =      1.849218
+@    MULPOP   N       0.27; N       0.19; N       0.24; N       0.30; 
+ -----------------------------------------------------------------------------
+@ 49    -207.201577006        1.05095D+01    1.01D-03    3
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    2
+
+               Column   1     Column   2     Column   3
+       1       0.00000052     0.00052979   220.89122692
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849208
+@    MULPOP   N       0.27; N       0.19; N       0.24; N       0.30; 
+ -----------------------------------------------------------------------------
+@ 50    -207.201577006        1.05095D+01    0.00D+00    4
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    3
+
+               Column   1     Column   2     Column   3     Column   4
+       1      -0.00000000     0.00000069     0.00052979   331.34118222
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849208
+@    MULPOP   N       0.27; N       0.19; N       0.24; N       0.30; 
+ -----------------------------------------------------------------------------
+@ 51    -207.201577006        1.05095D+01    0.00D+00    5
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    4
+
+               Column   1     Column   2     Column   3     Column   4     Column   5
+       1      -0.00000000    -0.00000000     0.00000078     0.00052979   441.79113760
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849208
+@    MULPOP   N       0.27; N       0.19; N       0.24; N       0.30; 
+ -----------------------------------------------------------------------------
+@ 52    -207.201577006        1.05095D+01    0.00D+00    6
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    5
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6
+       1      -0.00000000    -0.00000000     0.00000000     0.00000083     0.00052979   552.24109301
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849208
+@    MULPOP   N       0.27; N       0.19; N       0.24; N       0.30; 
+ -----------------------------------------------------------------------------
+@ 53    -207.201577006        1.05095D+01    0.00D+00    7
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    6
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7
+       1      -0.00000000    -0.00000000    -0.00000000     0.00000000     0.00000087     0.00052979   662.69104845
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849208
+@    MULPOP   N       0.27; N       0.19; N       0.24; N       0.30; 
+ -----------------------------------------------------------------------------
+@ 54    -207.201577006        1.05095D+01    0.00D+00    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    7
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000    -0.00000000    -0.00000000     0.00000000     0.00000000     0.00000089     0.00052979   773.14100389
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849208
+@    MULPOP   N       0.27; N       0.19; N       0.24; N       0.30; 
+ -----------------------------------------------------------------------------
+@ 55    -207.201577006        1.05095D+01   -5.68D-14    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    8
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000    -0.00000000    -0.00000000     0.00000000     0.00000000     0.00000000     0.00000091   883.59095275
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.849208
+@    MULPOP   N       0.27; N       0.19; N       0.24; N       0.30; 
+ -----------------------------------------------------------------------------
+@ 56    -213.173763123        7.85566D+00   -5.97D+00    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    7
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000    -0.00000000    -0.00000000     0.00000000     0.00000000     0.00000000    33.98310439   800.87803820
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      2.050935
+@    MULPOP   N       0.25; N       0.36; N       0.29; N       0.10; 
+ -----------------------------------------------------------------------------
+@ 57    -216.698918981        7.81008D-01   -3.53D+00    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    6
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000    -0.00000000     0.00000000     0.00000000     0.00000000     0.46491894    33.85171483   690.70452662
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      1.996775
+@    MULPOP   N       0.22; N       0.41; N       0.16; N       0.21; 
+ -----------------------------------------------------------------------------
+@ 58    -216.771642854        4.77326D-01   -7.27D-02    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    5
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000    -0.00000000     0.00000000     0.00000000     0.21053523     0.47135955    33.56929941   580.54785054
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      2.000325
+@    MULPOP   N       0.34; N       0.14; N       0.30; N       0.22; 
+ -----------------------------------------------------------------------------
+@ 59    -216.771940797        5.87778D-01   -2.98D-04    8
+
+
+ (DIIS_RED) C2-DIIS B matrix eigenvalues. IOK =    4
+
+               Column   1     Column   2     Column   3     Column   4     Column   5     Column   6     Column   7     Column   8
+       1      -0.00000000    -0.00000000     0.00000000     0.02537784     0.42236570     0.57736337    33.13892538   470.53054033
+    ==== End of matrix output ====
+      Virial theorem: -V/T =      2.001636
+@    MULPOP   N       0.19; N       0.47; N       0.12; N       0.22; 
+ -----------------------------------------------------------------------------
+@ 60    -216.794240107        5.57139D-02   -2.23D-02    8
+
+WARNING !!! DIIS aborted because max DIIS iterations reached !
+
+
+        SIRIUS QC-HF optimization (SIROPT)
+ ================================================
+
+
+   --- OUTPUT FROM SIRCNO     Keyword = ONLYFD
+
+
+Calculating AOSUPINT
+     (Precalculated AO two-electron integrals are transformed to P-supermatrix elements.
+      Threshold for discarding integrals :  1.00D-12 )
+
+
+ --- MACRO ITERATION  1 ---
+ --------------------------
+
+ Total QC-HF energy       :          -216.794240106737732  (MACRO    1)
+
+ - Nuclear repulsion      :           105.777940462097547
+ - Inactive energy        :          -321.528869598644860
+ - Active energy          :            -1.043310970190427
+
+ Norm of total gradient   :             0.055713892053
+ -    of CI gradient      :             0.000000000000
+ -    of orbital gradient :             0.055713892053
+      Virial theorem: -V/T =      2.001865
+@    MULPOP   N       0.28; N       0.26; N       0.22; N       0.23; 
+
+ (SIRNEO) iteration (  1,  6)
+ Micro iteration termination criterion met, EVAL(ISTATE+1) = -1.71D-03
+
+   --- OUTPUT FROM SIRCNO     Keyword = FD+NO 
+
+
+
+ --- MACRO ITERATION  2 ---
+ --------------------------
+
+ Total QC-HF energy       :          -216.793710575659105  (MACRO    2)
+
+ - Nuclear repulsion      :           105.777940462097547
+ - Inactive energy        :          -321.592860495155492
+ - Active energy          :            -0.978790542601174
+
+ Norm of total gradient   :             0.262461657375
+ -    of CI gradient      :             0.000000000000
+ -    of orbital gradient :             0.262461657375
+      Virial theorem: -V/T =      2.001046
+@    MULPOP   N       0.26; N       0.23; N       0.27; N       0.24; 
+
+ (SIRSTP) Energy difference;
+ actual, predicted and ratio:   0.000529531078627  -0.006985099796529   -0.075809
+
+ (SIRSTP) step is too large -- backstep
+
+   --- OUTPUT FROM SIRCNO     Keyword = FD+NO 
+
+
+
+ Optimization control: Step was too large, we backstep
+
+
+ --- MACRO ITERATION  2 BACKSTEP NO.  1 ---
+
+ Total QC-HF energy       :          -216.796192942942099  (MACRO    2)
+
+ - Nuclear repulsion      :           105.777940462097547
+ - Inactive energy        :          -321.572344897669041
+ - Active energy          :            -1.001788507370619
+
+ Norm of total gradient   :             0.136951460850
+ -    of CI gradient      :             0.000000000000
+ -    of orbital gradient :             0.136951460850
+      Virial theorem: -V/T =      2.001477
+@    MULPOP   N       0.29; N       0.24; N       0.24; N       0.23; 
+
+ Residual norm when dim(red L) =   8
+ NEO root     CSF        orbital          total
+    1     0.00000000     0.02197060     0.02197060 converged
+
+ (NEONEX) NEO vector is converged.
+
+   --- OUTPUT FROM SIRCNO     Keyword = FD+NO 
+
+
+
+ --- MACRO ITERATION  3 ---
+ --------------------------
+
+ Total QC-HF energy       :          -216.804951727520290  (MACRO    3)
+
+ - Nuclear repulsion      :           105.777940462097547
+ - Inactive energy        :          -321.631259787510885
+ - Active energy          :            -0.951632402106960
+
+ Norm of total gradient   :             0.117119131086
+ -    of CI gradient      :             0.000000000000
+ -    of orbital gradient :             0.117119131086
+      Virial theorem: -V/T =      2.000528
+@    MULPOP   N       0.28; N       0.29; N       0.21; N       0.21; 
+
+ Residual norm when dim(red L) =   7
+ NEO root     CSF        orbital          total
+    1     0.00000000     0.01657554     0.01657554 converged
+
+ (NEONEX) NEO vector is converged.
+
+   --- OUTPUT FROM SIRCNO     Keyword = FD+NO 
+
+
+
+ --- MACRO ITERATION  4 ---
+ --------------------------
+
+ Total QC-HF energy       :          -216.808388350731093  (MACRO    4)
+
+ - Nuclear repulsion      :           105.777940462097547
+ - Inactive energy        :          -321.645456940766962
+ - Active energy          :            -0.940871872061664
+
+ Norm of total gradient   :             0.034430032746
+ -    of CI gradient      :             0.000000000000
+ -    of orbital gradient :             0.034430032746
+      Virial theorem: -V/T =      2.000511
+@    MULPOP   N       0.27; N       0.29; N       0.22; N       0.22; 
+
+ Residual norm when dim(red L) =  10
+ NEO root     CSF        orbital          total
+    1     0.00000000     0.00090318     0.00090318 converged
+
+ (NEONEX) NEO vector is converged.
+
+   --- OUTPUT FROM SIRCNO     Keyword = FD+NO 
+
+
+
+ --- MACRO ITERATION  5 ---
+ --------------------------
+
+ Total QC-HF energy       :          -216.808710447618182  (MACRO    5)
+
+ - Nuclear repulsion      :           105.777940462097547
+ - Inactive energy        :          -321.646478063415088
+ - Active energy          :            -0.940172846300637
+
+ Norm of total gradient   :             0.001326708177
+ -    of CI gradient      :             0.000000000000
+ -    of orbital gradient :             0.001326708177
       Virial theorem: -V/T =      2.000661
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 40    -216.808633549        3.28622D-03   -2.14D-05    4
-      Virial theorem: -V/T =      2.000664
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 41    -216.808648160        2.70331D-03   -1.46D-05    5
-      Virial theorem: -V/T =      2.000664
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 42    -216.808661981        2.43895D-03   -1.38D-05    5
-      Virial theorem: -V/T =      2.000663
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 43    -216.808675573        2.09075D-03   -1.36D-05    5
-      Virial theorem: -V/T =      2.000663
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 44    -216.808702788        1.13781D-03   -2.72D-05    5
-      Virial theorem: -V/T =      2.000663
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 45    -216.808707045        9.03039D-04   -4.26D-06    5
-      Virial theorem: -V/T =      2.000662
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 46    -216.808710811        5.51911D-04   -3.77D-06    5
+@    MULPOP   N       0.28; N       0.28; N       0.22; N       0.22; 
+
+ (SIRNEO) iteration (  5, 12)
+ maximum number of microiterations reached
+
+   --- OUTPUT FROM SIRCNO     Keyword = FD+NO 
+
+
+
+ --- MACRO ITERATION  6 ---
+ --------------------------
+
+ Total QC-HF energy       :          -216.808711061674785  (MACRO    6)
+
+ - Nuclear repulsion      :           105.777940462097547
+ - Inactive energy        :          -321.646365019535438
+ - Active energy          :            -0.940286504236894
+
+ Norm of total gradient   :             0.000074938048
+ -    of CI gradient      :             0.000000000000
+ -    of orbital gradient :             0.000074938048
       Virial theorem: -V/T =      2.000661
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 47    -216.808710944        1.72185D-04   -1.33D-07    5
+@    MULPOP   N       0.28; N       0.28; N       0.22; N       0.22; 
+
+ Residual norm when dim(red L) =   5
+ NEO root     CSF        orbital          total
+    1     0.00000000     0.00000760     0.00000760 converged
+
+ (NEONEX) NEO vector is converged.
+
+   --- OUTPUT FROM SIRCNO     Keyword = FD+NO 
+
+
+
+ --- MACRO ITERATION  7 ---
+ --------------------------
+
+ Total QC-HF energy       :          -216.808711062287443  (MACRO    7)
+
+ - Nuclear repulsion      :           105.777940462097547
+ - Inactive energy        :          -321.646366395934024
+ - Active energy          :            -0.940285128450959
+
+ Norm of total gradient   :             0.000007603342
+ -    of CI gradient      :             0.000000000000
+ -    of orbital gradient :             0.000007603342
       Virial theorem: -V/T =      2.000661
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 48    -216.808710997        1.31596D-04   -5.38D-08    5
-      Virial theorem: -V/T =      2.000661
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 49    -216.808711025        9.25366D-05   -2.72D-08    5
-      Virial theorem: -V/T =      2.000661
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 50    -216.808711050        6.67280D-05   -2.52D-08    5
-      Virial theorem: -V/T =      2.000661
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 51    -216.808711058        4.03411D-05   -7.95D-09    5
-      Virial theorem: -V/T =      2.000661
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 52    -216.808711061        2.61506D-05   -3.14D-09    5
-      Virial theorem: -V/T =      2.000661
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 53    -216.808711062        1.44244D-05   -1.01D-09    5
-      Virial theorem: -V/T =      2.000661
-@      MULPOP N       0.28; N       0.28; N       0.22; N       0.22; 
- -----------------------------------------------------------------------------
-@ 54    -216.808711062        7.93974D-06   -1.76D-10    5
+@    MULPOP   N       0.28; N       0.28; N       0.22; N       0.22; 
 
-@ *** DIIS converged in  54 iterations !
-@     Converged SCF energy, gradient:   -216.808711062144    7.94D-06
-    - total time used in SIRFCK :              0.00 seconds
+ (SIRSTP) Energy difference;
+ actual, predicted and ratio:  -0.000000000612658  -0.000000000613504    0.998622
+ Close to convergence, ratio set to one.
+
+ *** Optimization control: QC-HF converged ***
+     Number of macro iterations used            7
+     Number of micro iterations used           44
+     Total number of CPU seconds used         0.32
+
+ CPU and wall time for SCF :       3.648       3.663
 
 
- *** SCF orbital energy analysis ***
+                     .----------------------------------------.
+                     | --- SIRIUS OPTIMIZATION STATISTICS --- |
+                     `----------------------------------------'
 
- Orbital energy analysis for an open-shell system.
- Orbital energies are not well-defined for open-shell systems
-   here is used block diagonalization of the FD=FC+FV Fock matrix.
- NOTE that Koopmans' theorem is not fulfilled for this case.
 
- Only the five lowest virtual orbital energies printed in each symmetry.
+ 
+     Date and time (Linux)  : Sun Jan 21 19:06:54 2018
+     Host name              : vladimir-Kubuntu-16                     
 
- Number of electrons :   26
- Orbital occupations :   13
 
- Sym       Hartree-Fock orbital energies
+  ITER ITMIC     EMCSCF           GRDNRM        RATIO      STPLNG
+ ---------------------------------------------------------------------
+    1    6   -216.794240106738   0.0557138921  0.000000   0.6984254330
+    2    0   -216.793710575659   0.2624616574 -0.075809   0.0000000000
+    2    7   -216.796192942942   0.1369514608  0.487084   0.4864135981
+    3    6   -216.804951727520   0.1171191311  0.809444   0.2497421996
+    4    9   -216.808388350731   0.0344300327  0.926650   0.0383367132
+    5   12   -216.808710447618   0.0013267082  0.994132   0.0044189956
+    6    4   -216.808711061675   0.0000749380  0.999919   0.0000492190
+    7    0   -216.808711062287   0.0000076033  1.000000   0.0000000000
 
-  1    -16.13013361   -16.12972595   -16.10532631   -16.10497415    -2.03159735
-        -1.38628319    -1.38160992    -1.37022081    -1.01776734    -0.91987604
-        -0.90357550    -0.89561271    -0.89541674    -0.69609147    -0.14712440
-        -0.13324980    -0.12267422    -0.05169791    -0.03697611
 
-    E(LUMO) :    -0.14712440 au (symmetry 1)
-  - E(HOMO) :    -0.89541674 au (symmetry 1)
-  ------------------------------------------
-    gap     :     0.74829234 au
+  ITER  INDGCM  GCIMAX      GCINRM     INDGOM  GOBMAX      GOBNRM      GRDNRM
+ ------------------------------------------------------------------------------
+    1      0    0.000000    0.000000    395    0.015822    0.055714    0.055714
+    2      0    0.000000    0.000000    519   -0.082319    0.262462    0.262462
+    2      0    0.000000    0.000000    477   -0.033677    0.136951    0.136951
+    3      0    0.000000    0.000000    398   -0.024225    0.117119    0.117119
+    4      0    0.000000    0.000000    562   -0.009470    0.034430    0.034430
+    5      0    0.000000    0.000000    520   -0.000292    0.001327    0.001327
+    6      0    0.000000    0.000000    347   -0.000016    0.000075    0.000075
+    7      0    0.000000    0.000000     10   -0.000002    0.000008    0.000008
 
-and E(SOMO) :    -0.69609147 au (symmetry 1)
 
- NOTE: MOLECULAR ORBITALS ARE NOT CANONICAL HARTREE-FOCK ORBITALS
+  ITER ITMIC NCLIN NOLIN   TIMMAC    TIMITR    TIMMIC    TIMLIN    TIMMIC/ITMIC
+ ------------------------------------------------------------------------------
 
- Largest off-diagonal Fock matrix element is  3.67D-02
+    1     6     0     6      0.04      0.00      0.03      0.02      0.01
+    2     0     0     0      0.01      0.00      0.00      0.00
+    2     7     0     7      0.04      0.00      0.04      0.02      0.01
+    3     6     0     6      0.03      0.00      0.02      0.02      0.00
+    4     9     0     9      0.04      0.00      0.04      0.03      0.00
+    5    12     0    12      0.05      0.00      0.05      0.04      0.00
+    6     4     0     4      0.02      0.00      0.02      0.01      0.01
+    7     0     0     0      0.00      0.00      0.00      0.00
 
- >>> Writing SIRIFC interface file <<<
 
- >>>> CPU and wall time for SCF :       5.614       6.585
+ ITER         EMY                 EACTIV              EMCSCF
+
+    1   -321.528869598645     -1.043310970190   -216.794240106738
+    2   -321.592860495155     -0.978790542601   -216.793710575659
+    2   -321.572344897669     -1.001788507371   -216.796192942942
+    3   -321.631259787511     -0.951632402107   -216.804951727520
+    4   -321.645456940767     -0.940871872062   -216.808388350731
+    5   -321.646478063415     -0.940172846301   -216.808710447618
+    6   -321.646365019535     -0.940286504237   -216.808711061675
+    7   -321.646366395934     -0.940285128451   -216.808711062287
+
+
+ ITER         DEPRED              DEACT               RATIO
+
+    1      0.000000000000      0.000000000000      0.000000000000
+    2     -0.006985099797      0.000529531079     -0.075808663305
+    2     -0.004009241981     -0.001952836204      0.487083646629
+    3     -0.010820737296     -0.008758784578      0.809444341803
+    4     -0.003708652109     -0.003436623211      0.926650197801
+    5     -0.000323998153     -0.000322096887      0.994131860845
+    6     -0.000000614106     -0.000000614057      0.999919488547
+    7     -0.000000000614     -0.000000000613      1.000000000000
+
+
+ ITER    BETA           GAMMA             STPLNG              RTRUST
+
+    1      2.36908680  1.00000000      0.698425432951      0.700000000000
+    2      0.00000000  0.00000000      0.000000000000      0.467945040077
+    2      2.03807752  1.00000000      0.486413598055      0.467945040077
+    3      0.20000000  1.00000000      0.249742199569      0.561534048093
+    4      0.20000000  1.00000000      0.038336713181      0.673840857711
+    5      0.20000000  1.00000000      0.004418995578      0.700000000000
+    6      0.20000000  1.00000000      0.000049218966      0.700000000000
+    7      0.00000000  0.00000000      0.000000000000      0.700000000000
+
+
+ Reduced L root no.  1
+ ITER         EVAL              EVEC(1)           EVEC(2)           EVEC(3)
+ ----------------------------------------------------------------------------
+    1   -0.020977235992   -0.517239703211    0.212676877771    0.303101998033
+    2    0.000000000000    0.000000000000    0.000000000000    0.000000000000
+    2   -0.045337278960    0.710172092014   -0.301971985893   -0.387180627158
+    3   -0.000295953809    0.998754905930   -0.032022062689   -0.026986992437
+    4   -0.000025918329    0.999970607224   -0.005667801661   -0.003117095816
+    5   -0.000000049128    0.999999609450   -0.000463739435   -0.000362715776
+    6   -0.000000000049    0.999999999952   -0.000008751271   -0.000003801132
+    7    0.000000000000    0.000000000000    0.000000000000    0.000000000000
 
 
                        .-----------------------------------.
-                       | >>> Final results from SIRIUS <<< |
+                       | --- Final results from SIRIUS --- |
                        `-----------------------------------'
 
 
 @    Spin multiplicity:           2
-@    Spatial symmetry:            1
+@    Spatial symmetry:            1 ( irrep  A   in C1  )
 @    Total charge of molecule:    1
 
-@    Final HF energy:            -216.808711062144                 
+@    Final HF energy:            -216.808711062287                 
 @    Nuclear repulsion:           105.777940462098
-@    Electronic energy:          -322.586651524241
+@    Electronic energy:          -322.586651524385
 
-@    Final gradient norm:           0.000007939736
-
- 
-     Date and time (Linux)  : Tue Jun  2 21:56:39 2015
-     Host name              : kbob-G41MT-S2                           
-
- (Only coefficients >0.0100 are printed.)
-
- Molecular orbitals for symmetry species  1
- ------------------------------------------
-
-    Orbital        10       11       12       13       14       15       16
-   1 N   :1s    -0.1033  -0.0022  -0.0528  -0.0392  -0.0330  -0.0018  -0.0018
-   2 N   :1s    -0.2524  -0.0057  -0.1288  -0.0953  -0.0845  -0.0041  -0.0052
-   3 N   :1s    -0.1437  -0.0003  -0.0693  -0.0526  -0.0466  -0.0145  -0.0161
-   4 N   :2px   -0.1019  -0.1026  -0.2263   0.0009  -0.3267   0.1230   0.1414
-   5 N   :2py   -0.0596  -0.2659  -0.1892   0.2106   0.2383   0.3207   0.2138
-   6 N   :2pz    0.3311  -0.0903  -0.0032   0.1711  -0.1699   0.1131   0.1289
-   7 N   :2px    0.0847   0.0544   0.1332  -0.0005   0.1815  -0.1477  -0.1791
-   8 N   :2py    0.0292   0.1331   0.1170  -0.1171  -0.1296  -0.3860  -0.2644
-   9 N   :2pz   -0.1983   0.0444  -0.0199  -0.1160   0.0838  -0.1315  -0.1567
-  10 N   :3d2-   0.0031   0.0242   0.0113  -0.0003  -0.0256   0.0006   0.0011
-  11 N   :3d1-  -0.0083  -0.0202  -0.0067   0.0275   0.0062  -0.0068  -0.0070
-  12 N   :3d0    0.0209  -0.0095  -0.0236   0.0097  -0.0236  -0.0064  -0.0051
-  13 N   :3d1+  -0.0087   0.0038  -0.0140   0.0011  -0.0001  -0.0048  -0.0015
-  14 N   :3d2+  -0.0037   0.0134  -0.0016   0.0062   0.0282  -0.0057  -0.0007
-  15 N   :1s     0.1071   0.0128  -0.0468  -0.0393  -0.0306   0.0008   0.0000
-  16 N   :1s     0.2614   0.0310  -0.1138  -0.0957  -0.0782   0.0023   0.0005
-  17 N   :1s     0.1500   0.0159  -0.0634  -0.0511  -0.0458  -0.0005   0.0045
-  18 N   :2px   -0.1782  -0.1198   0.2216  -0.0089   0.2728  -0.1439   0.1175
-  19 N   :2py    0.1857  -0.2028   0.1443  -0.3160  -0.0061  -0.3371   0.2212
-  20 N   :2pz   -0.2405  -0.1132   0.0826  -0.0637  -0.3507  -0.1223   0.0342
-  21 N   :2px    0.1287   0.0646  -0.1320  -0.0000  -0.1514   0.1718  -0.1495
-  22 N   :2py   -0.1149   0.0962  -0.0747   0.1891   0.0081   0.4048  -0.2732
-  23 N   :2pz    0.1361   0.0596  -0.0670   0.0204   0.1855   0.1515  -0.0391
-  24 N   :3d2-   0.0085  -0.0211   0.0021  -0.0074  -0.0118  -0.0016  -0.0008
-  25 N   :3d1-   0.0137   0.0034   0.0223  -0.0078   0.0082   0.0083  -0.0035
-  26 N   :3d0   -0.0089  -0.0002  -0.0024  -0.0244  -0.0164   0.0072  -0.0041
-  27 N   :3d1+  -0.0138  -0.0130   0.0126  -0.0074  -0.0304   0.0047  -0.0014
-  28 N   :3d2+   0.0039  -0.0215   0.0155  -0.0188   0.0268   0.0046  -0.0057
-  29 N   :1s    -0.0102   0.1061   0.0547   0.0525   0.0228   0.0015  -0.0006
-  30 N   :1s    -0.0244   0.2548   0.1326   0.1277   0.0580   0.0042  -0.0027
-  31 N   :1s    -0.0182   0.1727   0.0763   0.0719   0.0308   0.0110   0.0002
-  32 N   :2px    0.2402   0.0730  -0.1027   0.3086   0.0250  -0.3528  -0.1040
-  33 N   :2py   -0.0824  -0.0088   0.3423   0.1915  -0.1320   0.1239  -0.3662
-  34 N   :2pz   -0.0861   0.3129   0.0480  -0.0496   0.1497   0.0654   0.2665
-  35 N   :2px   -0.1141  -0.0479   0.0581  -0.1834  -0.0163   0.4332   0.1258
-  36 N   :2py    0.0410  -0.0146  -0.1960  -0.1100   0.0838  -0.1511   0.4534
-  37 N   :2pz    0.0437  -0.1877  -0.0468   0.0116  -0.1042  -0.0774  -0.3308
-  38 N   :3d2-  -0.0178   0.0011  -0.0167  -0.0077   0.0131   0.0057  -0.0052
-  39 N   :3d1-   0.0121   0.0050  -0.0208  -0.0046  -0.0064   0.0006   0.0032
-  40 N   :3d0    0.0102  -0.0223   0.0092   0.0253  -0.0046   0.0031   0.0003
-  41 N   :3d1+  -0.0184  -0.0069   0.0196  -0.0254  -0.0015  -0.0062  -0.0026
-  42 N   :3d2+  -0.0183  -0.0046   0.0153   0.0085  -0.0220   0.0012   0.0096
-  43 N   :1s     0.0072  -0.1176   0.0495   0.0313   0.0222  -0.0004   0.0024
-  44 N   :1s     0.0173  -0.2828   0.1200   0.0762   0.0566  -0.0007   0.0074
-  45 N   :1s     0.0124  -0.1891   0.0679   0.0407   0.0295   0.0014   0.0113
-  46 N   :2px    0.2323   0.0788   0.1008  -0.3210   0.0161   0.3796  -0.1378
-  47 N   :2py   -0.0886   0.2615  -0.2485  -0.0646  -0.0245  -0.1131  -0.0587
-  48 N   :2pz   -0.0388  -0.1836  -0.2529  -0.1626   0.1970  -0.0740  -0.4407
-  49 N   :2px   -0.1096  -0.0509  -0.0593   0.1858  -0.0102  -0.4669   0.1673
-  50 N   :2py    0.0446  -0.1719   0.1551   0.0442   0.0221   0.1388   0.0700
-  51 N   :2pz    0.0179   0.1003   0.1312   0.0807  -0.1313   0.0940   0.5502
-  52 N   :3d2-   0.0272   0.0052   0.0043  -0.0284   0.0091  -0.0023   0.0054
-  53 N   :3d1-  -0.0058  -0.0172  -0.0215  -0.0250   0.0136  -0.0024   0.0043
-  54 N   :3d0   -0.0012   0.0051   0.0190   0.0017   0.0115  -0.0038   0.0058
-  55 N   :3d1+  -0.0012  -0.0027  -0.0223   0.0133   0.0151   0.0085   0.0057
-  56 N   :3d2+   0.0197  -0.0067   0.0134   0.0003  -0.0089   0.0011  -0.0057
-
-
-
- >>>> Total CPU  time used in SIRIUS :      5.66 seconds
- >>>> Total wall time used in SIRIUS :      6.64 seconds
+@    Final gradient norm:           0.000007603342
 
  
-     Date and time (Linux)  : Tue Jun  2 21:56:39 2015
-     Host name              : kbob-G41MT-S2                           
+     Date and time (Linux)  : Sun Jan 21 19:06:54 2018
+     Host name              : vladimir-Kubuntu-16                     
+
+File label for MO orbitals:  21Jan18   (CNOORB)
+
+ (Only coefficients > 0.0100 are printed.)
+
+ Molecular orbitals for symmetry species 1  (A  )
+ ------------------------------------------------
+
+    Orbital         4        5        6        7        8        9       10
+   1 N   :1s     0.0019  -0.1316   0.1462  -0.1119   0.1525   0.0632   0.1033
+   2 N   :1s     0.0000  -0.2721   0.3198  -0.2447   0.3369   0.1306   0.2524
+   3 N   :1s     0.0009  -0.0616   0.2721  -0.2115   0.2832   0.1570   0.1437
+   4 N   :2px   -0.0001   0.0998   0.0829   0.0229  -0.0810   0.2004   0.1019
+   5 N   :2py   -0.0001   0.0021   0.0832   0.1802   0.0469   0.0162   0.0596
+   6 N   :2pz   -0.0001  -0.1031   0.1143  -0.0024  -0.0879  -0.2301  -0.3311
+   7 N   :2px   -0.0008  -0.0266   0.0320  -0.0462   0.0592  -0.0820  -0.0847
+   8 N   :2py   -0.0019  -0.0009  -0.0204  -0.0388  -0.0060  -0.0092  -0.0292
+   9 N   :2pz   -0.0011   0.0277  -0.0714   0.0358  -0.0288   0.0993   0.1983
+  10 N   :3d2-   0.0004  -0.0006  -0.0076  -0.0220  -0.0068  -0.0015  -0.0031
+  11 N   :3d1-  -0.0006  -0.0002   0.0102   0.0218   0.0069  -0.0004   0.0083
+  12 N   :3d0   -0.0005  -0.0062   0.0227   0.0006  -0.0187  -0.0097  -0.0209
+  13 N   :3d1+   0.0000   0.0218  -0.0030   0.0037  -0.0026   0.0351   0.0087
+  14 N   :3d2+   0.0000  -0.0107  -0.0097   0.0001   0.0123  -0.0165   0.0037
+  15 N   :1s     0.0013  -0.1307  -0.1478   0.1389   0.1272   0.0629  -0.1071
+  16 N   :1s     0.0000  -0.2704  -0.3235   0.3044   0.2814   0.1300  -0.2614
+  17 N   :1s     0.0009  -0.0603  -0.2746   0.2587   0.2340   0.1567  -0.1500
+  18 N   :2px   -0.0000  -0.1149   0.0676   0.0484   0.0553  -0.2340   0.1782
+  19 N   :2py   -0.0001   0.0669   0.1440   0.1242   0.0158   0.1450  -0.1857
+  20 N   :2pz   -0.0001  -0.0521  -0.0249   0.1086  -0.1263  -0.1282   0.2405
+  21 N   :2px   -0.0009   0.0301   0.0425  -0.0648  -0.0507   0.0962  -0.1287
+  22 N   :2py   -0.0018  -0.0178  -0.0641   0.0012   0.0210  -0.0615   0.1149
+  23 N   :2pz   -0.0010   0.0142   0.0260  -0.0440   0.0033   0.0576  -0.1361
+  24 N   :3d2-  -0.0003   0.0163   0.0128   0.0123  -0.0050   0.0258  -0.0085
+  25 N   :3d1-  -0.0002   0.0069   0.0117  -0.0004   0.0113   0.0107  -0.0137
+  26 N   :3d0   -0.0003   0.0084   0.0002   0.0100  -0.0151   0.0132   0.0089
+  27 N   :3d1+  -0.0005  -0.0126  -0.0010   0.0192  -0.0142  -0.0208   0.0138
+  28 N   :3d2+  -0.0005  -0.0093   0.0215   0.0151   0.0115  -0.0143  -0.0039
+  29 N   :1s    -0.7953  -0.1292   0.1219   0.1287  -0.1477   0.0757   0.0102
+  30 N   :1s     0.0261  -0.2633   0.2639   0.2791  -0.3208   0.1601   0.0244
+  31 N   :1s    -0.0193  -0.0647   0.2315   0.2466  -0.2790   0.1824   0.0182
+  32 N   :2px   -0.0011   0.0476   0.1477  -0.1130   0.0396   0.0983  -0.2402
+  33 N   :2py   -0.0017   0.0669   0.0105   0.1163   0.1430   0.1212   0.0824
+  34 N   :2pz   -0.0026   0.1132  -0.0863  -0.0360  -0.0783   0.2513   0.0861
+  35 N   :2px   -0.0024  -0.0138  -0.0124   0.0470  -0.0325  -0.0404   0.1141
+  36 N   :2py   -0.0041  -0.0187   0.0272   0.0051  -0.0685  -0.0470  -0.0410
+  37 N   :2pz   -0.0048  -0.0331   0.0657   0.0579  -0.0349  -0.1056  -0.0437
+  38 N   :3d2-   0.0003  -0.0067  -0.0119   0.0007  -0.0129  -0.0094   0.0178
+  39 N   :3d1-   0.0005  -0.0164   0.0064  -0.0119  -0.0124  -0.0252  -0.0121
+  40 N   :3d0   -0.0001  -0.0117   0.0195   0.0075   0.0194  -0.0206  -0.0102
+  41 N   :3d1+   0.0002  -0.0116  -0.0165   0.0187  -0.0016  -0.0190   0.0184
+  42 N   :3d2+  -0.0003   0.0020  -0.0059   0.0171   0.0116   0.0017   0.0183
+  43 N   :1s     0.5915  -0.1283  -0.1218  -0.1546  -0.1210   0.0757  -0.0072
+  44 N   :1s    -0.0192  -0.2617  -0.2636  -0.3353  -0.2630   0.1602  -0.0173
+  45 N   :1s     0.0157  -0.0636  -0.2314  -0.2930  -0.2258   0.1824  -0.0124
+  46 N   :2px   -0.0006  -0.0338   0.1579  -0.1069  -0.0414  -0.0639  -0.2323
+  47 N   :2py   -0.0023  -0.1311  -0.0454   0.0329  -0.0487  -0.2723   0.0886
+  48 N   :2pz    0.0004   0.0314   0.0400   0.0976  -0.1714   0.0893   0.0388
+  49 N   :2px   -0.0017   0.0093  -0.0203   0.0425   0.0234   0.0252   0.1096
+  50 N   :2py   -0.0053   0.0375   0.0660   0.0625   0.0630   0.1116  -0.0446
+  51 N   :2pz   -0.0002  -0.0098  -0.0207  -0.0364   0.0302  -0.0403  -0.0179
+  52 N   :3d2-  -0.0004  -0.0094   0.0240  -0.0156  -0.0099  -0.0139  -0.0272
+  53 N   :3d1-  -0.0003   0.0091   0.0093   0.0148  -0.0257   0.0171   0.0058
+  54 N   :3d0    0.0004   0.0105   0.0005  -0.0042   0.0112   0.0160   0.0012
+  55 N   :3d1+  -0.0001   0.0025  -0.0052   0.0102  -0.0072   0.0049   0.0012
+  56 N   :3d2+   0.0005   0.0172   0.0130  -0.0092   0.0077   0.0271  -0.0197
+
+    Orbital        11       12       13       14       15       16       17
+   1 N   :1s    -0.0022  -0.0529   0.0391  -0.0330   0.0018  -0.0018   0.0075
+   2 N   :1s    -0.0057  -0.1290   0.0950  -0.0845   0.0041  -0.0052   0.0156
+   3 N   :1s    -0.0003  -0.0694   0.0525  -0.0466   0.0145  -0.0161   0.0333
+   4 N   :2px   -0.1026  -0.2263  -0.0014  -0.3267  -0.1230   0.1414   0.2646
+   5 N   :2py   -0.2659  -0.1888  -0.2110   0.2383  -0.3207   0.2138  -0.2464
+   6 N   :2pz   -0.0903  -0.0028  -0.1711  -0.1699  -0.1131   0.1288   0.2747
+   7 N   :2px    0.0544   0.1332   0.0007   0.1815   0.1477  -0.1791  -0.3371
+   8 N   :2py    0.1331   0.1168   0.1173  -0.1296   0.3860  -0.2644   0.3127
+   9 N   :2pz    0.0444  -0.0201   0.1160   0.0838   0.1315  -0.1567  -0.3449
+  10 N   :3d2-   0.0242   0.0113   0.0003  -0.0256  -0.0006   0.0011  -0.0091
+  11 N   :3d1-  -0.0202  -0.0067  -0.0275   0.0062   0.0068  -0.0070  -0.0045
+  12 N   :3d0   -0.0095  -0.0236  -0.0097  -0.0236   0.0064  -0.0051  -0.0015
+  13 N   :3d1+   0.0038  -0.0140  -0.0011  -0.0001   0.0048  -0.0015   0.0029
+  14 N   :3d2+   0.0134  -0.0016  -0.0062   0.0282   0.0057  -0.0007   0.0067
+  15 N   :1s     0.0127  -0.0469   0.0392  -0.0306  -0.0008   0.0000  -0.0082
+  16 N   :1s     0.0310  -0.1140   0.0955  -0.0782  -0.0023   0.0005  -0.0178
+  17 N   :1s     0.0159  -0.0635   0.0510  -0.0458   0.0005   0.0045  -0.0376
+  18 N   :2px   -0.1198   0.2215   0.0094   0.2728   0.1439   0.1175   0.1863
+  19 N   :2py   -0.2028   0.1437   0.3162  -0.0061   0.3371   0.2212   0.0402
+  20 N   :2pz   -0.1132   0.0825   0.0639  -0.3507   0.1223   0.0342  -0.4136
+  21 N   :2px    0.0646  -0.1320  -0.0002  -0.1514  -0.1718  -0.1495  -0.2387
+  22 N   :2py    0.0962  -0.0743  -0.1893   0.0080  -0.4048  -0.2732  -0.0494
+  23 N   :2pz    0.0596  -0.0669  -0.0206   0.1855  -0.1515  -0.0391   0.5249
+  24 N   :3d2-  -0.0211   0.0021   0.0074  -0.0118   0.0016  -0.0008   0.0034
+  25 N   :3d1-   0.0034   0.0223   0.0078   0.0082  -0.0083  -0.0035   0.0031
+  26 N   :3d0   -0.0002  -0.0025   0.0244  -0.0164  -0.0072  -0.0041  -0.0022
+  27 N   :3d1+  -0.0130   0.0126   0.0074  -0.0304  -0.0047  -0.0014   0.0098
+  28 N   :3d2+  -0.0215   0.0155   0.0188   0.0268  -0.0046  -0.0057  -0.0068
+  29 N   :1s     0.1061   0.0548  -0.0524   0.0228  -0.0015  -0.0006   0.0005
+  30 N   :1s     0.2548   0.1329  -0.1274   0.0580  -0.0042  -0.0027   0.0016
+  31 N   :1s     0.1727   0.0764  -0.0717   0.0308  -0.0110   0.0002   0.0051
+  32 N   :2px    0.0730  -0.1021  -0.3088   0.0250   0.3528  -0.1040  -0.2574
+  33 N   :2py   -0.0088   0.3427  -0.1908  -0.1320  -0.1239  -0.3662   0.1304
+  34 N   :2pz    0.3129   0.0479   0.0497   0.1497  -0.0654   0.2665   0.0266
+  35 N   :2px   -0.0479   0.0577   0.1836  -0.0163  -0.4332   0.1257   0.3291
+  36 N   :2py   -0.0146  -0.1962   0.1096   0.0838   0.1511   0.4534  -0.1648
+  37 N   :2pz   -0.1877  -0.0468  -0.0117  -0.1042   0.0774  -0.3308  -0.0325
+  38 N   :3d2-   0.0011  -0.0167   0.0077   0.0131  -0.0057  -0.0052   0.0046
+  39 N   :3d1-   0.0050  -0.0208   0.0046  -0.0064  -0.0006   0.0032   0.0009
+  40 N   :3d0   -0.0223   0.0092  -0.0253  -0.0046  -0.0031   0.0003   0.0024
+  41 N   :3d1+  -0.0069   0.0196   0.0255  -0.0015   0.0062  -0.0026  -0.0060
+  42 N   :3d2+  -0.0046   0.0153  -0.0084  -0.0220  -0.0012   0.0096  -0.0001
+  43 N   :1s    -0.1176   0.0495  -0.0312   0.0222   0.0004   0.0024   0.0002
+  44 N   :1s    -0.2828   0.1201  -0.0760   0.0566   0.0007   0.0074   0.0005
+  45 N   :1s    -0.1891   0.0680  -0.0406   0.0295  -0.0014   0.0113  -0.0002
+  46 N   :2px    0.0788   0.1001   0.3212   0.0161  -0.3796  -0.1377  -0.2244
+  47 N   :2py    0.2615  -0.2486   0.0641  -0.0245   0.1131  -0.0587   0.0833
+  48 N   :2pz   -0.1836  -0.2532   0.1621   0.1970   0.0740  -0.4407   0.1114
+  49 N   :2px   -0.0509  -0.0589  -0.1859  -0.0102   0.4669   0.1672   0.2866
+  50 N   :2py   -0.1719   0.1551  -0.0439   0.0221  -0.1388   0.0700  -0.1048
+  51 N   :2pz    0.1003   0.1313  -0.0805  -0.1313  -0.0940   0.5502  -0.1403
+  52 N   :3d2-   0.0052   0.0043   0.0284   0.0091   0.0023   0.0054   0.0017
+  53 N   :3d1-  -0.0172  -0.0216   0.0249   0.0136   0.0024   0.0043   0.0010
+  54 N   :3d0    0.0051   0.0190  -0.0016   0.0115   0.0038   0.0058   0.0021
+  55 N   :3d1+  -0.0027  -0.0222  -0.0133   0.0151  -0.0085   0.0057  -0.0068
+  56 N   :3d2+  -0.0067   0.0134  -0.0003  -0.0089  -0.0011  -0.0057   0.0002
+
+    Orbital        18       19       20       21       22       23       24
+   1 N   :1s     0.1224  -0.0833  -0.0649  -0.1375  -0.0537  -0.0293  -0.0083
+   2 N   :1s     0.3165  -0.2092  -0.1634  -0.7603  -0.2642  -0.1393  -0.0447
+   3 N   :1s     1.0084  -0.7300  -0.5761   0.6560  -0.7334  -0.6390  -0.1294
+   4 N   :2px   -0.3390   0.1516   0.0674  -0.1710  -0.5349  -0.1070   0.1067
+   5 N   :2py    0.0447   0.1082  -0.0882  -0.0017   0.0963  -0.2268   0.3423
+   6 N   :2pz    0.2048  -0.2158  -0.2188   0.1801   0.2344   0.4584   0.2459
+   7 N   :2px    0.7676  -0.2816  -0.0591  -0.1426  -0.9643  -0.3331   0.1237
+   8 N   :2py   -0.1308  -0.3705   0.2812   0.0023   0.1246  -0.3153   0.4950
+   9 N   :2pz   -0.3480   0.5047   0.5636   0.1393   0.5516   0.8095   0.3893
+  10 N   :3d2-   0.0133   0.0235  -0.0020   0.0006   0.0088  -0.0079   0.0002
+  11 N   :3d1-   0.0038  -0.0114   0.0236  -0.0001   0.0038  -0.0054  -0.0098
+  12 N   :3d0    0.0160  -0.0002   0.0233  -0.0041  -0.0010  -0.0021  -0.0091
+  13 N   :3d1+  -0.0159  -0.0009   0.0108   0.0185   0.0137   0.0175  -0.0009
+  14 N   :3d2+  -0.0059  -0.0212  -0.0070  -0.0102  -0.0155  -0.0004  -0.0065
+  15 N   :1s    -0.1383  -0.0758  -0.0313  -0.1382   0.0570  -0.0250  -0.0009
+  16 N   :1s    -0.3554  -0.1900  -0.0772  -0.7646   0.2810  -0.1180  -0.0018
+  17 N   :1s    -1.1447  -0.6637  -0.2810   0.6701   0.7875  -0.5775  -0.0780
+  18 N   :2px   -0.3988  -0.1210  -0.0920   0.1941  -0.5693   0.1025   0.1413
+  19 N   :2py    0.1815   0.1944  -0.0455  -0.1189   0.2205  -0.2873   0.3399
+  20 N   :2pz   -0.0832  -0.1374  -0.1323   0.0903  -0.0350   0.3966   0.2181
+  21 N   :2px    0.8608   0.1676   0.2066   0.1541  -1.0642   0.3266   0.2324
+  22 N   :2py   -0.3465  -0.5118   0.2092  -0.0934   0.4636  -0.5090   0.4804
+  23 N   :2pz    0.1040   0.3757   0.4174   0.0635  -0.1744   0.6211   0.3164
+  24 N   :3d2-   0.0083   0.0064   0.0124   0.0144  -0.0171   0.0062   0.0016
+  25 N   :3d1-   0.0081  -0.0103   0.0133   0.0056  -0.0064   0.0016  -0.0090
+  26 N   :3d0    0.0051  -0.0036   0.0173   0.0074  -0.0061   0.0110  -0.0062
+  27 N   :3d1+  -0.0192   0.0086   0.0259  -0.0095   0.0017  -0.0145  -0.0080
+  28 N   :3d2+   0.0057  -0.0309   0.0059  -0.0087   0.0158   0.0020  -0.0047
+  29 N   :1s     0.0205   0.0118   0.1617  -0.1272  -0.0030   0.0330   0.0404
+  30 N   :1s     0.0526   0.0330   0.4069  -0.6917  -0.0103   0.1725   0.1809
+  31 N   :1s     0.1636   0.0921   1.4078   0.5435  -0.0914   0.3892   1.1339
+  32 N   :2px   -0.1668   0.0180  -0.1501  -0.0726  -0.3325   0.0517   0.2053
+  33 N   :2py    0.0103   0.1176  -0.2540  -0.0987   0.0794  -0.1098   0.4300
+  34 N   :2pz   -0.0163  -0.1165  -0.4122  -0.1812   0.0396   0.4135   0.3815
+  35 N   :2px    0.4855  -0.0598   0.3056  -0.0597  -0.4707   0.1246   0.4280
+  36 N   :2py   -0.0746  -0.3739   0.5533  -0.0756   0.0916  -0.0646   0.7809
+  37 N   :2pz    0.0001   0.3321   0.8890  -0.1557   0.0267   0.6930   0.8748
+  38 N   :3d2-   0.0065   0.0180   0.0035  -0.0064   0.0076  -0.0069   0.0107
+  39 N   :3d1-   0.0107   0.0042   0.0124  -0.0143   0.0025   0.0108   0.0177
+  40 N   :3d0    0.0143  -0.0172   0.0096  -0.0102   0.0069   0.0139   0.0150
+  41 N   :3d1+  -0.0285   0.0027   0.0140  -0.0107  -0.0178   0.0039   0.0127
+  42 N   :3d2+  -0.0059  -0.0241   0.0009   0.0022  -0.0001   0.0144  -0.0059
+  43 N   :1s    -0.0037   0.1496  -0.0634  -0.1280  -0.0000   0.0452  -0.0279
+  44 N   :1s    -0.0089   0.3779  -0.1564  -0.6965  -0.0018   0.2249  -0.1181
+  45 N   :1s    -0.0306   1.2822  -0.5627   0.5574   0.0355   0.7318  -0.9393
+  46 N   :2px   -0.1494   0.0982  -0.0739   0.0478  -0.3281  -0.0591   0.1639
+  47 N   :2py    0.0255   0.4333  -0.2197   0.2037   0.0876  -0.4072   0.4751
+  48 N   :2pz    0.0097  -0.1653  -0.0890  -0.0559   0.0535   0.3333   0.1530
+  49 N   :2px    0.4563  -0.1934   0.1743   0.0342  -0.4559  -0.1506   0.3065
+  50 N   :2py   -0.0975  -0.9074   0.5002   0.1649   0.1082  -0.8347   0.9776
+  51 N   :2pz   -0.0420   0.4205   0.3288  -0.0541   0.0760   0.5194   0.1141
+  52 N   :3d2-   0.0228   0.0128   0.0081  -0.0085   0.0098   0.0011  -0.0136
+  53 N   :3d1-   0.0059   0.0026   0.0268   0.0080   0.0035  -0.0202   0.0037
+  54 N   :3d0    0.0103  -0.0078   0.0040   0.0089   0.0067  -0.0133   0.0067
+  55 N   :3d1+  -0.0223   0.0036   0.0160   0.0019  -0.0163  -0.0106  -0.0040
+  56 N   :3d2+   0.0064  -0.0180  -0.0050   0.0157  -0.0001  -0.0096   0.0213
+
+  Total CPU  time used in SIRIUS :   3.68 seconds
+  Total wall time used in SIRIUS :   3.69 seconds
+
+ 
+     Date and time (Linux)  : Sun Jan 21 19:06:54 2018
+     Host name              : vladimir-Kubuntu-16                     
 
 
                      .---------------------------------------.
                      | End of Wave Function Section (SIRIUS) |
                      `---------------------------------------'
 
- >>>> Total CPU  time used in DALTON:   6.62 seconds
- >>>> Total wall time used in DALTON:   7.78 seconds
+  Total CPU  time used in DALTON:   4.14 seconds
+  Total wall time used in DALTON:   4.15 seconds
 
  
-     Date and time (Linux)  : Tue Jun  2 21:56:39 2015
-     Host name              : kbob-G41MT-S2                           
+     Date and time (Linux)  : Sun Jan 21 19:06:54 2018
+     Host name              : vladimir-Kubuntu-16                     
