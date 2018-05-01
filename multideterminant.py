@@ -123,6 +123,7 @@ class QChem:
                     for p in det['promotions']:
                         # starting from 2-nd determinant
                         print('  DET %i %i PR %i 1 %i 1' % (i + 2, p['spin'], p['from'], p['to']), file=output_file)
+                print('END MDET', file=output_file)
 
 
 def main():
