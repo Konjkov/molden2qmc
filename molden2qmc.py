@@ -11,7 +11,7 @@ from operator import itemgetter
 if sys.version_info > (3, 0):
     from functools import reduce
 
-__version__ = '3.1.0'
+__version__ = '3.0.3'
 
 
 def fact2(k):
@@ -44,16 +44,6 @@ def list_mul(list_a, list_b):
 
 class SectionNotFound(Exception):
     """Section not found in MOLDEN file."""
-
-    def __init__(self, section_name):
-        self.section_name = section_name
-
-    def __str__(self):
-        return repr(self.section_name)
-
-
-class ORCASectionNotFound(Exception):
-    """Section not found in ORCA Output file."""
 
     def __init__(self, section_name):
         self.section_name = section_name
@@ -595,8 +585,7 @@ class Molden(object):
 
         # (Number of basis functions) ** 2 coefficients
         num = 0
-        # for orbital in sorted(self.mo_matrix, key=itemgetter('SPIN', 'ENERGY')):
-        for orbital in sorted(self.mo_matrix, key=itemgetter('SPIN',)):
+        for orbital in sorted(self.mo_matrix, key=itemgetter('SPIN', 'ENERGY')):
             for ao in orbital['MO']:
                 for coefficient in ao['DATA']:
                     if num % 4 == 0:
@@ -621,8 +610,7 @@ class DefaultConverter(Molden):
         self.atom_list_converter()
         self.mo_matrix_converter()
 
-    @staticmethod
-    def whole_contraction_factor(primitives, l):
+    def whole_contraction_factor(self, primitives, l):
         """
         :param primitives: ((a_1, d_1), (a_2, d_2), ...)
         :param l: angular quantum number
@@ -642,8 +630,7 @@ class DefaultConverter(Molden):
                 s += p1[1] * p2[1] * (2 * sqrt(p1[0] * p2[0])/(p1[0] + p2[0]))**(l + 1.5)
         return 1/sqrt(s)
 
-    @staticmethod
-    def m_independent_factor(a, l):
+    def m_independent_factor(self, a, l):
         """
         :param a: alpha
         :param l: angular quantum number
@@ -655,8 +642,7 @@ class DefaultConverter(Molden):
         """
         return sqrt(2**(l + 1.5) * a**(l + 1.5))/pi**0.75 * sqrt(2**l/fact2(2*l-1))
 
-    @staticmethod
-    def m_dependent_factor(l, m):
+    def m_dependent_factor(self, l, m):
         """
         :param l: angular quantum number
         :param m: magnetic quantum number
@@ -939,20 +925,6 @@ class Orca(DefaultConverter):
     """
     title = "generated from Orca output data.\n"
 
-    def __init__(self, f, pseudoatoms="none", orca_input_path=None):
-        """Initialise multi-determinant support."""
-
-        self.orca_input_path = orca_input_path
-        if orca_input_path:
-            self.internal = 0  # CASSCF internal orbitals
-            self.active = 0  # CASSCF active orbitals
-            self.spin_determinants = []  # CASSCF spin-determinants
-            self.parse_output()
-            # self.f = open(self.orca_input_path, "r")
-            # self.check_monotonic()
-
-        super(Orca, self).__init__(f, pseudoatoms)
-
     def d_to_spherical(self, cartesian):
         """
         In ORCA spherical MOLDEN input expected.
@@ -1000,189 +972,6 @@ class Orca(DefaultConverter):
         coefficient[8] *= -1
         return super(Orca, self).g_normalize(coefficient)
 
-    def orca_section(self, section_name):
-        """
-        :returns: content of named section
-        """
-        self.f.seek(0)
-        line = self.f.readline()
-        while line and not line.startswith(section_name):
-            line = self.f.readline()
-        if not line:
-            raise SectionNotFound(section_name)
-        result = [line]
-        line = self.f.readline()
-        line = self.f.readline()
-        while line and not line.startswith('-------'):
-            result.append(line)
-            line = self.f.readline()
-        return result
-
-    def parse_output(self):
-        """Retrive from ORCA output:
-            Spin-Determinant information
-            number of active & internal orbitals in CASSCF
-
-        because of this issue https://orcaforum.cec.mpg.de/viewtopic.php?f=8&t=3212
-        ORCA input should be:
-        ! CASSCF cc-pVQZ
-
-        %casscf
-          nel  3
-          norb 4
-          PrintWF det
-        end
-
-        * xyzfile 0 2 ../../mol.xyz
-
-        $new_job
-        %casscf
-          nel  3
-          norb 4
-          PrintWF csf
-        end
-
-        * xyzfile 0 2 ../../mol.xyz
-
-        Keep your attention on not using symmetry because of this issue
-        https://orcaforum.cec.mpg.de/viewtopic.php?f=11&t=3254
-
-        :param prefix: ORCA input file prefix.
-        :return: list of spin-determinants, number of internal orbitals
-        """
-
-        determinants = {}
-
-        def ternary2decimal(ternary):
-            """Convert ternary string to decimal.
-            '001122' = 1 * 2 + 3 * 2 + 9 * 1 + 27 * 1 = 44
-            '21102' -> 200
-            """
-            return reduce(lambda x, y: x * 3 + int(y), ternary, 0)
-
-        with open(self.orca_input_path, "r") as orca_input:
-            line = orca_input.readline()
-            key = None
-            while line and not line.startswith('  Spin-Determinant CI Printing'):
-                line = orca_input.readline()
-                if line.startswith('   Internal'):
-                    self.internal = int(line.split()[5])
-                if line.startswith('   Active'):
-                    self.active = int(line.split()[5])
-            if not line:
-                raise ORCASectionNotFound('Spin-Determinant CI Printing')
-            line = orca_input.readline()
-            while line and not line.startswith('DENSITY MATRIX'):
-                if line.startswith('CFG['):
-                    key = line.split()[0][4:-1]
-                    determinants[key] = []
-                elif line.startswith('   ['):
-                    det, val = line.split()
-                    determinants[key].append({det[1:-1]: float(val)})
-                line = orca_input.readline()
-
-        with open(self.orca_input_path, "r") as orca_input:
-            line = orca_input.readline()
-            key = None
-            while line and not line.startswith('  Extended CI Printing'):
-                line = orca_input.readline()
-            if not line:
-                raise ORCASectionNotFound('Extended CI Printing')
-            line = orca_input.readline()
-            while line and not line.startswith('DENSITY MATRIX'):
-                if line.startswith(' CFG['):
-                    if determinants.get(line.split()[1]) == []:
-                        key = line.split()[1]
-                elif key and line.startswith(' \tCSF['):
-                    determinants[key] = float(line.split()[1])
-                    key = None
-                line = orca_input.readline()
-
-        self.spin_determinants = []
-        # Sort spin-determinants by increasing occupation levels
-        for k, v in sorted(determinants.items(), key=lambda x: ternary2decimal(x[0][::-1])):
-            if isinstance(v, list):
-                for v1 in v:
-                    self.spin_determinants += [v1.items()[0]]
-            else:
-                self.spin_determinants += [(k, v)]
-
-    def check_monotonic(self):
-        """Check if energy of orbitals increases monotonically."""
-        section_body = self.orca_section("ORBITAL ENERGIES")[3:]
-        energy = None
-        for line in section_body:
-            split_line = line.split()
-            if line.isspace():
-                break
-            elif len(split_line) == 4:
-                if energy and float(split_line[2]) < energy:
-                    print(line, energy)
-                energy = float(split_line[2])
-
-    @staticmethod
-    def get_promotion_rules(spin_det_1, spin_det_2):
-        """Creates promotions rules for two spin-determinants
-
-        for '2u00' ->, '0u20'
-        promotion rules is
-            [(1, 1, 3), (2, 1, 3)]
-        for rule (1, 1, 3)
-            first is spin (1=up/2=down)
-            second is number of orbital in active space electron promote from
-            third is of orbital in active space electron promote to
-        orbital numeration starting from 1.
-        """
-        # divide spin-determinants into spin parts
-        spin_det_1_up = [e in ('2', 'u') for e in spin_det_1]
-        spin_det_1_down = [e in ('2', 'd') for e in spin_det_1]
-
-        spin_det_2_up = [e in ('2', 'u') for e in spin_det_2]
-        spin_det_2_down = [e in ('2', 'd') for e in spin_det_2]
-
-        # get difference between initial and final spin-det
-        spin_det_up = [x - y for x, y in zip(spin_det_1_up, spin_det_2_up)]
-        spin_det_down = [x - y for x, y in zip(spin_det_1_down, spin_det_2_down)]
-
-        # get indexes of releasing and filling orbitals
-        spin_det_1_up_indexes = [i+1 for i, x in enumerate(spin_det_up) if x == 1]
-        spin_det_2_up_indexes = [i+1 for i, x in enumerate(spin_det_up) if x == -1]
-
-        spin_det_1_down_indexes = [i+1 for i, x in enumerate(spin_det_down) if x == 1]
-        spin_det_2_down_indexes = [i+1 for i, x in enumerate(spin_det_down) if x == -1]
-
-        return (
-            [(1, fr, to) for fr, to in zip(spin_det_1_up_indexes, spin_det_2_up_indexes)] +
-            [(2, fr, to) for fr, to in zip(spin_det_1_down_indexes, spin_det_2_down_indexes)]
-        )
-
-    @property
-    def ground_state(self):
-        """Lowest occupation spin-determinant"""
-        return self.spin_determinants[0][0]
-
-    def gwfn_multideterminant_information(self):
-        """
-        :returns: MULTIDETERMINANT INFORMATION section of gwfn.data file
-        """
-        if self.orca_input_path:
-            result = ("MULTIDETERMINANT INFORMATION\n"
-                      "----------------------------\n"
-                      " MD\n")
-
-            result += '  %i\n' % len(self.spin_determinants)
-            for _, weight in self.spin_determinants:
-                result += ' %9.6f\n' % weight
-
-            for i, (spin_det, _) in enumerate(self.spin_determinants):
-                if self.ground_state != spin_det:
-                    for s, f, t in self.get_promotion_rules(self.ground_state, spin_det):
-                        result += '  DET %i %i PR %i 1 %i 1\n' % (i+1, s, f + self.internal, t + self.internal)
-
-            return result + "\n"
-        else:
-            return super(Orca, self).gwfn_multideterminant_information()
-
 
 class PSI4(DefaultConverter):
     """
@@ -1202,7 +991,7 @@ class PSI4(DefaultConverter):
 
 class Dalton(DefaultConverter):
     """
-    DALTON 2013
+    DALTON 2016
     """
     title = "generated from Dalton output data.\n"
 
@@ -1342,7 +1131,7 @@ def main():
             "1 -- PSI4\n"
             "2 -- CFOUR 2.0beta\n"
             "3 -- ORCA 3.X - 4.X\n"
-            "4 -- DALTON2013\n"
+            "4 -- DALTON2016\n"
             "5 -- MOLPRO\n"
             "6 -- NWCHEM\n"
             "7 -- QCHEM 4.X"
@@ -1356,18 +1145,12 @@ def main():
         "none = pseudopotential was not used for any atoms in this calculation.\n"
         "all = pseudopotential was used for all atoms in this calculation.\n"
         "white space separated numbers = number of pseudoatoms (started from 1)."))
-    parser.add_argument('--multideterminant', type=str, const='mol', nargs='?', help="prefix of ORCA CASSCF output")
 
     args = parser.parse_args()
 
     if not os.path.exists(args.input_file):
-        print("File %s not found..." % args.input_file)
+        print ("File %s not found..." % args.input_file)
         sys.exit(1)
-
-    if args.multideterminant:
-        orca_input_path = os.path.join(os.path.dirname(args.input_file), args.multideterminant + '.out')
-    else:
-        orca_input_path = None
 
     input_file = open(args.input_file, "r")
 
@@ -1378,18 +1161,15 @@ def main():
     elif args.code == 2:
         CFour(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 3:
-        Orca(input_file, args.pseudoatoms, orca_input_path).gwfn(args.output_file)
+        Orca(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 4:
         Dalton(input_file, args.pseudoatoms).gwfn(args.output_file)
-        print("In Dalton's MOLDEN file all occupation numbers of HF and DFT MOs are zero values by mistake\n"
-              "So you should correct 'Number of electrons per primitive cell' in gwfn.data file by hand.")
     elif args.code == 5:
         Molpro(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 6:
         NwChem(input_file, args.pseudoatoms).gwfn(args.output_file)
     elif args.code == 7:
         QChem(input_file, args.pseudoatoms).gwfn(args.output_file)
-
 
 if __name__ == "__main__":
     main()
