@@ -2,9 +2,8 @@
 import re
 import sys
 import argparse
+from functools import reduce
 
-if sys.version_info > (3, 0):
-    from functools import reduce
 
 class SectionNotFound(Exception):
     """Section not found in MOLDEN file."""
@@ -24,6 +23,51 @@ class ORCASectionNotFound(Exception):
     """Section not found in ORCA Output file."""
 
 
+class Default:
+    """All possible combinations."""
+
+    title = "All possible combinations of DETs."
+
+    def __init__(self):
+        """Initialise multi-determinant support."""
+        self.max_orbital = 18
+        self.alpha_occ = (6, 7)
+        self.beta_occ = (6,)
+        self.alpha_virt = range(6, self.max_orbital + 1)
+        self.beta_virt = range(6, self.max_orbital + 1)
+        self.orbitals = (
+                len(self.alpha_occ) *
+                len(self.beta_occ) *
+                len(self.alpha_virt) *
+                len(self.beta_virt)
+        ) + 1
+
+    def correlation(self):
+        """
+        :returns: MDET section of correlation.data file
+        """
+        with open('correlation.data', 'w') as output_file:
+            print('START MDET', file=output_file)
+            print('Title', file=output_file)
+            print(' multideterminant WFN %s\n' % self.title, file=output_file)
+
+            print('MD', file=output_file)
+            print('  %i' % self.orbitals, file=output_file)
+            print('  1.0  1  0', file=output_file)
+            for i in range(1, self.orbitals):
+                print('  0.0  %i  1' % (i+1), file=output_file)
+
+            i = 1
+            for alpha_from in self.alpha_occ:
+                for beta_from in self.beta_occ:
+                    for alpha_to in self.alpha_virt:
+                        for beta_to in self.beta_virt:
+                            i += 1
+                            print('  DET %i 1 PR %i 1 %i 1' % (i, alpha_from, alpha_to), file=output_file)
+                            print('  DET %i 2 PR %i 1 %i 1' % (i, beta_from, beta_to), file=output_file)
+            print('END MDET', file=output_file)
+
+
 class QChem:
     """
     QChem 4.4
@@ -37,7 +81,7 @@ class QChem:
         self.active = {'alpha': 0, 'beta': 0}
         self.determinants = []
         self.parse_output()
-        # self.truncate(order)
+        self.truncate(order)
 
     def parse_output(self):
         """Retrieve from QChem output:
@@ -336,15 +380,19 @@ def main():
             "7 -- QChem\n"
         )
     )
-
     parser.add_argument('input_file', type=str, help="path to output file")
+    # truncation order for multideterminant extension
+    parser.add_argument('--truncate', type=int, const='20', nargs='?', help="truncation order")
     args = parser.parse_args()
+
+    if args.code == 0:
+        Default().correlation()
 
     if args.code == 3:
         Orca(args.input_file).correlation()
 
     if args.code == 7:
-        QChem(args.input_file).correlation()
+        QChem(args.input_file, args.truncate).correlation()
 
 
 if __name__ == "__main__":
