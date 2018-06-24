@@ -74,14 +74,14 @@ class QChem:
     """
     title = "generated from QChem output data."
 
-    def __init__(self, output_file, order=0):
+    def __init__(self, output_file, order=0, tol=0.01):
         """Initialise multi-determinant support."""
         self.output_file = output_file
         self.occupied = {'alpha': 0, 'beta': 0}
         self.active = {'alpha': 0, 'beta': 0}
         self.determinants = []
         self.parse_output()
-        self.truncate(order)
+        self.truncate(order, tol)
 
     def parse_output(self):
         """Retrieve from QChem output:
@@ -133,13 +133,13 @@ class QChem:
                 })
                 line = qchem_output.readline()
 
-    def truncate(self, order, tol=0.01):
+    def truncate(self, order=None, tol=0.01):
         """Leave only determinants with active space orbital
         number not greater then order."""
         determinants = []
         limit = order + self.occupied['alpha']
         for det in self.determinants:
-            if det['promotions'][0]['to'] > limit or det['promotions'][1]['to'] > limit:
+            if order and (det['promotions'][0]['to'] > limit or det['promotions'][1]['to'] > limit):
                 continue
             if abs(det['weight']) < tol:
                 break
@@ -382,7 +382,8 @@ def main():
     )
     parser.add_argument('input_file', type=str, help="path to output file")
     # truncation order for multideterminant extension
-    parser.add_argument('--truncate', type=int, const='20', nargs='?', help="truncation order")
+    parser.add_argument('--truncate', type=int, default=0, nargs='?', help="truncation order")
+    parser.add_argument('--tolerance', type=float, default=0.01, nargs='?', help="min amplitude weight")
     args = parser.parse_args()
 
     if args.code == 0:
@@ -392,7 +393,7 @@ def main():
         Orca(args.input_file).correlation()
 
     if args.code == 7:
-        QChem(args.input_file, args.truncate).correlation()
+        QChem(args.input_file, args.truncate, args.tolerance).correlation()
 
 
 if __name__ == "__main__":
