@@ -402,7 +402,7 @@ class Molden:
                 return atom['N'] - 2
             elif atom['N'] <= 18:  # Na-Ar
                 return atom['N'] - 10
-            elif atom['N'] <= 26:  # K-Zn
+            elif atom['N'] <= 30:  # K-Zn
                 return atom['N'] - 18
             elif atom['N'] <= 36:  # Ga-Kr
                 return atom['N'] - 28
