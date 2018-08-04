@@ -15,11 +15,11 @@ class SectionNotFound(Exception):
         return repr(self.section_name)
 
 
-class QChemSectionNotFound(Exception):
+class QChemSectionNotFound(SectionNotFound):
     """Section not found in QChem Output file."""
 
 
-class ORCASectionNotFound(Exception):
+class ORCASectionNotFound(SectionNotFound):
     """Section not found in ORCA Output file."""
 
 
@@ -385,15 +385,17 @@ def main():
     parser.add_argument('--truncate', type=int, default=0, nargs='?', help="truncation order")
     parser.add_argument('--tolerance', type=float, default=0.01, nargs='?', help="min amplitude weight")
     args = parser.parse_args()
+    try:
+        if args.code == 0:
+            Default().correlation()
 
-    if args.code == 0:
-        Default().correlation()
+        if args.code == 3:
+            Orca(args.input_file).correlation()
 
-    if args.code == 3:
-        Orca(args.input_file).correlation()
-
-    if args.code == 7:
-        QChem(args.input_file, args.truncate, args.tolerance).correlation()
+        if args.code == 7:
+            QChem(args.input_file, args.truncate, args.tolerance).correlation()
+    except SectionNotFound:
+        exit(1)
 
 
 if __name__ == "__main__":
