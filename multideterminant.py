@@ -74,14 +74,14 @@ class QChem:
     """
     title = "generated from QChem output data."
 
-    def __init__(self, output_file, order=0, tol=0.01):
+    def __init__(self, output_file, excitation=0, amplitude=0):
         """Initialise multi-determinant support."""
         self.output_file = output_file
         self.occupied = {'alpha': 0, 'beta': 0}
         self.active = {'alpha': 0, 'beta': 0}
         self.determinants = []
         self.parse_output()
-        self.truncate(order, tol)
+        self.truncate(excitation, amplitude)
 
     def parse_output(self):
         """Retrieve from QChem output:
@@ -133,16 +133,16 @@ class QChem:
                 })
                 line = qchem_output.readline()
 
-    def truncate(self, order=None, tol=0.01):
+    def truncate(self, excitation=None, amplitude=None):
         """Leave only determinants with active space orbital
         number not greater then order."""
         determinants = []
-        limit = order + self.occupied['alpha']
+        limit = excitation + self.occupied['alpha']
         for det in self.determinants:
-            if order and (det['promotions'][0]['to'] > limit or det['promotions'][1]['to'] > limit):
+            if excitation and excitation and (det['promotions'][0]['to'] > limit or det['promotions'][1]['to'] > limit):
                 continue
-            if abs(det['weight']) < tol:
-                break
+            if amplitude and abs(det['weight']) < amplitude:
+                continue
             determinants.append(det)
         self.determinants = determinants
 
@@ -160,8 +160,13 @@ class QChem:
                 print('  %i' % (len(self.determinants) + 1), file=output_file)
                 # first determinant
                 print(' %9.6f    1    0' % 1.0, file=output_file)
+                opt_group_number = 1
+                prev_weight = None
                 for i, det in enumerate(self.determinants):
-                    print(' %9.6f    %i    1' % (det['weight'], i+2), file=output_file)
+                    if prev_weight != det['weight']:
+                        opt_group_number += 1
+                    print(' %9.6f    %i    1' % (det['weight'], opt_group_number), file=output_file)
+                    prev_weight = det['weight']
 
                 for i, det in enumerate(self.determinants):
                     for p in det['promotions']:
@@ -381,9 +386,9 @@ def main():
         )
     )
     parser.add_argument('input_file', type=str, help="path to output file")
-    # truncation order for multideterminant extension
-    parser.add_argument('--truncate', type=int, default=0, nargs='?', help="truncation order")
-    parser.add_argument('--tolerance', type=float, default=0.01, nargs='?', help="min amplitude weight")
+    # truncation for multideterminant extension
+    parser.add_argument('--excitation', type=int, default=0, nargs='?', help="max excitaion orbital number")
+    parser.add_argument('--amplitude', type=float, default=0, nargs='?', help="min amplitude weight")
     args = parser.parse_args()
     try:
         if args.code == 0:
@@ -393,7 +398,7 @@ def main():
             Orca(args.input_file).correlation()
 
         if args.code == 7:
-            QChem(args.input_file, args.truncate, args.tolerance).correlation()
+            QChem(args.input_file, args.excitation, args.amplitude).correlation()
     except SectionNotFound:
         exit(1)
 
