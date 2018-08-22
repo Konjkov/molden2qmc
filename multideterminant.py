@@ -363,8 +363,13 @@ class Orca:
             print('MD', file=output_file)
             print('  %i' % len(self.spin_determinants), file=output_file)
 
+            opt_group_number = 0
+            prev_weight = None
             for i, (_, weight) in enumerate(self.spin_determinants):
-                print(' %9.6f  %i %i' % (weight, i+1, int(i > 0)), file=output_file)
+                if prev_weight != weight:
+                    opt_group_number += 1
+                print(' %9.6f  %i %i' % (weight, opt_group_number, int(i > 0)), file=output_file)
+                prev_weight = weight
 
             for i, (spin_det, _) in enumerate(self.spin_determinants):
                 if self.ground_state != spin_det:
