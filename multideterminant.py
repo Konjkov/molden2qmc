@@ -114,7 +114,8 @@ class QChem:
                     self.occupied['beta'] = int(m.group('beta'))
                 line = qchem_output.readline()
             if not line:
-                raise QChemSectionNotFound('T2-amplitudes')
+                "Single determinant"
+                return
             line = qchem_output.readline()
             virtual_map = {'A': self.occupied['alpha'], 'B': self.occupied['beta']}
             while line and not line == '\n':
@@ -150,29 +151,28 @@ class QChem:
         """
         :returns: MDET section of correlation.data file
         """
-        if len(self.determinants) > 0:
-            with open('correlation.data', 'w') as output_file:
-                print('START MDET', file=output_file)
-                print('Title', file=output_file)
-                print(' multideterminant WFN %s\n' % self.title, file=output_file)
+        with open('correlation.data', 'w') as output_file:
+            print('START MDET', file=output_file)
+            print('Title', file=output_file)
+            print(' multideterminant WFN %s\n' % self.title, file=output_file)
 
-                print('MD', file=output_file)
-                print('  %i' % (len(self.determinants) + 1), file=output_file)
-                # first determinant
-                print(' %9.6f    1    0' % 1.0, file=output_file)
-                opt_group_number = 1
-                prev_weight = None
-                for i, det in enumerate(self.determinants):
-                    if prev_weight != det['weight']:
-                        opt_group_number += 1
-                    print(' %9.6f    %i    1' % (det['weight'], opt_group_number), file=output_file)
-                    prev_weight = det['weight']
+            print('MD', file=output_file)
+            print('  %i' % (len(self.determinants) + 1), file=output_file)
+            # first determinant
+            print(' %9.6f    1    0' % 1.0, file=output_file)
+            opt_group_number = 1
+            prev_weight = None
+            for i, det in enumerate(self.determinants):
+                if prev_weight != det['weight']:
+                    opt_group_number += 1
+                print(' %9.6f    %i    1' % (det['weight'], opt_group_number), file=output_file)
+                prev_weight = det['weight']
 
-                for i, det in enumerate(self.determinants):
-                    for p in det['promotions']:
-                        # starting from 2-nd determinant
-                        print('  DET %i %i PR %i 1 %i 1' % (i + 2, p['spin'], p['from'], p['to']), file=output_file)
-                print('END MDET', file=output_file)
+            for i, det in enumerate(self.determinants):
+                for p in det['promotions']:
+                    # starting from 2-nd determinant
+                    print('  DET %i %i PR %i 1 %i 1' % (i + 2, p['spin'], p['from'], p['to']), file=output_file)
+            print('END MDET', file=output_file)
 
 
 class Orca:
@@ -260,7 +260,9 @@ class Orca:
                 if line.startswith('   Active'):
                     self.active = int(line.split()[5])
             if not line:
-                raise ORCASectionNotFound('Spin-Determinant CI Printing')
+                "Single determinant output"
+                self.spin_determinants = [(1, 1.0)]
+                return
             line = orca_input.readline()
             while line and not line.startswith('DENSITY MATRIX'):
                 if line.startswith('CFG['):
@@ -395,17 +397,15 @@ def main():
     parser.add_argument('--excitation', type=int, default=0, nargs='?', help="max excitaion orbital number")
     parser.add_argument('--amplitude', type=float, default=0, nargs='?', help="min amplitude weight")
     args = parser.parse_args()
-    try:
-        if args.code == 0:
-            Default().correlation()
 
-        if args.code == 3:
-            Orca(args.input_file).correlation()
+    if args.code == 0:
+        Default().correlation()
 
-        if args.code == 7:
-            QChem(args.input_file, args.excitation, args.amplitude).correlation()
-    except SectionNotFound:
-        exit(1)
+    if args.code == 3:
+        Orca(args.input_file).correlation()
+
+    if args.code == 7:
+        QChem(args.input_file, args.excitation, args.amplitude).correlation()
 
 
 if __name__ == "__main__":
