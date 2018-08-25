@@ -28,19 +28,80 @@ class Default:
 
     title = "All possible combinations of DETs."
 
-    def __init__(self):
+    def __init__(self, orca_input_path):
         """Initialise multi-determinant support."""
-        self.max_orbital = 18
-        self.alpha_occ = (6, 7)
-        self.beta_occ = (6,)
-        self.alpha_virt = range(6, self.max_orbital + 1)
-        self.beta_virt = range(6, self.max_orbital + 1)
+        self.orca_input_path = orca_input_path
+        self.up = 0
+        self.down = 0
+        self.get_up_down()
+        self.internal = 0
+        self.active = 0
+        self.parse_output()
+        self.alpha_occ = range(self.internal+1, self.up+1)
+        self.beta_occ = range(self.internal+1, self.down+1)
+        self.alpha_virt = range(self.up+1, self.internal+self.active+1)
+        self.beta_virt = range(self.down+1, self.internal+self.active+1)
         self.orbitals = (
                 len(self.alpha_occ) *
                 len(self.beta_occ) *
                 len(self.alpha_virt) *
                 len(self.beta_virt)
         ) + 1
+
+    def orca_section(self, section_name):
+        """
+        :returns: content of named section
+        """
+        with open(self.orca_input_path, 'r') as orca_input:
+            orca_input.seek(0)
+            line = orca_input.readline()
+            while line and not line.startswith(section_name):
+                line = orca_input.readline()
+            if not line:
+                raise SectionNotFound(section_name)
+            result = [line]
+            line = orca_input.readline()
+            line = orca_input.readline()
+            while line and not line.startswith('-------'):
+                result.append(line)
+                line = orca_input.readline()
+            return result
+
+    def get_up_down(self):
+        """Get up and down electron numbers from ORCA output file.
+        Number of up&down electrons required in CASINO input.
+        """
+
+        regexp1 = re.compile('Multiplicity           Mult            ....\s+(?P<mult>\d+)')
+        regexp2 = re.compile('Number of Electrons    NEL             ....\s+(?P<elec>\d+)')
+        with open(self.orca_input_path, 'r') as orca_out:
+            for line in orca_out:
+                m1 = re.search(regexp1, line)
+                if m1:
+                    mult = int(m1.group('mult'))
+                m2 = re.search(regexp2, line)
+                if m2:
+                    elec = int(m2.group('elec'))
+        self.up = (elec + mult - 1)//2
+        self.down = (elec - mult + 1)//2
+
+    def parse_output(self):
+        """Retrive from ORCA output:
+            Spin-Determinant information
+            number of active & internal orbitals in CASSCF
+        """
+
+        determinants = {}
+
+        with open(self.orca_input_path, "r") as orca_input:
+            line = orca_input.readline()
+            key = None
+            while line and not line.startswith('  Spin-Determinant CI Printing'):
+                line = orca_input.readline()
+                if line.startswith('   Internal'):
+                    self.internal = int(line.split()[5])
+                if line.startswith('   Active'):
+                    self.active = int(line.split()[5])
 
     def correlation(self):
         """
@@ -399,7 +460,7 @@ def main():
     args = parser.parse_args()
 
     if args.code == 0:
-        Default().correlation()
+        Default(args.input_file).correlation()
 
     if args.code == 3:
         Orca(args.input_file).correlation()
