@@ -3,6 +3,7 @@ import re
 import sys
 import argparse
 from functools import reduce
+from decimal import Decimal
 
 
 class SectionNotFound(Exception):
@@ -331,7 +332,7 @@ class Orca:
                     determinants[key] = []
                 elif line.startswith('   ['):
                     det, val = line.split()
-                    determinants[key].append({det[1:-1]: float(val)})
+                    determinants[key].append({det[1:-1]: round(Decimal(val), 6)})
                 line = orca_input.readline()
 
         with open(self.orca_input_path, "r") as orca_input:
@@ -347,7 +348,7 @@ class Orca:
                     if determinants.get(line.split()[1]) == []:
                         key = line.split()[1]
                 elif key and line.startswith(' \tCSF['):
-                    determinants[key] = float(line.split()[1])
+                    determinants[key] = round(Decimal(line.split()[1]), 6)
                     key = None
                 line = orca_input.readline()
 
@@ -355,7 +356,7 @@ class Orca:
         # Sort spin-determinants by increasing occupation levels
         for k, v in sorted(determinants.items(), key=lambda x: ternary2decimal(x[0][::-1])):
             if isinstance(v, list):
-                for v1 in v:
+                for v1 in sorted(v, key=lambda x: list(x.items())[0][1], reverse=True):
                     self.spin_determinants += [list(v1.items())[0]]
             else:
                 self.spin_determinants += [(k, v)]
@@ -369,9 +370,9 @@ class Orca:
             if line.isspace():
                 break
             elif len(split_line) == 4:
-                if energy and float(split_line[2]) < energy:
+                if energy and Decimal(split_line[2]) < energy:
                     print(line, energy)
-                energy = float(split_line[2])
+                energy = Decimal(split_line[2])
 
     @staticmethod
     def get_promotion_rules(spin_det_1, spin_det_2):
@@ -425,7 +426,6 @@ class Orca:
 
             print('MD', file=output_file)
             print('  %i' % len(self.spin_determinants), file=output_file)
-
             opt_group_number = 0
             prev_weight = None
             for i, (_, weight) in enumerate(self.spin_determinants):
