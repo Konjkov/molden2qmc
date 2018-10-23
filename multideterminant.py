@@ -24,112 +24,6 @@ class ORCASectionNotFound(SectionNotFound):
     """Section not found in ORCA Output file."""
 
 
-class Default:
-    """All possible combinations."""
-
-    title = "All possible combinations of DETs."
-
-    def __init__(self, orca_input_path):
-        """Initialise multi-determinant support."""
-        self.orca_input_path = orca_input_path
-        self.up = 0
-        self.down = 0
-        self.get_up_down()
-        self.internal = 0
-        self.active = 0
-        self.parse_output()
-        self.alpha_occ = range(self.internal+1, self.up+1)
-        self.beta_occ = range(self.internal+1, self.down+1)
-        self.alpha_virt = range(self.up+1, self.internal+self.active+1)
-        self.beta_virt = range(self.down+1, self.internal+self.active+1)
-        self.orbitals = (
-                len(self.alpha_occ) *
-                len(self.beta_occ) *
-                len(self.alpha_virt) *
-                len(self.beta_virt)
-        ) + 1
-
-    def orca_section(self, section_name):
-        """
-        :returns: content of named section
-        """
-        with open(self.orca_input_path, 'r') as orca_input:
-            orca_input.seek(0)
-            line = orca_input.readline()
-            while line and not line.startswith(section_name):
-                line = orca_input.readline()
-            if not line:
-                raise SectionNotFound(section_name)
-            result = [line]
-            line = orca_input.readline()
-            line = orca_input.readline()
-            while line and not line.startswith('-------'):
-                result.append(line)
-                line = orca_input.readline()
-            return result
-
-    def get_up_down(self):
-        """Get up and down electron numbers from ORCA output file.
-        Number of up&down electrons required in CASINO input.
-        """
-
-        regexp1 = re.compile('Multiplicity           Mult            ....\s+(?P<mult>\d+)')
-        regexp2 = re.compile('Number of Electrons    NEL             ....\s+(?P<elec>\d+)')
-        with open(self.orca_input_path, 'r') as orca_out:
-            for line in orca_out:
-                m1 = re.search(regexp1, line)
-                if m1:
-                    mult = int(m1.group('mult'))
-                m2 = re.search(regexp2, line)
-                if m2:
-                    elec = int(m2.group('elec'))
-        self.up = (elec + mult - 1)//2
-        self.down = (elec - mult + 1)//2
-
-    def parse_output(self):
-        """Retrive from ORCA output:
-            Spin-Determinant information
-            number of active & internal orbitals in CASSCF
-        """
-
-        determinants = {}
-
-        with open(self.orca_input_path, "r") as orca_input:
-            line = orca_input.readline()
-            key = None
-            while line and not line.startswith('  Spin-Determinant CI Printing'):
-                line = orca_input.readline()
-                if line.startswith('   Internal'):
-                    self.internal = int(line.split()[5])
-                if line.startswith('   Active'):
-                    self.active = int(line.split()[5])
-
-    def correlation(self):
-        """
-        :returns: MDET section of correlation.data file
-        """
-        with open('correlation.data', 'w') as output_file:
-            print('START MDET', file=output_file)
-            print('Title', file=output_file)
-            print(' multideterminant WFN %s\n' % self.title, file=output_file)
-
-            print('MD', file=output_file)
-            print('  %i' % self.orbitals, file=output_file)
-            print('  1.0  1  0', file=output_file)
-            for i in range(1, self.orbitals):
-                print('  0.0  %i  1' % (i+1), file=output_file)
-
-            i = 1
-            for alpha_from in self.alpha_occ:
-                for beta_from in self.beta_occ:
-                    for alpha_to in self.alpha_virt:
-                        for beta_to in self.beta_virt:
-                            i += 1
-                            print('  DET %i 1 PR %i 1 %i 1' % (i, alpha_from, alpha_to), file=output_file)
-                            print('  DET %i 2 PR %i 1 %i 1' % (i, beta_from, beta_to), file=output_file)
-            print('END MDET', file=output_file)
-
-
 class QChem:
     """
     QChem 4.4
@@ -245,12 +139,12 @@ class Orca:
 
     def __init__(self, orca_input_path):
         """Initialise multi-determinant support."""
+        self.tolerance = Decimal('0.000001')
         self.internal = 0  # CASSCF internal orbitals
         self.active = 0  # CASSCF active orbitals
         self.spin_determinants = []  # CASSCF spin-determinants
         self.orca_input_path = orca_input_path
         self.parse_output()
-        # self.check_monotonic()
 
     def orca_section(self, section_name):
         """
@@ -356,23 +250,12 @@ class Orca:
         # Sort spin-determinants by increasing occupation levels
         for k, v in sorted(determinants.items(), key=lambda x: ternary2decimal(x[0][::-1])):
             if isinstance(v, list):
-                for v1 in sorted(v, key=lambda x: list(x.items())[0][1], reverse=True):
+                for v1 in v:
                     self.spin_determinants += [list(v1.items())[0]]
             else:
                 self.spin_determinants += [(k, v)]
-
-    def check_monotonic(self):
-        """Check if energy of orbitals increases monotonically."""
-        section_body = self.orca_section("ORBITAL ENERGIES")[3:]
-        energy = None
-        for line in section_body:
-            split_line = line.split()
-            if line.isspace():
-                break
-            elif len(split_line) == 4:
-                if energy and Decimal(split_line[2]) < energy:
-                    print(line, energy)
-                energy = Decimal(split_line[2])
+        self.spin_determinants = sorted(self.spin_determinants, key=lambda x: abs(x[1] + self.tolerance), reverse=True)
+        self.spin_determinants = list(filter(lambda x: abs(x[1]) > self.tolerance, self.spin_determinants))
 
     @staticmethod
     def get_promotion_rules(spin_det_1, spin_det_2):
