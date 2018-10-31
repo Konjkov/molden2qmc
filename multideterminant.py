@@ -209,7 +209,7 @@ class Orca:
         with open(self.orca_input_path, "r") as orca_input:
             line = orca_input.readline()
             key = None
-            while line and not line.startswith('  Spin-Determinant CI Printing'):
+            while line and not (line.startswith('  Spin-Determinant CI Printing') or line.startswith('  Extended CI Printing')):
                 line = orca_input.readline()
                 if line.startswith('   Internal'):
                     self.internal = int(line.split()[5])
@@ -341,9 +341,6 @@ def main():
     parser.add_argument('--excitation', type=int, default=0, nargs='?', help="max excitaion orbital number")
     parser.add_argument('--amplitude', type=float, default=0, nargs='?', help="min amplitude weight")
     args = parser.parse_args()
-
-    if args.code == 0:
-        Default(args.input_file).correlation()
 
     if args.code == 3:
         Orca(args.input_file).correlation()
