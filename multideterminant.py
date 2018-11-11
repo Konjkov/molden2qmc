@@ -191,9 +191,6 @@ class Orca:
 
         * xyzfile 0 2 ../../mol.xyz
 
-        Keep your attention on not using symmetry because of this issue
-        https://orcaforum.cec.mpg.de/viewtopic.php?f=11&t=3254
-
         :return: list of spin-determinants, number of internal orbitals
         """
 
@@ -295,8 +292,17 @@ class Orca:
 
     @property
     def ground_state(self):
-        """Lowest occupation spin-determinant"""
-        return self.spin_determinants[0][0]
+        """Lowest occupation spin-determinant."""
+        count_2 = self.spin_determinants[0][0].count('2')
+        count_u = self.spin_determinants[0][0].count('u')
+        count_d = self.spin_determinants[0][0].count('d')
+        count_0 = self.spin_determinants[0][0].count('0')
+        return (
+            '2' * (count_2 + min(count_u, count_d)) +
+            'u' * (count_u - count_d) +
+            'd' * (count_d - count_u) +
+            '0' * (count_0 + min(count_u, count_d))
+        )
 
     def correlation(self):
         """
