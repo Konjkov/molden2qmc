@@ -23,6 +23,34 @@ class QChemSectionNotFound(SectionNotFound):
 class ORCASectionNotFound(SectionNotFound):
     """Section not found in ORCA Output file."""
 
+class PSI4:
+    """
+    Psi4
+    """
+    title = "generated from Psi4 output data."
+
+    def __init__(self, output_file):
+        """Initialise multi-determinant support."""
+        self.output_file = output_file
+        self.occupied = {'alpha': 0, 'beta': 0}
+        self.active = {'alpha': 0, 'beta': 0}
+        self.determinants = []
+
+    def correlation(self):
+        """
+        :returns: MDET section of correlation.data file
+        """
+        with open('correlation.data', 'w') as output_file:
+            print('START MDET', file=output_file)
+            print('Title', file=output_file)
+            print(' multideterminant WFN %s\n' % self.title, file=output_file)
+
+            print('MD', file=output_file)
+            print('  %i' % (len(self.determinants) + 1), file=output_file)
+            # first determinant
+            print(' %9.6f    1    0' % 1.0, file=output_file)
+            print('END MDET', file=output_file)
+
 
 class QChem:
     """
@@ -214,7 +242,7 @@ class Orca:
                     self.active = int(line.split()[5])
             if not line:
                 "Single determinant output"
-                self.spin_determinants = [(1, 1.0)]
+                self.spin_determinants = [('', 1.0)]
                 return
             line = orca_input.readline()
             while line and not line.startswith('DENSITY MATRIX'):
@@ -347,6 +375,9 @@ def main():
     parser.add_argument('--excitation', type=int, default=0, nargs='?', help="max excitaion orbital number")
     parser.add_argument('--amplitude', type=float, default=0, nargs='?', help="min amplitude weight")
     args = parser.parse_args()
+
+    if args.code == 1:
+        PSI4(args.input_file).correlation()
 
     if args.code == 3:
         Orca(args.input_file).correlation()
