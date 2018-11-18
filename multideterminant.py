@@ -23,18 +23,130 @@ class QChemSectionNotFound(SectionNotFound):
 class ORCASectionNotFound(SectionNotFound):
     """Section not found in ORCA Output file."""
 
-class PSI4:
+class Default:
+
+    def __init__(self, *args, **kwargs):
+        "Single determinant"
+        self.determinants = [('', 1.0)]
+
+    @staticmethod
+    def get_promotion_rules(spin_det_1, spin_det_2):
+        """Creates promotions rules for two spin-determinants
+
+        for '2u00' ->, '0u20'
+        promotion rules is
+            [(1, 1, 3), (2, 1, 3)]
+        for rule (1, 1, 3)
+            first is spin (1=up/2=down)
+            second is number of orbital in active space electron promote from
+            third is of orbital in active space electron promote to
+        orbital numeration starting from 1.
+        """
+        # divide spin-determinants into spin parts
+        spin_det_1_up = [e in ('2', 'u') for e in spin_det_1]
+        spin_det_1_down = [e in ('2', 'd') for e in spin_det_1]
+
+        spin_det_2_up = [e in ('2', 'u') for e in spin_det_2]
+        spin_det_2_down = [e in ('2', 'd') for e in spin_det_2]
+
+        # get difference between initial and final spin-det
+        spin_det_up = [x - y for x, y in zip(spin_det_1_up, spin_det_2_up)]
+        spin_det_down = [x - y for x, y in zip(spin_det_1_down, spin_det_2_down)]
+
+        # get indexes of releasing and filling orbitals
+        spin_det_1_up_indexes = [i+1 for i, x in enumerate(spin_det_up) if x == 1]
+        spin_det_2_up_indexes = [i+1 for i, x in enumerate(spin_det_up) if x == -1]
+
+        spin_det_1_down_indexes = [i+1 for i, x in enumerate(spin_det_down) if x == 1]
+        spin_det_2_down_indexes = [i+1 for i, x in enumerate(spin_det_down) if x == -1]
+
+        return (
+            [(1, fr, to) for fr, to in zip(spin_det_1_up_indexes, spin_det_2_up_indexes)] +
+            [(2, fr, to) for fr, to in zip(spin_det_1_down_indexes, spin_det_2_down_indexes)]
+        )
+
+    @property
+    def ground_state(self):
+        """Lowest occupation spin-determinant."""
+        count_2 = self.determinants[0][0].count('2')
+        count_u = self.determinants[0][0].count('u')
+        count_d = self.determinants[0][0].count('d')
+        count_0 = self.determinants[0][0].count('0')
+        return (
+            '2' * (count_2 + min(count_u, count_d)) +
+            'u' * (count_u - count_d) +
+            'd' * (count_d - count_u) +
+            '0' * (count_0 + min(count_u, count_d))
+        )
+
+
+class PSI4(Default):
     """
     Psi4
     """
     title = "generated from Psi4 output data."
 
-    def __init__(self, output_file):
+    def __init__(self, input_path):
         """Initialise multi-determinant support."""
-        self.output_file = output_file
+        super().__init__(input_path)
         self.occupied = {'alpha': 0, 'beta': 0}
         self.active = {'alpha': 0, 'beta': 0}
-        self.determinants = []
+        self.input_path = input_path
+        self.parse_output()
+
+    def parse_output(self):
+        """Retrive from Psi4 output:
+
+           The 20 most important determinants:
+
+            *   1    0.967659  (    0,    0)  2AX 3AA
+            *   2    0.101346  (    2,    2)  3AA 4AX
+            *   3    0.101346  (    4,    3)  3AA 5AX
+            *   4    0.076684  (    4,    5)  3AA 5AA 7AB
+            *   5    0.076684  (    2,    6)  3AA 4AA 8AB
+            *   6    0.076581  (   11,    3)  3AA 5AB 7AA
+            *   7    0.076581  (   16,    2)  3AA 4AB 8AA
+            *   8   -0.071317  (   21,    1)  2AA 3AB 9AA
+            *   9    0.058707  (   11,    5)  3AA 7AX
+            *  10    0.058707  (   16,    6)  3AA 8AX
+            *  11    0.041218  (    6,    7)  2AA 6AA 9AB
+            *  12   -0.038805  (   22,    0)  2AB 3AA 9AA
+            *  13   -0.034382  (    7,    1)  3AX 6AA
+            *  14   -0.032511  (    0,    7)  2AA 3AA 9AB
+            *  15    0.030375  (   22,    7)  3AA 9AX
+            *  16    0.024633  (   21,    4)  2AA 6AB 9AA
+            *  17    0.017823  (    7,    4)  3AA 6AX
+            *  18   -0.016585  (   25,    0)  2AB 6AA 9AA
+            *  19   -0.005510  (   25,    7)  6AA 9AX
+            *  20    0.002691  (    6,    0)  2AX 6AA
+
+        :return: list of spin-determinants, number of internal orbitals
+        """
+        with open(self.input_path, "r") as psi4_input:
+            line = psi4_input.readline()
+            key = None
+            while line and not line.startswith('   The '):
+                line = psi4_input.readline()
+                if line.startswith('         Frozen DOCC'):
+                    docc = int(line.split()[3])
+                if line.startswith('              Active'):
+                    active = int(line.split()[2])
+            if not line:
+                return
+            while line:
+                line = psi4_input.readline()
+                if line.startswith('    *'):
+                    line = line.replace('(', '').replace(')', '').replace(',', '')
+                    weight = Decimal(line.split()[2])
+                    determinant_tmpl = ['2'] * docc + ['0'] * active
+                    for orb in line.split()[5:]:
+                        if orb[-2:] == 'AX':
+                            determinant_tmpl[int(orb[:-2])-1] = '2'
+                        elif orb[-2:] == 'AA':
+                            determinant_tmpl[int(orb[:-2])-1] = 'u'
+                        elif orb[-2:] == 'AB':
+                            determinant_tmpl[int(orb[:-2])-1] = 'd'
+                    self.determinants.append((''.join(determinant_tmpl), weight))
 
     def correlation(self):
         """
@@ -46,21 +158,28 @@ class PSI4:
             print(' multideterminant WFN %s\n' % self.title, file=output_file)
 
             print('MD', file=output_file)
-            print('  %i' % (len(self.determinants) + 1), file=output_file)
+            print('  %i' % (len(self.determinants)), file=output_file)
+            opt_group_number = 0
+            prev_weight = None
+            for i, (_, weight) in enumerate(self.determinants):
+                if prev_weight != weight:
+                    opt_group_number += 1
+                print(' %9.6f  %i %i' % (weight, opt_group_number, int(i > 0)), file=output_file)
+                prev_weight = weight
             # first determinant
-            print(' %9.6f    1    0' % 1.0, file=output_file)
             print('END MDET', file=output_file)
 
 
-class QChem:
+class QChem(Default):
     """
     QChem 4.4
     """
     title = "generated from QChem output data."
 
-    def __init__(self, output_file, excitation=0, amplitude=0):
+    def __init__(self, output_path, excitation=0, amplitude=0):
         """Initialise multi-determinant support."""
-        self.output_file = output_file
+        super().__init__(output_path, excitation=0, amplitude=0)
+        self.output_path = output_path
         self.occupied = {'alpha': 0, 'beta': 0}
         self.active = {'alpha': 0, 'beta': 0}
         self.determinants = []
@@ -89,7 +208,7 @@ class QChem:
             '(?P<second_to_spin>[AB])'
         )
         spin_map = {'A': 1, 'B': 2}
-        with open(self.output_file, "r") as qchem_output:
+        with open(self.output_path, "r") as qchem_output:
             line = qchem_output.readline()
             while line and not line.startswith('       Value      i             j           ->   a             b'):
                 m = re.search(electron_regexp, line)
@@ -98,7 +217,7 @@ class QChem:
                     self.occupied['beta'] = int(m.group('beta'))
                 line = qchem_output.readline()
             if not line:
-                "Single determinant"
+                # single determinant output
                 return
             line = qchem_output.readline()
             virtual_map = {'A': self.occupied['alpha'], 'B': self.occupied['beta']}
@@ -159,26 +278,26 @@ class QChem:
             print('END MDET', file=output_file)
 
 
-class Orca:
+class Orca(Default):
     """
     ORCA 4.X
     """
     title = "generated from Orca output data"
 
-    def __init__(self, orca_input_path):
+    def __init__(self, input_path):
         """Initialise multi-determinant support."""
+        super().__init__(input_path)
         self.tolerance = Decimal('0.000001')
         self.internal = 0  # CASSCF internal orbitals
         self.active = 0  # CASSCF active orbitals
-        self.spin_determinants = []  # CASSCF spin-determinants
-        self.orca_input_path = orca_input_path
+        self.input_path = input_path
         self.parse_output()
 
     def orca_section(self, section_name):
         """
         :returns: content of named section
         """
-        with open(self.orca_input_path, "r") as orca_input:
+        with open(self.input_path, "r") as orca_input:
             orca_input.seek(0)
             line = orca_input.readline()
             while line and not line.startswith(section_name):
@@ -231,7 +350,7 @@ class Orca:
             """
             return reduce(lambda x, y: x * 3 + int(y), ternary, 0)
 
-        with open(self.orca_input_path, "r") as orca_input:
+        with open(self.input_path, "r") as orca_input:
             line = orca_input.readline()
             key = None
             while line and not (line.startswith('  Spin-Determinant CI Printing') or line.startswith('  Extended CI Printing')):
@@ -241,8 +360,6 @@ class Orca:
                 if line.startswith('   Active'):
                     self.active = int(line.split()[5])
             if not line:
-                "Single determinant output"
-                self.spin_determinants = [('', 1.0)]
                 return
             line = orca_input.readline()
             while line and not line.startswith('DENSITY MATRIX'):
@@ -254,7 +371,7 @@ class Orca:
                     determinants[key].append({det[1:-1]: round(Decimal(val), 6)})
                 line = orca_input.readline()
 
-        with open(self.orca_input_path, "r") as orca_input:
+        with open(self.input_path, "r") as orca_input:
             line = orca_input.readline()
             key = None
             while line and not line.startswith('  Extended CI Printing'):
@@ -271,66 +388,16 @@ class Orca:
                     key = None
                 line = orca_input.readline()
 
-        self.spin_determinants = []
+        self.determinants = []
         # Sort spin-determinants by increasing occupation levels
         for k, v in sorted(determinants.items(), key=lambda x: ternary2decimal(x[0][::-1])):
             if isinstance(v, list):
                 for v1 in v:
-                    self.spin_determinants += [list(v1.items())[0]]
+                    self.determinants += [list(v1.items())[0]]
             else:
-                self.spin_determinants += [(k, v)]
-        self.spin_determinants = sorted(self.spin_determinants, key=lambda x: abs(x[1] + self.tolerance), reverse=True)
-        self.spin_determinants = list(filter(lambda x: abs(x[1]) > self.tolerance, self.spin_determinants))
-
-    @staticmethod
-    def get_promotion_rules(spin_det_1, spin_det_2):
-        """Creates promotions rules for two spin-determinants
-
-        for '2u00' ->, '0u20'
-        promotion rules is
-            [(1, 1, 3), (2, 1, 3)]
-        for rule (1, 1, 3)
-            first is spin (1=up/2=down)
-            second is number of orbital in active space electron promote from
-            third is of orbital in active space electron promote to
-        orbital numeration starting from 1.
-        """
-        # divide spin-determinants into spin parts
-        spin_det_1_up = [e in ('2', 'u') for e in spin_det_1]
-        spin_det_1_down = [e in ('2', 'd') for e in spin_det_1]
-
-        spin_det_2_up = [e in ('2', 'u') for e in spin_det_2]
-        spin_det_2_down = [e in ('2', 'd') for e in spin_det_2]
-
-        # get difference between initial and final spin-det
-        spin_det_up = [x - y for x, y in zip(spin_det_1_up, spin_det_2_up)]
-        spin_det_down = [x - y for x, y in zip(spin_det_1_down, spin_det_2_down)]
-
-        # get indexes of releasing and filling orbitals
-        spin_det_1_up_indexes = [i+1 for i, x in enumerate(spin_det_up) if x == 1]
-        spin_det_2_up_indexes = [i+1 for i, x in enumerate(spin_det_up) if x == -1]
-
-        spin_det_1_down_indexes = [i+1 for i, x in enumerate(spin_det_down) if x == 1]
-        spin_det_2_down_indexes = [i+1 for i, x in enumerate(spin_det_down) if x == -1]
-
-        return (
-            [(1, fr, to) for fr, to in zip(spin_det_1_up_indexes, spin_det_2_up_indexes)] +
-            [(2, fr, to) for fr, to in zip(spin_det_1_down_indexes, spin_det_2_down_indexes)]
-        )
-
-    @property
-    def ground_state(self):
-        """Lowest occupation spin-determinant."""
-        count_2 = self.spin_determinants[0][0].count('2')
-        count_u = self.spin_determinants[0][0].count('u')
-        count_d = self.spin_determinants[0][0].count('d')
-        count_0 = self.spin_determinants[0][0].count('0')
-        return (
-            '2' * (count_2 + min(count_u, count_d)) +
-            'u' * (count_u - count_d) +
-            'd' * (count_d - count_u) +
-            '0' * (count_0 + min(count_u, count_d))
-        )
+                self.determinants += [(k, v)]
+        self.determinants = sorted(self.determinants, key=lambda x: abs(x[1] + self.tolerance), reverse=True)
+        self.determinants = list(filter(lambda x: abs(x[1]) > self.tolerance, self.determinants))
 
     def correlation(self):
         """
@@ -342,16 +409,16 @@ class Orca:
             print(' multideterminant WFN %s\n' % self.title, file=output_file)
 
             print('MD', file=output_file)
-            print('  %i' % len(self.spin_determinants), file=output_file)
+            print('  %i' % len(self.determinants), file=output_file)
             opt_group_number = 0
             prev_weight = None
-            for i, (_, weight) in enumerate(self.spin_determinants):
+            for i, (_, weight) in enumerate(self.determinants):
                 if prev_weight != weight:
                     opt_group_number += 1
                 print(' %9.6f  %i %i' % (weight, opt_group_number, int(i > 0)), file=output_file)
                 prev_weight = weight
 
-            for i, (spin_det, _) in enumerate(self.spin_determinants):
+            for i, (spin_det, _) in enumerate(self.determinants):
                 if self.ground_state != spin_det:
                     for s, f, t in self.get_promotion_rules(self.ground_state, spin_det):
                         print('  DET %i %i PR %i 1 %i 1' % (i+1, s, f + self.internal, t + self.internal), file=output_file)
