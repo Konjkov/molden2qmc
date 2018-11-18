@@ -133,6 +133,7 @@ class PSI4(Default):
                     active = int(line.split()[2])
             if not line:
                 return
+            self.determinants = []
             while line:
                 line = psi4_input.readline()
                 if line.startswith('    *'):
@@ -166,7 +167,10 @@ class PSI4(Default):
                     opt_group_number += 1
                 print(' %9.6f  %i %i' % (weight, opt_group_number, int(i > 0)), file=output_file)
                 prev_weight = weight
-            # first determinant
+            for i, (spin_det, _) in enumerate(self.determinants):
+                if self.ground_state != spin_det:
+                    for s, f, t in self.get_promotion_rules(self.ground_state, spin_det):
+                        print('  DET %i %i PR %i 1 %i 1' % (i+1, s, f, t), file=output_file)
             print('END MDET', file=output_file)
 
 
