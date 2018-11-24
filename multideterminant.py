@@ -280,10 +280,25 @@ class Orca(Default):
 
         self.determinants = []
         for v in determinants.values():
-            for v1 in v:
-                self.determinants += [self.set_determinant_parity(v1)]
+            for det in v:
+                det = self.set_promotion_parity(det)
+                det = self.set_determinant_parity(det)
+                self.determinants += [det]
         self.determinants = sorted(self.determinants, key=lambda x: abs(x[1] + self.tolerance), reverse=True)
         self.determinants = list(filter(lambda x: abs(x[1]) > self.tolerance, self.determinants))
+
+    def parity_shell(self, values):
+        """Determine parity of list of integers.
+        from http://www.dalkescientific.com/writings/diary/archive/2016/08/14/fragment_chiral_molecules.html
+        """
+        N = len(values)
+        num_swaps = 0
+        for i in range(N - 1):
+            for j in range(i + 1, N):
+                if values[i] > values[j]:
+                    values[i], values[j] = values[j], values[i]
+                    num_swaps += 1
+        return num_swaps % 2
 
     def set_determinant_parity(self, det):
         """parity of determinant in CSF in ORCA
@@ -294,11 +309,42 @@ class Orca(Default):
         'ud00u000' -  1
         'uu00d000' - -1
         """
-        return det[0], det[1]
+        csf = []
+        count_u = 0
+        count_d = 0
+        for x in det[0]:
+            if x == 'u':
+                csf.append(count_u * 2)
+                count_u += 1
+            elif x == 'd':
+                csf.append(count_d * 2 + 1)
+                count_d += 1
+            elif x == '2':
+                csf.append(count_u * 2)
+                count_u += 1
+                csf.append(count_d * 2 + 1)
+                count_d += 1
+        parity = self.parity_shell(csf)
+        return det[0], (-1)**parity*det[1]
 
     def set_promotion_parity(self, det):
         """parity of promotion rule in CASINO"""
-        return det[0], det[1]
+        count_2 = det[0].count('2')
+        count_u = det[0].count('u')
+        count_d = det[0].count('d')
+        count_0 = det[0].count('0')
+        up_det = list(range(count_2 + count_u)) + (count_0 + count_d) * [None]
+        down_det = list(range(count_2 + count_d)) + (count_0 + count_u) * [None]
+        rules = self.get_promotion_rules(self.ground_state(det[0]), det[0])
+        for s, f, t in rules:
+            if s == 1:
+                up_det[t-1], up_det[f-1] = up_det[f-1], None
+            elif s == 2:
+                down_det[t-1], down_det[f-1] = down_det[f-1], None
+        up_det = [x for x in up_det if x is not None]
+        down_det = [x for x in down_det if x is not None]
+        parity = self.parity_shell(up_det) + self.parity_shell(down_det)
+        return det[0], (-1)**parity*det[1]
 
     def correlation(self):
         """
@@ -314,7 +360,6 @@ class Orca(Default):
             opt_group_number = 0
             prev_weight = None
             for i, det in enumerate(self.determinants):
-                det = self.set_promotion_parity(det)
                 if prev_weight != det[1]:
                     opt_group_number += 1
                 print(' %9.6f  %i %i' % (det[1], opt_group_number, int(i > 0)), file=output_file)
