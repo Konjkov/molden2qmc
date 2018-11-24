@@ -65,13 +65,12 @@ class Default:
             [(2, fr, to) for fr, to in zip(spin_det_1_down_indexes, spin_det_2_down_indexes)]
         )
 
-    @property
-    def ground_state(self):
+    def ground_state(self, det):
         """Lowest occupation spin-determinant."""
-        count_2 = self.determinants[0][0].count('2')
-        count_u = self.determinants[0][0].count('u')
-        count_d = self.determinants[0][0].count('d')
-        count_0 = self.determinants[0][0].count('0')
+        count_2 = det.count('2')
+        count_u = det.count('u')
+        count_d = det.count('d')
+        count_0 = det.count('0')
         return (
             '2' * (count_2 + min(count_u, count_d)) +
             'u' * (count_u - count_d) +
@@ -168,8 +167,8 @@ class PSI4(Default):
                 print(' %9.6f  %i %i' % (weight, opt_group_number, int(i > 0)), file=output_file)
                 prev_weight = weight
             for i, (spin_det, _) in enumerate(self.determinants):
-                if self.ground_state != spin_det:
-                    for s, f, t in self.get_promotion_rules(self.ground_state, spin_det):
+                if self.ground_state(spin_det) != spin_det:
+                    for s, f, t in self.get_promotion_rules(self.ground_state(spin_det), spin_det):
                         print('  DET %i %i PR %i 1 %i 1' % (i+1, s, f, t), file=output_file)
             print('END MDET', file=output_file)
 
@@ -239,13 +238,6 @@ class Orca(Default):
 
         determinants = {}
 
-        def ternary2decimal(ternary):
-            """Convert ternary string to decimal.
-            '001122' = 1 * 2 + 3 * 2 + 9 * 1 + 27 * 1 = 44
-            '21102' -> 200
-            """
-            return reduce(lambda x, y: x * 3 + int(y), ternary, 0)
-
         with open(self.input_path, "r") as orca_input:
             line = orca_input.readline()
             key = None
@@ -280,18 +272,14 @@ class Orca(Default):
                     if determinants.get(line.split()[1]) == []:
                         key = line.split()[1]
                 elif key and line.startswith(' \tCSF['):
-                    determinants[key] = round(Decimal(line.split()[1]), 6)
+                    determinants[key] = [{key: round(Decimal(line.split()[1]), 6)}]
                     key = None
                 line = orca_input.readline()
 
         self.determinants = []
-        # Sort spin-determinants by increasing occupation levels
-        for k, v in sorted(determinants.items(), key=lambda x: ternary2decimal(x[0][::-1])):
-            if isinstance(v, list):
-                for v1 in v:
-                    self.determinants += [list(v1.items())[0]]
-            else:
-                self.determinants += [(k, v)]
+        for k, v in determinants.items():
+            for num, v1 in enumerate(v):
+                self.determinants += [list(v1.items())[0]]
         self.determinants = sorted(self.determinants, key=lambda x: abs(x[1] + self.tolerance), reverse=True)
         self.determinants = list(filter(lambda x: abs(x[1]) > self.tolerance, self.determinants))
 
@@ -315,9 +303,8 @@ class Orca(Default):
                 prev_weight = weight
 
             for i, (spin_det, _) in enumerate(self.determinants):
-                if self.ground_state != spin_det:
-                    for s, f, t in self.get_promotion_rules(self.ground_state, spin_det):
-                        print('  DET %i %i PR %i 1 %i 1' % (i+1, s, f + self.internal, t + self.internal), file=output_file)
+                for s, f, t in self.get_promotion_rules(self.ground_state(spin_det), spin_det):
+                    print('  DET %i %i PR %i 1 %i 1' % (i+1, s, f + self.internal, t + self.internal), file=output_file)
             print('END MDET', file=output_file)
 
 
