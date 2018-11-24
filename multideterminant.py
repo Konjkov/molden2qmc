@@ -256,7 +256,7 @@ class Orca(Default):
                     determinants[key] = []
                 elif line.startswith('   ['):
                     det, val = line.split()
-                    determinants[key].append({det[1:-1]: round(Decimal(val), 6)})
+                    determinants[key].append((det[1:-1], round(Decimal(val), 6)))
                 line = orca_input.readline()
 
         with open(self.input_path, "r") as orca_input:
@@ -269,19 +269,36 @@ class Orca(Default):
             line = orca_input.readline()
             while line and not line.startswith('DENSITY MATRIX'):
                 if line.startswith(' CFG['):
-                    if determinants.get(line.split()[1]) == []:
-                        key = line.split()[1]
+                    _, val, _, _ = line.split()
+                    if determinants.get(val) == []:
+                        key = val
                 elif key and line.startswith(' \tCSF['):
-                    determinants[key] = [{key: round(Decimal(line.split()[1]), 6)}]
+                    _, val = line.split()
+                    determinants[key] = [(key, round(Decimal(val), 6))]
                     key = None
                 line = orca_input.readline()
 
         self.determinants = []
-        for k, v in determinants.items():
-            for num, v1 in enumerate(v):
-                self.determinants += [list(v1.items())[0]]
+        for v in determinants.values():
+            for v1 in v:
+                self.determinants += [self.set_determinant_parity(v1)]
         self.determinants = sorted(self.determinants, key=lambda x: abs(x[1] + self.tolerance), reverse=True)
         self.determinants = list(filter(lambda x: abs(x[1]) > self.tolerance, self.determinants))
+
+    def set_determinant_parity(self, det):
+        """parity of determinant in CSF in ORCA
+        '2u000000' -  1
+        '0u200000' - -1
+        '0u020000' - -1
+        'du00u000' - -1
+        'ud00u000' -  1
+        'uu00d000' - -1
+        """
+        return det[0], det[1]
+
+    def set_promotion_parity(self, det):
+        """parity of promotion rule in CASINO"""
+        return det[0], det[1]
 
     def correlation(self):
         """
@@ -296,14 +313,15 @@ class Orca(Default):
             print('  %i' % len(self.determinants), file=output_file)
             opt_group_number = 0
             prev_weight = None
-            for i, (_, weight) in enumerate(self.determinants):
-                if prev_weight != weight:
+            for i, det in enumerate(self.determinants):
+                det = self.set_promotion_parity(det)
+                if prev_weight != det[1]:
                     opt_group_number += 1
-                print(' %9.6f  %i %i' % (weight, opt_group_number, int(i > 0)), file=output_file)
-                prev_weight = weight
+                print(' %9.6f  %i %i' % (det[1], opt_group_number, int(i > 0)), file=output_file)
+                prev_weight = det[1]
 
-            for i, (spin_det, _) in enumerate(self.determinants):
-                for s, f, t in self.get_promotion_rules(self.ground_state(spin_det), spin_det):
+            for i, det in enumerate(self.determinants):
+                for s, f, t in self.get_promotion_rules(self.ground_state(det[0]), det[0]):
                     print('  DET %i %i PR %i 1 %i 1' % (i+1, s, f + self.internal, t + self.internal), file=output_file)
             print('END MDET', file=output_file)
 
