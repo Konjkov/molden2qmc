@@ -249,7 +249,6 @@ class Molden:
                 self.D_orb_conversion_required = False
                 self.F_orb_conversion_required = True
             if line.startswith("[7F]"):
-                self.D_orb_conversion_required = True
                 self.F_orb_conversion_required = False
             if line.startswith("[9G]"):
                 self.G_orb_conversion_required = False
@@ -639,12 +638,12 @@ ORBITAL COEFFICIENTS
     def orbital_coefficients(self):
         """
         :returns: ORBITAL COEFFICIENTS section of gwfn.data file,
-        sorted by ('SPIN', 'ENERGY')
+        sorted by 'SPIN'
         """
         result = ''
         # (Number of basis functions) ** 2 coefficients
         num = 0
-        for orbital in sorted(self.mo_matrix, key=itemgetter('SPIN', 'ENERGY')):
+        for orbital in sorted(self.mo_matrix, key=itemgetter('SPIN')):
             for ao in orbital['MO']:
                 for coefficient in ao['DATA']:
                     if num % 4 == 0 and num > 0:
