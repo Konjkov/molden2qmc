@@ -6,19 +6,17 @@ import os
 import sys
 from math import pi, sqrt, factorial, fabs
 from itertools import combinations
-from operator import itemgetter
+from operator import itemgetter, mul
 from functools import reduce
 
-__version__ = '4.0.1'
+__version__ = '4.0.2'
 
 
 def fact2(k):
     """
     Compute double factorial: k!! = 1*3*5*....k
-
-    inspired by https://gist.github.com/fmeyer/289467
     """
-    return reduce(float.__mul__, range(k, 0, -2), 1.0)
+    return reduce(mul, range(k, 0, -2), 1.0)
 
 
 def smart_float(x):
@@ -730,7 +728,6 @@ class DefaultConverter(GWFN):
     def d_to_spherical(self, cartesian):
         """
         Convert cartesian representation of d-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of D functions is expected:
             5D: D 0, D+1, D-1, D+2, D-2
             6D: xx, yy, zz, xy, xz, yz
@@ -751,7 +748,6 @@ class DefaultConverter(GWFN):
     def f_to_spherical(self, cartesian):
         """
         Convert cartesian representation of f-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of F functions is expected:
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
@@ -778,7 +774,6 @@ class DefaultConverter(GWFN):
     def g_to_spherical(self, cartesian):
         """
         Convert cartesian representation of g-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of G functions is expected:
             9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
             15G: xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
@@ -892,7 +887,6 @@ class Turbomole(DefaultConverter):
     def d_to_spherical(self, cartesian):
         """
         Convert cartesian representation of d-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of D functions is expected:
             5D: D 0, D+1, D-1, D+2, D-2
             6D: xx, yy, zz, xy, xz, yz
@@ -903,7 +897,6 @@ class Turbomole(DefaultConverter):
     def f_to_spherical(self, cartesian):
         """
         Convert cartesian representation of f-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of F functions is expected:
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
@@ -914,7 +907,6 @@ class Turbomole(DefaultConverter):
     def g_to_spherical(self, cartesian):
         """
         Convert cartesian representation of g-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of G functions is expected:
             9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
             15G: xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
@@ -944,7 +936,6 @@ class CFour(DefaultConverter):
     def d_to_spherical(self, cartesian):
         """
         Convert cartesian representation of d-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of D functions is expected:
             5D: D 0, D+1, D-1, D+2, D-2
             6D: xx, yy, zz, xy, xz, yz
@@ -955,7 +946,6 @@ class CFour(DefaultConverter):
     def f_to_spherical(self, cartesian):
         """
         Convert cartesian representation of f-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of F functions is expected:
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
@@ -966,7 +956,6 @@ class CFour(DefaultConverter):
     def g_to_spherical(self, cartesian):
         """
         Convert cartesian representation of g-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of G functions is expected:
             9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
             15G: xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
@@ -1071,7 +1060,6 @@ class Molpro(DefaultConverter):
     def d_to_spherical(self, cartesian):
         """
         Convert cartesian representation of d-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of D functions is expected:
             5D: D 0, D+1, D-1, D+2, D-2
             6D: xx, yy, zz, xy, xz, yz
@@ -1082,7 +1070,6 @@ class Molpro(DefaultConverter):
     def f_to_spherical(self, cartesian):
         """
         Convert cartesian representation of f-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of F functions is expected:
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
@@ -1093,7 +1080,6 @@ class Molpro(DefaultConverter):
     def g_to_spherical(self, cartesian):
         """
         Convert cartesian representation of g-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of G functions is expected:
             9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
             15G: xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
@@ -1114,7 +1100,6 @@ class NwChem(DefaultConverter):
     def d_to_spherical(self, cartesian):
         """
         Convert cartesian representation of d-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of D functions is expected:
             5D: D 0, D+1, D-1, D+2, D-2
             6D: xx, yy, zz, xy, xz, yz
@@ -1125,7 +1110,6 @@ class NwChem(DefaultConverter):
     def f_to_spherical(self, cartesian):
         """
         Convert cartesian representation of f-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of F functions is expected:
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
@@ -1136,7 +1120,6 @@ class NwChem(DefaultConverter):
     def g_to_spherical(self, cartesian):
         """
         Convert cartesian representation of g-orbital to spherical
-        http://theochem.github.io/horton/tut_gaussian_basis.html
         The following order of G functions is expected:
             9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
             15G: xxxx yyyy zzzz xxxy xxxz yyyx yyyz zzzx zzzy,
