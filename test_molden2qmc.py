@@ -1,8 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 __author__ = 'Vladimir Konjkov'
-__version__ = '2.6.0'
+__version__ = '4.0.3'
 
 import unittest
 import filecmp

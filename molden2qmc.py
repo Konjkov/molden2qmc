@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import argparse
 import os
@@ -9,7 +8,7 @@ from itertools import combinations
 from operator import itemgetter, mul
 from functools import reduce
 
-__version__ = '4.0.2'
+__version__ = '4.0.3'
 
 
 def fact2(k):
@@ -29,13 +28,6 @@ def smart_float(x):
     ' 123d+45'
     """
     return float(x.replace('D', 'E').replace('d', 'e'))  # for MOLPRO only
-
-
-def list_mul(list_a, list_b):
-    """
-    element-wise multiplication of two lists
-    """
-    return [a*b for a, b in zip(list_a, list_b)]
 
 
 class SectionNotFound(Exception):
@@ -892,7 +884,7 @@ class Turbomole(DefaultConverter):
             6D: xx, yy, zz, xy, xz, yz
         """
         norm = [2.0/sqrt(3)] * 3 + [1.0] * 3
-        return super(Turbomole, self).d_to_spherical(list_mul(norm, cartesian))
+        return super(Turbomole, self).d_to_spherical(map(mul, norm, cartesian))
 
     def f_to_spherical(self, cartesian):
         """
@@ -902,7 +894,7 @@ class Turbomole(DefaultConverter):
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
         """
         norm = [6.0/sqrt(15)] * 3 + [2.0/sqrt(3)] * 6 + [1.0]
-        return super(Turbomole, self).f_to_spherical(list_mul(norm, cartesian))
+        return super(Turbomole, self).f_to_spherical(map(mul, norm, cartesian))
 
     def g_to_spherical(self, cartesian):
         """
@@ -913,7 +905,7 @@ class Turbomole(DefaultConverter):
                  xxyy xxzz yyzz xxyz yyxz zzxy
         """
         norm = [24.0/sqrt(105)] * 3 + [6.0/sqrt(15)] * 6 + [4.0/3.0] * 3 + [2.0/sqrt(3)] * 3
-        return super(Turbomole, self).g_to_spherical(list_mul(norm, cartesian))
+        return super(Turbomole, self).g_to_spherical(map(mul, norm, cartesian))
 
 
 class CFour(DefaultConverter):
@@ -941,7 +933,7 @@ class CFour(DefaultConverter):
             6D: xx, yy, zz, xy, xz, yz
         """
         norm = [2.0/sqrt(3)] * 3 + [1.0/sqrt(3)] * 3
-        return super(CFour, self).d_to_spherical(list_mul(norm, cartesian))
+        return super(CFour, self).d_to_spherical(map(mul, norm, cartesian))
 
     def f_to_spherical(self, cartesian):
         """
@@ -951,7 +943,7 @@ class CFour(DefaultConverter):
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
         """
         norm = [6.0/sqrt(15)] * 3 + [2.0/sqrt(15)] * 6 + [1.0/sqrt(15)]
-        return super(CFour, self).f_to_spherical(list_mul(norm, cartesian))
+        return super(CFour, self).f_to_spherical(map(mul, norm, cartesian))
 
     def g_to_spherical(self, cartesian):
         """
@@ -962,7 +954,7 @@ class CFour(DefaultConverter):
                  xxyy xxzz yyzz xxyz yyxz zzxy
         """
         norm = [24.0/sqrt(105)] * 3 + [6.0/sqrt(105)] * 6 + [4.0/sqrt(105)] * 3 + [2.0/sqrt(105)] * 3
-        return super(CFour, self).g_to_spherical(list_mul(norm, cartesian))
+        return super(CFour, self).g_to_spherical(map(mul, norm, cartesian))
 
 
 class Orca(DefaultConverter):
@@ -1065,7 +1057,7 @@ class Molpro(DefaultConverter):
             6D: xx, yy, zz, xy, xz, yz
         """
         norm = [2.0/sqrt(3)/sqrt(3)] * 3 + [1.0/sqrt(3)] * 3
-        return super(Molpro, self).d_to_spherical(list_mul(norm, cartesian))
+        return super(Molpro, self).d_to_spherical(map(mul, norm, cartesian))
 
     def f_to_spherical(self, cartesian):
         """
@@ -1075,7 +1067,7 @@ class Molpro(DefaultConverter):
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
         """
         norm = [6.0/sqrt(15)/sqrt(15)] * 3 + [2.0/sqrt(3)/sqrt(15)] * 6 + [1.0/sqrt(15)]
-        return super(Molpro, self).f_to_spherical(list_mul(norm, cartesian))
+        return super(Molpro, self).f_to_spherical(map(mul, norm, cartesian))
 
     def g_to_spherical(self, cartesian):
         """
@@ -1088,7 +1080,7 @@ class Molpro(DefaultConverter):
         norm = [24.0/sqrt(105)/sqrt(105)] * 3 + [6.0/sqrt(15)/sqrt(105)] * 6 +\
                [4.0/3.0/sqrt(105)] * 3 + [2.0/sqrt(3)/sqrt(105)] * 3
 
-        return super(Molpro, self).g_to_spherical(list_mul(norm, cartesian))
+        return super(Molpro, self).g_to_spherical(map(mul, norm, cartesian))
 
 
 class NwChem(DefaultConverter):
@@ -1105,7 +1097,7 @@ class NwChem(DefaultConverter):
             6D: xx, yy, zz, xy, xz, yz
         """
         norm = [2.0/sqrt(3)] * 3 + [1.0] * 3
-        return super(NwChem, self).d_to_spherical(list_mul(norm, cartesian))
+        return super(NwChem, self).d_to_spherical(map(mul, norm, cartesian))
 
     def f_to_spherical(self, cartesian):
         """
@@ -1115,7 +1107,7 @@ class NwChem(DefaultConverter):
             10F: xxx, yyy, zzz, xyy, xxy, xxz, xzz, yzz, yyz, xyz
         """
         norm = [6.0/sqrt(15)] * 3 + [2.0/sqrt(3)] * 6 + [1.0]
-        return super(NwChem, self).f_to_spherical(list_mul(norm, cartesian))
+        return super(NwChem, self).f_to_spherical(map(mul, norm, cartesian))
 
     def g_to_spherical(self, cartesian):
         """
@@ -1126,7 +1118,7 @@ class NwChem(DefaultConverter):
                  xxyy xxzz yyzz xxyz yyxz zzxy
         """
         norm = [24.0/sqrt(105)] * 3 + [6.0/sqrt(15)] * 6 + [4.0/3.0] * 3 + [2.0/sqrt(3)] * 3
-        return super(NwChem, self).g_to_spherical(list_mul(norm, cartesian))
+        return super(NwChem, self).g_to_spherical(map(mul, norm, cartesian))
 
 
 class QChem(DefaultConverter):
