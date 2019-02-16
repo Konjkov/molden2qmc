@@ -3,7 +3,7 @@
                                          
 
 
-              Northwest Computational Chemistry Package (NWChem) 6.6
+              Northwest Computational Chemistry Package (NWChem) 6.8
               ------------------------------------------------------
 
 
@@ -11,7 +11,7 @@
                        Pacific Northwest National Laboratory
                                 Richland, WA 99352
 
-                              Copyright (c) 1994-2015
+                              Copyright (c) 1994-2017
                        Pacific Northwest National Laboratory
                             Battelle Memorial Institute
 
@@ -36,15 +36,16 @@
            Job information
            ---------------
 
-    hostname        = vladimir-Aspire-E5-571G
+    hostname        = vladimir-Kubuntu-16
     program         = nwchem
-    date            = Sat Oct  3 15:23:34 2015
+    date            = Sat Feb 16 13:59:48 2019
 
-    compiled        = Сб._окт._03_14:57:08_2015
-    source          = /home/vladimir/bin/nwchem-6.6
-    nwchem branch   = 6.6
-    nwchem revision = N/A
-    ga revision     = N/A
+    compiled        = Wed_Aug_15_19:14:19_2018
+    source          = /home/edo/debichem-team/nwchem/nwchem-6.8.1
+    nwchem branch   = 6.8.1
+    nwchem revision = v6.8-133-ge032219
+    ga revision     = 5.6.5
+    use scalapack   = T
     input           = N4.nw
     prefix          = N4.
     data base       = ./N4.db
@@ -57,10 +58,10 @@
            Memory information
            ------------------
 
-    heap     =   30769596 doubles =    234.8 Mbytes
-    stack    =   30769601 doubles =    234.8 Mbytes
-    global   =   61539200 doubles =    469.5 Mbytes (distinct from heap & stack)
-    total    =  123078397 doubles =    939.0 Mbytes
+    heap     =   13107198 doubles =    100.0 Mbytes
+    stack    =   13107195 doubles =    100.0 Mbytes
+    global   =   26214400 doubles =    200.0 Mbytes (distinct from heap & stack)
+    total    =   52428793 doubles =    400.0 Mbytes
     verify   = yes
     hardfail = no 
 
@@ -210,7 +211,7 @@
 
 
   library name resolved from: environment
-  library file name is: </home/vladimir/bin/nwchem-6.6/src/basis/libraries/>
+  library file name is: </home/vladimir/bin/nwchem-6.8/src/basis/libraries/>
   
                       Basis "ao basis" -> "" (spherical)
                       -----
@@ -244,6 +245,12 @@
  ---------------- ------------------------------  ------  ---------------------
  N                          def2-SVP                 6       14   3s2p1d
 
+
+                              NWChem Property Module
+                              ----------------------
+
+
+                              test HF/def2-SVP energy
 
                                  NWChem SCF Module
                                  -----------------
@@ -292,7 +299,7 @@
  LUMO         =       0.130298
 
 
- Starting SCF solution at       0.3s
+ Starting SCF solution at       0.2s
 
 
 
@@ -307,7 +314,7 @@
 
  Integral file          = ./N4.aoints.0
  Record size in doubles =  65536        No. of integs per rec  =  43688
- Max. records in memory =     42        Max. records in file   = 773934
+ Max. records in memory =     42        Max. records in file   = 180111
  No. of bits per label  =      8        No. of bits per value  =     64
 
 
@@ -316,22 +323,22 @@
 
               iter       energy          gnorm     gmax       time
              ----- ------------------- --------- --------- --------
-                 1     -217.2308792996  1.27D+00  3.33D-01      0.7
-                 2     -217.3096702667  1.81D-01  5.15D-02      0.8
-                 3     -217.3140068903  4.23D-03  1.28D-03      1.1
-                 4     -217.3140081027  1.17D-05  2.99D-06      1.4
-                 5     -217.3140081027  4.14D-09  8.93D-10      1.8
+                 1     -217.2308792996  1.27D+00  3.33D-01      0.6
+                 2     -217.3096702667  1.81D-01  5.15D-02      0.7
+                 3     -217.3140068903  4.23D-03  1.28D-03      0.8
+                 4     -217.3140081027  1.17D-05  2.99D-06      0.9
+                 5     -217.3140081027  4.14D-09  8.93D-10      1.1
 
 
        Final RHF  results 
        ------------------ 
 
-         Total SCF energy =   -217.314008102666
-      One-electron energy =   -503.537362646151
-      Two-electron energy =    180.445406445598
+         Total SCF energy =   -217.314008102671
+      One-electron energy =   -503.537362646153
+      Two-electron energy =    180.445406445595
  Nuclear repulsion energy =    105.777948097886
 
-        Time for solution =      1.4s
+        Time for solution =      0.7s
 
 
              Final eigenvalues
@@ -603,8 +610,19 @@
 
  Parallel integral file used      28 records with       0 large values
 
+ MOLDEN output will be written to the file ./N4.molden
+  do_norm_janpa  F
+  do_norm_nwchem  F
+  molden scftype: RHF                  spinref:                     1
+  
+  Molden file created 
+  If you plan to use JANPA 
+    run the .molden file through 
+    molden2molden.jar -NormalizeBF to get the
+    correct Molden normalization 
+   
 
- Task  times  cpu:        1.8s     wall:        1.6s
+ Task  times  cpu:        1.0s     wall:        0.7s
  Summary of allocated global arrays
 -----------------------------------
   No active global arrays
@@ -615,9 +633,9 @@
                          ------------------------------
 
        create   destroy   get      put      acc     scatter   gather  read&inc
-calls:  387      387     4861     2777     2787        0        0       61     
+calls:  388      388     4915     2896     2787        0        0       61     
 number of processes/call 1.00e+00 1.00e+00 1.00e+00 0.00e+00 0.00e+00
-bytes total:             9.40e+06 6.26e+06 1.71e+06 0.00e+00 0.00e+00 4.88e+02
+bytes total:             9.40e+06 6.29e+06 1.71e+06 0.00e+00 0.00e+00 4.88e+02
 bytes remote:            0.00e+00 0.00e+00 0.00e+00 0.00e+00 0.00e+00 0.00e+00
 Max memory consumed for GA by this process: 338688 bytes
 MA_summarize_allocated_blocks: starting scan ...
@@ -628,9 +646,9 @@ MA usage statistics:
 					      heap	     stack
 					      ----	     -----
 	current number of blocks	         0	         0
-	maximum number of blocks	        17	        14
+	maximum number of blocks	        20	        14
 	current total bytes		         0	         0
-	maximum total bytes		  22036688	  22510376
+	maximum total bytes		  22036672	  22510392
 	maximum total K-bytes		     22037	     22511
 	maximum total M-bytes		        23	        23
 
@@ -660,10 +678,11 @@ MA usage statistics:
           E. Apra, E. J. Bylaska, W. A. de Jong, N. Govind, K. Kowalski,
        T. P. Straatsma, M. Valiev, H. J. J. van Dam, D. Wang, T. L. Windus,
         J. Hammond, J. Autschbach, K. Bhaskaran-Nair, J. Brabec, K. Lopata,
-        S. Fischer, S. Krishnamoorthy, W. Ma, M. Klemm, O. Villa, Y. Chen,
-    V. Anisimov, F. Aquino, S. Hirata, M. T. Hackler, T. Risthaus, M. Malagoli,
-       A. Marenich, A. Otero-de-la-Roza, J. Mullin, P. Nichols, R. Peverati,
-     J. Pittner, Y. Zhao, P.-D. Fan, A. Fonari, M. Williamson, R. J. Harrison,
+    S. A. Fischer, S. Krishnamoorthy, M. Jacquelin, W. Ma, M. Klemm, O. Villa,
+      Y. Chen, V. Anisimov, F. Aquino, S. Hirata, M. T. Hackler, V. Konjkov,
+            D. Mejia-Rodriguez, T. Risthaus, M. Malagoli, A. Marenich,
+   A. Otero-de-la-Roza, J. Mullin, P. Nichols, R. Peverati, J. Pittner, Y. Zhao,
+        P.-D. Fan, A. Fonari, M. J. Williamson, R. J. Harrison, J. R. Rehr,
       M. Dupuis, D. Silverstein, D. M. A. Smith, J. Nieplocha, V. Tipparaju,
     M. Krishnan, B. E. Van Kuiken, A. Vazquez-Mayagoitia, L. Jensen, M. Swart,
       Q. Wu, T. Van Voorhis, A. A. Auer, M. Nooijen, L. D. Crosby, E. Brown,
@@ -675,4 +694,4 @@ MA usage statistics:
       T. Nakajima, S. Niu, L. Pollack, M. Rosing, K. Glaesemann, G. Sandrone,
       M. Stave, H. Taylor, G. Thomas, J. H. van Lenthe, A. T. Wong, Z. Zhang.
 
- Total times  cpu:        1.8s     wall:        1.6s
+ Total times  cpu:        1.1s     wall:        0.7s

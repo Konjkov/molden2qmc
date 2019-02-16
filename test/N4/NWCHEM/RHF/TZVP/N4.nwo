@@ -3,7 +3,7 @@
                                          
 
 
-              Northwest Computational Chemistry Package (NWChem) 6.6
+              Northwest Computational Chemistry Package (NWChem) 6.8
               ------------------------------------------------------
 
 
@@ -11,7 +11,7 @@
                        Pacific Northwest National Laboratory
                                 Richland, WA 99352
 
-                              Copyright (c) 1994-2015
+                              Copyright (c) 1994-2017
                        Pacific Northwest National Laboratory
                             Battelle Memorial Institute
 
@@ -36,15 +36,16 @@
            Job information
            ---------------
 
-    hostname        = vladimir-Aspire-E5-571G
+    hostname        = vladimir-Kubuntu-16
     program         = nwchem
-    date            = Sat Oct  3 15:23:40 2015
+    date            = Sat Feb 16 13:59:43 2019
 
-    compiled        = Сб._окт._03_14:57:08_2015
-    source          = /home/vladimir/bin/nwchem-6.6
-    nwchem branch   = 6.6
-    nwchem revision = N/A
-    ga revision     = N/A
+    compiled        = Wed_Aug_15_19:14:19_2018
+    source          = /home/edo/debichem-team/nwchem/nwchem-6.8.1
+    nwchem branch   = 6.8.1
+    nwchem revision = v6.8-133-ge032219
+    ga revision     = 5.6.5
+    use scalapack   = T
     input           = N4.nw
     prefix          = N4.
     data base       = ./N4.db
@@ -57,10 +58,10 @@
            Memory information
            ------------------
 
-    heap     =   30769594 doubles =    234.8 Mbytes
-    stack    =   30769599 doubles =    234.8 Mbytes
-    global   =   61539200 doubles =    469.5 Mbytes (distinct from heap & stack)
-    total    =  123078393 doubles =    939.0 Mbytes
+    heap     =   13107198 doubles =    100.0 Mbytes
+    stack    =   13107195 doubles =    100.0 Mbytes
+    global   =   26214400 doubles =    200.0 Mbytes (distinct from heap & stack)
+    total    =   52428793 doubles =    400.0 Mbytes
     verify   = yes
     hardfail = no 
 
@@ -210,7 +211,7 @@
 
 
   library name resolved from: environment
-  library file name is: </home/vladimir/bin/nwchem-6.6/src/basis/libraries/>
+  library file name is: </home/vladimir/bin/nwchem-6.8/src/basis/libraries/>
   
                       Basis "ao basis" -> "" (spherical)
                       -----
@@ -258,6 +259,12 @@
  N                         def2-TZVP                11       31   5s3p2d1f
 
 
+                              NWChem Property Module
+                              ----------------------
+
+
+                             test HF/def2-TZVP energy
+
                                  NWChem SCF Module
                                  -----------------
 
@@ -287,7 +294,7 @@
 
 
 
- Forming initial guess at       0.3s
+ Forming initial guess at       0.1s
 
 
       Superposition of Atomic Density Guess
@@ -305,7 +312,7 @@
  LUMO         =       0.117362
 
 
- Starting SCF solution at       1.4s
+ Starting SCF solution at       0.5s
 
 
 
@@ -320,7 +327,7 @@
 
  Integral file          = ./N4.aoints.0
  Record size in doubles =  65536        No. of integs per rec  =  43688
- Max. records in memory =      0        Max. records in file   = 773934
+ Max. records in memory =      0        Max. records in file   = 180719
  No. of bits per label  =      8        No. of bits per value  =     64
 
 
@@ -329,22 +336,22 @@
 
               iter       energy          gnorm     gmax       time
              ----- ------------------- --------- --------- --------
-                 1     -217.5209195235  1.23D+00  2.52D-01      6.0
-                 2     -217.5938676309  2.18D-01  4.57D-02      7.4
-                 3     -217.5992650335  2.25D-02  6.84D-03      9.6
-                 4     -217.5993403224  1.96D-04  4.17D-05     13.1
-                 5     -217.5993403253  2.37D-08  6.68D-09     19.4
+                 1     -217.5209195236  1.23D+00  2.52D-01      3.0
+                 2     -217.5938676310  2.18D-01  4.57D-02      3.8
+                 3     -217.5992650336  2.25D-02  6.84D-03      5.1
+                 4     -217.5993403225  1.96D-04  4.17D-05      7.2
+                 5     -217.5993403254  2.37D-08  6.68D-09     10.8
 
 
        Final RHF  results 
        ------------------ 
 
-         Total SCF energy =   -217.599340325315
-      One-electron energy =   -504.287974303529
-      Two-electron energy =    180.910685880328
+         Total SCF energy =   -217.599340325411
+      One-electron energy =   -504.287974303753
+      Two-electron energy =    180.910685880455
  Nuclear repulsion energy =    105.777948097886
 
-        Time for solution =     18.0s
+        Time for solution =      9.9s
 
 
              Final eigenvalues
@@ -649,8 +656,19 @@ rate(mb/s): 0.00e+00  0.00e+00
 
  Parallel integral file used     623 records with       0 large values
 
+ MOLDEN output will be written to the file ./N4.molden
+  do_norm_janpa  F
+  do_norm_nwchem  F
+  molden scftype: RHF                  spinref:                     1
+  
+  Molden file created 
+  If you plan to use JANPA 
+    run the .molden file through 
+    molden2molden.jar -NormalizeBF to get the
+    correct Molden normalization 
+   
 
- Task  times  cpu:       19.6s     wall:       19.9s
+ Task  times  cpu:       11.1s     wall:        8.5s
  Summary of allocated global arrays
 -----------------------------------
   No active global arrays
@@ -661,9 +679,9 @@ rate(mb/s): 0.00e+00  0.00e+00
                          ------------------------------
 
        create   destroy   get      put      acc     scatter   gather  read&inc
-calls:  384      384     1.03e+04 6207     5969        0        0       53     
+calls:  385      385     9993     6017     5969        0        0       53     
 number of processes/call 1.00e+00 1.00e+00 1.00e+00 0.00e+00 0.00e+00
-bytes total:             4.49e+07 2.85e+07 7.26e+06 0.00e+00 0.00e+00 4.24e+02
+bytes total:             4.52e+07 2.87e+07 7.26e+06 0.00e+00 0.00e+00 4.24e+02
 bytes remote:            0.00e+00 0.00e+00 0.00e+00 0.00e+00 0.00e+00 0.00e+00
 Max memory consumed for GA by this process: 1599104 bytes
 MA_summarize_allocated_blocks: starting scan ...
@@ -674,9 +692,9 @@ MA usage statistics:
 					      heap	     stack
 					      ----	     -----
 	current number of blocks	         0	         0
-	maximum number of blocks	        16	        14
+	maximum number of blocks	        20	        14
 	current total bytes		         0	         0
-	maximum total bytes		     80152	  27984920
+	maximum total bytes		     80120	  27984952
 	maximum total K-bytes		        81	     27985
 	maximum total M-bytes		         1	        28
 
@@ -706,10 +724,11 @@ MA usage statistics:
           E. Apra, E. J. Bylaska, W. A. de Jong, N. Govind, K. Kowalski,
        T. P. Straatsma, M. Valiev, H. J. J. van Dam, D. Wang, T. L. Windus,
         J. Hammond, J. Autschbach, K. Bhaskaran-Nair, J. Brabec, K. Lopata,
-        S. Fischer, S. Krishnamoorthy, W. Ma, M. Klemm, O. Villa, Y. Chen,
-    V. Anisimov, F. Aquino, S. Hirata, M. T. Hackler, T. Risthaus, M. Malagoli,
-       A. Marenich, A. Otero-de-la-Roza, J. Mullin, P. Nichols, R. Peverati,
-     J. Pittner, Y. Zhao, P.-D. Fan, A. Fonari, M. Williamson, R. J. Harrison,
+    S. A. Fischer, S. Krishnamoorthy, M. Jacquelin, W. Ma, M. Klemm, O. Villa,
+      Y. Chen, V. Anisimov, F. Aquino, S. Hirata, M. T. Hackler, V. Konjkov,
+            D. Mejia-Rodriguez, T. Risthaus, M. Malagoli, A. Marenich,
+   A. Otero-de-la-Roza, J. Mullin, P. Nichols, R. Peverati, J. Pittner, Y. Zhao,
+        P.-D. Fan, A. Fonari, M. J. Williamson, R. J. Harrison, J. R. Rehr,
       M. Dupuis, D. Silverstein, D. M. A. Smith, J. Nieplocha, V. Tipparaju,
     M. Krishnan, B. E. Van Kuiken, A. Vazquez-Mayagoitia, L. Jensen, M. Swart,
       Q. Wu, T. Van Voorhis, A. A. Auer, M. Nooijen, L. D. Crosby, E. Brown,
@@ -721,4 +740,4 @@ MA usage statistics:
       T. Nakajima, S. Niu, L. Pollack, M. Rosing, K. Glaesemann, G. Sandrone,
       M. Stave, H. Taylor, G. Thomas, J. H. van Lenthe, A. T. Wong, Z. Zhang.
 
- Total times  cpu:       19.6s     wall:       20.1s
+ Total times  cpu:       11.1s     wall:        8.6s

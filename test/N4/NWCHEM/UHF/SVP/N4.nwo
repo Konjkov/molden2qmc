@@ -3,7 +3,7 @@
                                          
 
 
-              Northwest Computational Chemistry Package (NWChem) 6.6
+              Northwest Computational Chemistry Package (NWChem) 6.8
               ------------------------------------------------------
 
 
@@ -11,7 +11,7 @@
                        Pacific Northwest National Laboratory
                                 Richland, WA 99352
 
-                              Copyright (c) 1994-2015
+                              Copyright (c) 1994-2017
                        Pacific Northwest National Laboratory
                             Battelle Memorial Institute
 
@@ -36,15 +36,16 @@
            Job information
            ---------------
 
-    hostname        = vladimir-Bars
-    program         = /home/vladimir/bin/nwchem-6.6_molden/bin/LINUX64/nwchem
-    date            = Mon May 16 11:14:31 2016
+    hostname        = vladimir-Kubuntu-16
+    program         = nwchem
+    date            = Sat Feb 16 14:03:51 2019
 
-    compiled        = Пт._мая_13_17:47:57_2016
-    source          = /home/vladimir/bin/nwchem-6.6_molden
-    nwchem branch   = 6.6
-    nwchem revision = 27746
-    ga revision     = 10594
+    compiled        = Wed_Aug_15_19:14:19_2018
+    source          = /home/edo/debichem-team/nwchem/nwchem-6.8.1
+    nwchem branch   = 6.8.1
+    nwchem revision = v6.8-133-ge032219
+    ga revision     = 5.6.5
+    use scalapack   = T
     input           = N4.nw
     prefix          = N4.
     data base       = ./N4.db
@@ -210,7 +211,7 @@
 
 
   library name resolved from: environment
-  library file name is: </home/vladimir/bin/nwchem-6.6/src/basis/libraries/>
+  library file name is: </home/vladimir/bin/nwchem-6.8/src/basis/libraries/>
   
                       Basis "ao basis" -> "" (spherical)
                       -----
@@ -245,6 +246,12 @@
  N                          def2-SVP                 6       14   3s2p1d
 
 
+                              NWChem Property Module
+                              ----------------------
+
+
+                              test HF/def2-SVP energy
+
                                  NWChem SCF Module
                                  -----------------
 
@@ -274,7 +281,7 @@
 
 
 
- Forming initial guess at       0.1s
+ Forming initial guess at       0.0s
 
 
       Superposition of Atomic Density Guess
@@ -294,7 +301,7 @@
  LUMO         =      -0.287750
 
 
- Starting SCF solution at       0.2s
+ Starting SCF solution at       0.1s
 
 
 
@@ -309,7 +316,7 @@
 
  Integral file          = ./N4.aoints.0
  Record size in doubles =  65536        No. of integs per rec  =  43688
- Max. records in memory =     42        Max. records in file   = 745097
+ Max. records in memory =     42        Max. records in file   = 180714
  No. of bits per label  =      8        No. of bits per value  =     64
 
 
@@ -318,95 +325,95 @@
 
               iter       energy          gnorm     gmax       time
              ----- ------------------- --------- --------- --------
-                 1     -216.7717221653  5.84D-01  1.52D-01      0.3
-                 2     -216.8072491376  1.61D-01  4.01D-02      0.3
-                 3     -216.8138119693  1.43D-02  4.25D-03      0.5
+                 1     -216.7717221653  5.84D-01  1.52D-01      0.6
+                 2     -216.8072491376  1.61D-01  4.01D-02      0.7
+                 3     -216.8138119693  1.43D-02  4.25D-03      1.0
   ga_iter_lsolve: convergence stagnant ... aborting solve
 
  Disabled NR: increased maxiter to 110
 
-                 4     -216.8139366066  1.45D-02  2.91D-03      0.7
-                 5     -216.8139806818  1.06D-02  2.21D-03      0.8
-                 6     -216.8140067007  5.68D-03  1.98D-03      0.9
-                 7     -216.8140254729  8.14D-03  1.99D-03      0.9
-                 8     -216.8140778724  1.15D-02  2.27D-03      1.0
-                 9     -216.8142295406  2.88D-02  5.03D-03      1.1
-                10     -216.8144054616  3.19D-02  1.03D-02      1.3
-                11     -216.8146504462  2.67D-02  9.21D-03      1.3
+                 4     -216.8139366066  1.45D-02  2.91D-03      1.1
+                 5     -216.8139806818  1.06D-02  2.21D-03      1.2
+                 6     -216.8140067007  5.68D-03  1.98D-03      1.2
+                 7     -216.8140254729  8.14D-03  1.99D-03      1.2
+                 8     -216.8140778724  1.15D-02  2.27D-03      1.3
+                 9     -216.8142295406  2.88D-02  5.03D-03      1.3
+                10     -216.8144054616  3.19D-02  1.03D-02      1.4
+                11     -216.8146504462  2.67D-02  9.21D-03      1.4
                 12     -216.8153330391  3.94D-02  9.64D-03      1.4
                 13     -216.8157747835  3.86D-02  7.55D-03      1.5
                 14     -216.8162897358  4.52D-02  9.77D-03      1.5
                 15     -216.8168798576  3.30D-02  7.53D-03      1.6
-                16     -216.8171601713  2.35D-02  5.67D-03      1.7
-                17     -216.8173540316  2.14D-02  5.52D-03      1.8
-                18     -216.8175016384  2.07D-02  4.24D-03      1.9
-                19     -216.8176961109  1.94D-02  4.23D-03      2.0
-                20     -216.8178217702  1.65D-02  3.00D-03      2.1
-                21     -216.8178795321  8.25D-03  1.65D-03      2.1
-                22     -216.8178987329  5.78D-03  1.11D-03      2.2
-                23     -216.8179072998  3.82D-03  1.07D-03      2.3
-                24     -216.8179126676  4.37D-03  9.46D-04      2.4
-                25     -216.8179189549  3.61D-03  7.03D-04      2.5
-                26     -216.8179238080  3.03D-03  6.45D-04      2.5
-                27     -216.8179258451  1.98D-03  3.56D-04      2.6
-                28     -216.8179268624  1.38D-03  2.60D-04      2.8
-                29     -216.8179275611  1.06D-03  1.82D-04      2.8
-                30     -216.8179278143  8.04D-04  1.48D-04      2.9
-                31     -216.8179279862  5.32D-04  1.13D-04      3.0
-                32     -216.8179280767  3.54D-04  5.15D-05      3.0
-                33     -216.8179281210  3.51D-04  8.10D-05      3.1
-                34     -216.8179281567  3.28D-04  6.25D-05      3.2
-                35     -216.8179281824  2.03D-04  4.06D-05      3.2
-                36     -216.8179281917  1.19D-04  2.82D-05      3.3
-                37     -216.8179281955  1.05D-04  2.06D-05      3.3
-                38     -216.8179282002  1.21D-04  2.05D-05      3.4
-                39     -216.8179282048  1.05D-04  2.40D-05      3.5
-                40     -216.8179282079  6.62D-05  1.22D-05      3.6
-                41     -216.8179282088  4.50D-05  8.97D-06      3.6
-                42     -216.8179282097  4.35D-05  8.44D-06      3.7
-                43     -216.8179282103  4.06D-05  7.73D-06      3.8
-                44     -216.8179282108  3.83D-05  6.08D-06      3.8
-                45     -216.8179282114  2.97D-05  4.73D-06      3.9
-                46     -216.8179282116  1.86D-05  4.41D-06      4.0
-                47     -216.8179282116  1.01D-05  2.14D-06      4.0
-                48     -216.8179282117  8.54D-06  2.05D-06      4.1
-                49     -216.8179282117  8.60D-06  1.77D-06      4.1
-                50     -216.8179282117  6.74D-06  1.38D-06      4.2
-                51     -216.8179282117  5.56D-06  1.08D-06      4.2
-                52     -216.8179282118  3.47D-06  7.34D-07      4.3
-                53     -216.8179282118  3.54D-06  5.29D-07      4.4
-                54     -216.8179282118  2.76D-06  4.92D-07      4.5
-                55     -216.8179282118  2.27D-06  3.55D-07      4.6
-                56     -216.8179282118  1.99D-06  3.39D-07      4.6
-                57     -216.8179282118  1.71D-06  2.70D-07      4.7
-                58     -216.8179282118  1.09D-06  1.68D-07      4.8
-                59     -216.8179282118  8.87D-07  1.97D-07      4.8
-                60     -216.8179282118  9.06D-07  1.49D-07      4.9
-                61     -216.8179282118  5.38D-07  8.35D-08      4.9
-                62     -216.8179282118  5.14D-07  7.94D-08      5.0
-                63     -216.8179282118  5.04D-07  6.93D-08      5.0
-                64     -216.8179282118  4.77D-07  8.52D-08      5.1
-                65     -216.8179282118  4.15D-07  6.03D-08      5.2
-                66     -216.8179282118  2.65D-07  3.97D-08      5.3
-                67     -216.8179282118  2.49D-07  3.72D-08      5.3
-                68     -216.8179282118  1.51D-07  2.05D-08      5.4
-                69     -216.8179282118  1.04D-07  2.44D-08      5.5
-                70     -216.8179282118  9.87D-08  1.16D-08      5.6
+                16     -216.8171601713  2.35D-02  5.67D-03      1.6
+                17     -216.8173540316  2.14D-02  5.52D-03      1.6
+                18     -216.8175016384  2.07D-02  4.24D-03      1.7
+                19     -216.8176961109  1.94D-02  4.23D-03      1.7
+                20     -216.8178217702  1.65D-02  3.00D-03      1.8
+                21     -216.8178795321  8.25D-03  1.65D-03      1.8
+                22     -216.8178987329  5.78D-03  1.11D-03      1.8
+                23     -216.8179072998  3.82D-03  1.07D-03      1.9
+                24     -216.8179126676  4.37D-03  9.46D-04      1.9
+                25     -216.8179189549  3.61D-03  7.03D-04      1.9
+                26     -216.8179238080  3.03D-03  6.45D-04      2.0
+                27     -216.8179258451  1.98D-03  3.56D-04      2.0
+                28     -216.8179268624  1.38D-03  2.60D-04      2.1
+                29     -216.8179275611  1.06D-03  1.82D-04      2.1
+                30     -216.8179278143  8.04D-04  1.48D-04      2.2
+                31     -216.8179279862  5.32D-04  1.13D-04      2.2
+                32     -216.8179280767  3.54D-04  5.15D-05      2.2
+                33     -216.8179281210  3.51D-04  8.10D-05      2.3
+                34     -216.8179281567  3.28D-04  6.25D-05      2.3
+                35     -216.8179281824  2.03D-04  4.06D-05      2.3
+                36     -216.8179281917  1.19D-04  2.82D-05      2.4
+                37     -216.8179281955  1.05D-04  2.06D-05      2.4
+                38     -216.8179282002  1.21D-04  2.05D-05      2.5
+                39     -216.8179282048  1.05D-04  2.40D-05      2.5
+                40     -216.8179282079  6.62D-05  1.22D-05      2.5
+                41     -216.8179282088  4.50D-05  8.97D-06      2.6
+                42     -216.8179282097  4.35D-05  8.44D-06      2.6
+                43     -216.8179282103  4.06D-05  7.73D-06      2.6
+                44     -216.8179282108  3.83D-05  6.08D-06      2.7
+                45     -216.8179282114  2.97D-05  4.73D-06      2.7
+                46     -216.8179282116  1.86D-05  4.41D-06      2.8
+                47     -216.8179282116  1.01D-05  2.14D-06      2.8
+                48     -216.8179282117  8.54D-06  2.05D-06      2.9
+                49     -216.8179282117  8.60D-06  1.77D-06      2.9
+                50     -216.8179282117  6.74D-06  1.38D-06      2.9
+                51     -216.8179282117  5.56D-06  1.08D-06      3.0
+                52     -216.8179282118  3.47D-06  7.34D-07      3.0
+                53     -216.8179282118  3.54D-06  5.29D-07      3.1
+                54     -216.8179282118  2.76D-06  4.92D-07      3.1
+                55     -216.8179282118  2.27D-06  3.55D-07      3.1
+                56     -216.8179282118  1.99D-06  3.39D-07      3.2
+                57     -216.8179282118  1.71D-06  2.70D-07      3.2
+                58     -216.8179282118  1.09D-06  1.68D-07      3.3
+                59     -216.8179282118  8.87D-07  1.97D-07      3.3
+                60     -216.8179282118  9.06D-07  1.49D-07      3.3
+                61     -216.8179282118  5.38D-07  8.35D-08      3.4
+                62     -216.8179282118  5.14D-07  7.94D-08      3.4
+                63     -216.8179282118  5.04D-07  6.93D-08      3.5
+                64     -216.8179282118  4.77D-07  8.52D-08      3.5
+                65     -216.8179282118  4.15D-07  6.03D-08      3.5
+                66     -216.8179282118  2.65D-07  3.97D-08      3.6
+                67     -216.8179282118  2.49D-07  3.72D-08      3.6
+                68     -216.8179282118  1.51D-07  2.05D-08      3.7
+                69     -216.8179282118  1.04D-07  2.44D-08      3.7
+                70     -216.8179282118  9.87D-08  1.16D-08      3.7
 
 
        Final UHF  results 
        ------------------ 
 
-         Total SCF energy =   -216.817928211771
-      One electron energy =   -493.757344701473
-      Two electron energy =    171.161468391816
+         Total SCF energy =   -216.817928211776
+      One electron energy =   -493.757344701476
+      Two electron energy =    171.161468391814
  Nuclear repulsion energy =    105.777948097886
 
                        Sz =      0.5000
                  Sz(Sz+1) =      0.7500
                       S^2 =      0.8012
 
-        Time for solution =      5.5s
+        Time for solution =      3.4s
 
 
           Final alpha eigenvalues
@@ -946,8 +953,19 @@
 
  Parallel integral file used      28 records with       0 large values
 
+ MOLDEN output will be written to the file ./N4.molden
+  do_norm_janpa  F
+  do_norm_nwchem  F
+  molden scftype: UHF                  spinref:                     2
+  
+  Molden file created 
+  If you plan to use JANPA 
+    run the .molden file through 
+    molden2molden.jar -NormalizeBF to get the
+    correct Molden normalization 
+   
 
- Task  times  cpu:        5.6s     wall:        8.3s
+ Task  times  cpu:        3.7s     wall:        3.4s
  Summary of allocated global arrays
 -----------------------------------
   No active global arrays
@@ -958,9 +976,9 @@
                          ------------------------------
 
        create   destroy   get      put      acc     scatter   gather  read&inc
-calls: 4311     4311     4.43e+04 2.32e+04 8.51e+04  876        0       61     
+calls: 4313     4313     4.44e+04 2.36e+04 8.51e+04  876        0       61     
 number of processes/call 1.00e+00 1.00e+00 1.00e+00 0.00e+00 0.00e+00
-bytes total:             1.58e+08 1.14e+08 2.47e+07 4.47e+03 0.00e+00 4.88e+02
+bytes total:             1.58e+08 1.18e+08 2.47e+07 4.47e+03 0.00e+00 4.88e+02
 bytes remote:            0.00e+00 0.00e+00 0.00e+00 0.00e+00 0.00e+00 0.00e+00
 Max memory consumed for GA by this process: 570104 bytes
 MA_summarize_allocated_blocks: starting scan ...
@@ -971,7 +989,7 @@ MA usage statistics:
 					      heap	     stack
 					      ----	     -----
 	current number of blocks	         0	         0
-	maximum number of blocks	        17	        14
+	maximum number of blocks	        20	        14
 	current total bytes		         0	         0
 	maximum total bytes		  22036656	  22511752
 	maximum total K-bytes		     22037	     22512
@@ -1003,20 +1021,20 @@ MA usage statistics:
           E. Apra, E. J. Bylaska, W. A. de Jong, N. Govind, K. Kowalski,
        T. P. Straatsma, M. Valiev, H. J. J. van Dam, D. Wang, T. L. Windus,
         J. Hammond, J. Autschbach, K. Bhaskaran-Nair, J. Brabec, K. Lopata,
-       S. A. Fischer, S. Krishnamoorthy, W. Ma, M. Klemm, O. Villa, Y. Chen,
-    V. Anisimov, F. Aquino, S. Hirata, M. T. Hackler, T. Risthaus, M. Malagoli,
-       A. Marenich, A. Otero-de-la-Roza, J. Mullin, P. Nichols, R. Peverati,
-     J. Pittner, Y. Zhao, P.-D. Fan, A. Fonari, M. Williamson, R. J. Harrison,
-       J. R. Rehr, M. Dupuis, D. Silverstein, D. M. A. Smith, J. Nieplocha,
-        V. Tipparaju, M. Krishnan, B. E. Van Kuiken, A. Vazquez-Mayagoitia,
-        L. Jensen, M. Swart, Q. Wu, T. Van Voorhis, A. A. Auer, M. Nooijen,
-      L. D. Crosby, E. Brown, G. Cisneros, G. I. Fann, H. Fruchtl, J. Garza,
-        K. Hirao, R. A. Kendall, J. A. Nichols, K. Tsemekhman, K. Wolinski,
-     J. Anchell, D. E. Bernholdt, P. Borowski, T. Clark, D. Clerc, H. Dachsel,
-   M. J. O. Deegan, K. Dyall, D. Elwood, E. Glendening, M. Gutowski, A. C. Hess,
-         J. Jaffe, B. G. Johnson, J. Ju, R. Kobayashi, R. Kutteh, Z. Lin,
-   R. Littlefield, X. Long, B. Meng, T. Nakajima, S. Niu, L. Pollack, M. Rosing,
-   K. Glaesemann, G. Sandrone, M. Stave, H. Taylor, G. Thomas, J. H. van Lenthe,
-                               A. T. Wong, Z. Zhang.
+    S. A. Fischer, S. Krishnamoorthy, M. Jacquelin, W. Ma, M. Klemm, O. Villa,
+      Y. Chen, V. Anisimov, F. Aquino, S. Hirata, M. T. Hackler, V. Konjkov,
+            D. Mejia-Rodriguez, T. Risthaus, M. Malagoli, A. Marenich,
+   A. Otero-de-la-Roza, J. Mullin, P. Nichols, R. Peverati, J. Pittner, Y. Zhao,
+        P.-D. Fan, A. Fonari, M. J. Williamson, R. J. Harrison, J. R. Rehr,
+      M. Dupuis, D. Silverstein, D. M. A. Smith, J. Nieplocha, V. Tipparaju,
+    M. Krishnan, B. E. Van Kuiken, A. Vazquez-Mayagoitia, L. Jensen, M. Swart,
+      Q. Wu, T. Van Voorhis, A. A. Auer, M. Nooijen, L. D. Crosby, E. Brown,
+      G. Cisneros, G. I. Fann, H. Fruchtl, J. Garza, K. Hirao, R. A. Kendall,
+      J. A. Nichols, K. Tsemekhman, K. Wolinski, J. Anchell, D. E. Bernholdt,
+      P. Borowski, T. Clark, D. Clerc, H. Dachsel, M. J. O. Deegan, K. Dyall,
+    D. Elwood, E. Glendening, M. Gutowski, A. C. Hess, J. Jaffe, B. G. Johnson,
+     J. Ju, R. Kobayashi, R. Kutteh, Z. Lin, R. Littlefield, X. Long, B. Meng,
+      T. Nakajima, S. Niu, L. Pollack, M. Rosing, K. Glaesemann, G. Sandrone,
+      M. Stave, H. Taylor, G. Thomas, J. H. van Lenthe, A. T. Wong, Z. Zhang.
 
- Total times  cpu:        5.6s     wall:        8.4s
+ Total times  cpu:        3.8s     wall:        3.4s

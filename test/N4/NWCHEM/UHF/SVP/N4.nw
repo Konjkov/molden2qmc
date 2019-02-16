@@ -21,4 +21,9 @@ scf
  maxiter 100
 end
 
-task scf energy
+property
+  moldenfile
+  molden_norm none
+end
+
+task scf property

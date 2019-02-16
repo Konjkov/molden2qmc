@@ -16,4 +16,10 @@ scf
  thresh 1e-7
 end
 
-task scf energy
+property
+  moldenfile
+  molden_norm none
+end
+
+task scf property
+
