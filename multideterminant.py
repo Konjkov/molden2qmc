@@ -2,6 +2,7 @@
 import re
 import argparse
 from functools import reduce
+from collections import OrderedDict
 from decimal import Decimal
 
 
@@ -182,7 +183,8 @@ class Orca(Default):
     def __init__(self, input_path):
         """Initialise multi-determinant support."""
         super().__init__(input_path)
-        self.tolerance = Decimal('0.000001')
+        # ORCA output precision
+        self.tolerance = Decimal('0.000000001')
         self.internal = 0  # CASSCF internal orbitals
         self.active = 0  # CASSCF active orbitals
         self.input_path = input_path
@@ -236,11 +238,11 @@ class Orca(Default):
         :return: list of spin-determinants, number of internal orbitals
         """
 
-        determinants = {}
+        determinants = dict()
+        cfg = weight = None
 
         with open(self.input_path, "r") as orca_input:
             line = orca_input.readline()
-            key = None
             while line and not (line.startswith('  Spin-Determinant CI Printing') or line.startswith('  Extended CI Printing')):
                 line = orca_input.readline()
                 if line.startswith('   Internal'):
@@ -251,17 +253,23 @@ class Orca(Default):
                 return
             line = orca_input.readline()
             while line and not line.startswith('DENSITY MATRIX'):
+                # Group determinants by CFD weights
                 if line.startswith('CFG['):
-                    key = line.split()[0][4:-1]
-                    determinants[key] = []
-                elif line.startswith('   ['):
+                    cfg, weight = line.split()
+                    cfg = cfg[4:-1]
+                    determinants[cfg] = dict(weight=Decimal(weight), spin_det=[])
+                elif weight and line.startswith('   ['):
                     det, val = line.split()
-                    determinants[key].append((det[1:-1], round(Decimal(val), 6)))
+                    spin_det = [det[1:-1], Decimal(val)]
+                    if abs(spin_det[1]) > self.tolerance:
+                        spin_det = self.set_promotion_parity(spin_det)
+                        spin_det = self.set_determinant_parity(spin_det)
+                        determinants[cfg]['spin_det'].append(spin_det)
                 line = orca_input.readline()
 
         with open(self.input_path, "r") as orca_input:
             line = orca_input.readline()
-            key = None
+            key = val = None
             while line and not line.startswith('  Extended CI Printing'):
                 line = orca_input.readline()
             if not line:
@@ -269,23 +277,13 @@ class Orca(Default):
             line = orca_input.readline()
             while line and not line.startswith('DENSITY MATRIX'):
                 if line.startswith(' CFG['):
-                    _, val, _, _ = line.split()
-                    if determinants.get(val) == []:
-                        key = val
-                elif key and line.startswith(' \tCSF['):
-                    _, val = line.split()
-                    determinants[key] = [(key, round(Decimal(val), 6))]
-                    key = None
+                    _, key, _, _ = line.split()
+                    val = determinants.get(key)
+                elif key and val and not val['spin_det'] and line.startswith(' \tCSF['):
+                    _, spin_det = line.split()
+                    val['spin_det'].append((key, Decimal(spin_det)))
                 line = orca_input.readline()
-
-        self.determinants = []
-        for v in determinants.values():
-            for det in v:
-                det = self.set_promotion_parity(det)
-                det = self.set_determinant_parity(det)
-                self.determinants += [det]
-        self.determinants = sorted(self.determinants, key=lambda x: abs(x[1] + self.tolerance), reverse=True)
-        self.determinants = list(filter(lambda x: abs(x[1]) > self.tolerance, self.determinants))
+        self.determinants = OrderedDict(sorted(determinants.items(), key=lambda x: abs(x[1]['weight']), reverse=True))
 
     def parity_shell(self, values):
         """Determine parity of list of integers.
@@ -353,21 +351,25 @@ class Orca(Default):
         with open('correlation.data', 'w') as output_file:
             print('START MDET', file=output_file)
             print('Title', file=output_file)
-            print(' multideterminant WFN %s\n' % self.title, file=output_file)
-
+            print(' multideterminant WFN {}\n'.format(self.title), file=output_file)
             print('MD', file=output_file)
-            print('  %i' % len(self.determinants), file=output_file)
+            print('  {}'.format(sum((len(self.determinants[det]['spin_det']) for det in self.determinants))), file=output_file)
             opt_group_number = 0
             prev_weight = None
             for i, det in enumerate(self.determinants):
-                if prev_weight != det[1]:
+                weight = self.determinants[det]['weight']
+                if prev_weight != weight:
                     opt_group_number += 1
-                print(' %9.6f  %i %i' % (det[1], opt_group_number, int(i > 0)), file=output_file)
-                prev_weight = det[1]
+                for spin_det in self.determinants[det]['spin_det']:
+                    print(' {: .9f}  {} {}'.format(spin_det[1], opt_group_number, int(i > 0)), file=output_file)
+                prev_weight = weight
 
-            for i, det in enumerate(self.determinants):
-                for s, f, t in self.get_promotion_rules(self.ground_state(det[0]), det[0]):
-                    print('  DET %i %i PR %i 1 %i 1' % (i+1, s, f + self.internal, t + self.internal), file=output_file)
+            i = 0
+            for det in self.determinants:
+                for spin_det in self.determinants[det]['spin_det']:
+                    i += 1
+                    for s, f, t in self.get_promotion_rules(self.ground_state(spin_det[0]), spin_det[0]):
+                        print('  DET {} {} PR {} 1 {} 1'.format(i, s, f + self.internal, t + self.internal), file=output_file)
             print('END MDET', file=output_file)
 
 
