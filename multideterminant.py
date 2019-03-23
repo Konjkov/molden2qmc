@@ -26,6 +26,8 @@ class ORCASectionNotFound(SectionNotFound):
 
 class Default:
 
+    title = "Single determinant."
+
     def __init__(self, *args, **kwargs):
         """Single determinant"""
         self.determinants = [('', 1.0)]
@@ -78,6 +80,19 @@ class Default:
             'd' * (count_d - count_u) +
             '0' * (count_0 + min(count_u, count_d))
         )
+
+    def correlation(self):
+        """
+        :returns: empty MDET section of correlation.data file
+        """
+        with open('correlation.data', 'w') as output_file:
+            print('START MDET', file=output_file)
+            print('Title', file=output_file)
+            print(' multideterminant WFN {}\n'.format(self.title), file=output_file)
+            print('MD', file=output_file)
+            print('  {}'.format(1), file=output_file)
+            print(' {: .9f}  {} {}'.format(1, 1, 0), file=output_file)
+            print('END MDET', file=output_file)
 
 
 class PSI4(Default):
@@ -499,6 +514,9 @@ def main():
     parser.add_argument('--excitation', type=int, default=0, nargs='?', help="max excitaion orbital number")
     parser.add_argument('--amplitude', type=float, default=0, nargs='?', help="min amplitude weight")
     args = parser.parse_args()
+
+    if args.code == 0:
+        Default(args.input_file).correlation()
 
     if args.code == 1:
         PSI4(args.input_file).correlation()
