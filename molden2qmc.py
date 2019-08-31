@@ -8,7 +8,7 @@ from itertools import combinations
 from operator import itemgetter, mul
 from functools import reduce
 
-__version__ = '4.0.3'
+__version__ = '4.0.4'
 
 
 def fact2(k):

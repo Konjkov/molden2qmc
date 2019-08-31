@@ -117,7 +117,7 @@ class test_CFour(unittest.TestCase):
     molden_file = 'MOLDEN'
 
     def test_RHF_SVP(self):
-        test_dir = 'RHF/SVP_patch/'
+        test_dir = 'RHF/SVP/'
         with open(self.base_dir + test_dir + self.molden_file, "r") as f:
             cfour = molden2qmc.CFour(f)
         cfour.gwfn()
@@ -127,7 +127,7 @@ class test_CFour(unittest.TestCase):
         self.assertTrue(np.allclose(mo_matrix(cfour), mo_matrix(orca), atol=0.0001))
 
     def test_RHF_cc_pVTZ(self):
-        test_dir = 'RHF/cc-pVTZ_patch/'
+        test_dir = 'RHF/cc-pVTZ/'
         with open(self.base_dir + test_dir + self.molden_file, "r") as f:
             cfour = molden2qmc.CFour(f)
         cfour.gwfn()
@@ -137,7 +137,7 @@ class test_CFour(unittest.TestCase):
         self.assertTrue(np.allclose(mo_matrix(cfour), mo_matrix(orca), atol=0.001))
 
     def test_RHF_cc_pVQZ(self):
-        test_dir = 'RHF/cc-pVQZ_patch/'
+        test_dir = 'RHF/cc-pVQZ/'
         with open(self.base_dir + test_dir + self.molden_file, "r") as f:
             cfour = molden2qmc.CFour(f)
         cfour.gwfn()
