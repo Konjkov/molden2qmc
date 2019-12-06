@@ -10,7 +10,7 @@ import molden2qmc
 
 molden2qmc.__version__ = __version__
 
-np.set_printoptions(threshold=np.nan, suppress=True, linewidth=10000)
+np.set_printoptions(threshold=np.inf, suppress=True, linewidth=10000)
 
 
 def mo_matrix(m, col=0, skip=4):
