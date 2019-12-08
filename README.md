@@ -34,7 +34,7 @@ Latest versions tested:
 - TURBOMOLE - V6.6
 - Psi4      - 1.1 release
 - CFOUR     - 2.1
-- ORCA      - Version 4.1.1
+- ORCA      - Version 4.2.0
 - Dalton    - 2018.2
 - Molpro    - Version 2012.1
 - NWChem    - 6.8.1
