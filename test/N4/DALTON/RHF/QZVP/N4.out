@@ -4,7 +4,7 @@
      *************** Dalton - An Electronic Structure Program ***************
      ************************************************************************
 
-    This is output from DALTON release Dalton2017.alpha (2017)
+    This is output from DALTON release Dalton2018.2 (2019)
          ( Web site: http://daltonprogram.org )
 
    ----------------------------------------------------------------------------
@@ -52,8 +52,8 @@
      
     and
      
-       Dalton, a Molecular Electronic Structure Program,
-       Release Dalton2017.alpha (2017), see http://daltonprogram.org
+       Dalton, a molecular electronic structure program,
+       Release Dalton2018.2 (2019), see http://daltonprogram.org
    ----------------------------------------------------------------------------
 
     Authors in alphabetical order (major contribution(s) in parenthesis):
@@ -67,13 +67,14 @@
   Linus Boman,              NTNU,                         Norway      (Cholesky decomposition and subsystems)
   Ove Christiansen,         Aarhus University,            Denmark     (CC module)
   Renzo Cimiraglia,         University of Ferrara,        Italy       (NEVPT2)
-  Sonia Coriani,            University of Trieste,        Italy       (CC module, MCD in RESPONS)
+  Sonia Coriani,            Technical Univ. of Denmark,   Denmark     (CC module, MCD in RESPONS)
   Janusz Cukras,            University of Trieste,        Italy       (MChD in RESPONS)
   Paal Dahle,               University of Oslo,           Norway      (Parallelization)
   Erik K. Dalskov,          UNI-C,                        Denmark     (SOPPA)
   Thomas Enevoldsen,        Univ. of Southern Denmark,    Denmark     (SOPPA)
   Janus J. Eriksen,         Aarhus University,            Denmark     (Polarizable embedding model, TDA)
   Rasmus Faber,             University of Copenhagen,     Denmark     (Vib.avg. NMR with SOPPA, parallel AO-SOPPA)
+  Tobias Fahleson,          KTH Stockholm,                Sweden      (Damped cubic response)
   Berta Fernandez,          U. of Santiago de Compostela, Spain       (doublet spin, ESR in RESPONS)
   Lara Ferrighi,            Aarhus University,            Denmark     (PCM Cubic response)
   Heike Fliegl,             University of Oslo,           Norway      (CCSD(R12))
@@ -91,6 +92,7 @@
   Eirik Hjertenaes,         NTNU,                         Norway      (Cholesky decomposition)
   Pi A. B. Haase,           University of Copenhagen,     Denmark     (Triplet AO-SOPPA)
   Maria Francesca Iozzi,    University of Oslo,           Norway      (RPA)
+  Christoph Jacob           TU Braunschweig               Germany     (Frozen density embedding model)
   Brano Jansik              Technical Univ. of Ostrava    Czech Rep.  (DFT cubic response)
   Hans Joergen Aa. Jensen,  Univ. of Southern Denmark,    Denmark     (DALTON; SIRIUS, RESPONS, ABACUS modules, London, and much more)
   Dan Jonsson,              UiT The Arctic U. of Norway,  Norway      (cubic response in RESPONS module)
@@ -108,10 +110,10 @@
   Ola B. Lutnaes,           University of Oslo,           Norway      (DFT Hessian)
   Juan I. Melo,             University of Buenos Aires,   Argentina   (LRESC, Relativistic Effects on NMR Shieldings)
   Kurt V. Mikkelsen,        University of Copenhagen,     Denmark     (MC-SCRF and QM/MM)
-  Rolf H. Myhre,            NTNU,                         Norway      (Cholesky, subsystems and ECC2)
+  Rolf H. Myhre,            NTNU,                         Norway      (Subsystems and CC3)
   Christian Neiss,          Univ. Erlangen-Nuernberg,     Germany     (CCSD(R12))
   Christian B. Nielsen,     University of Copenhagen,     Denmark     (QM/MM)
-  Patrick Norman,           Linkoeping University,        Sweden      (Cubic response and complex frequency response in RESPONS)
+  Patrick Norman,           KTH Stockholm,                Sweden      (Cubic response and complex frequency response in RESPONS)
   Jeppe Olsen,              Aarhus University,            Denmark     (SIRIUS CI/density modules)
   Jogvan Magnus H. Olsen,   Univ. of Southern Denmark,    Denmark     (Polarizable embedding model, QM/MM)
   Anders Osted,             Copenhagen University,        Denmark     (QM/MM)
@@ -129,6 +131,7 @@
   Alfredo Sanchez de Meras, University of Valencia,       Spain       (CC module, Cholesky decomposition)
   Trond Saue,               Paul Sabatier University,     France      (direct Fock matrix construction)
   Stephan P. A. Sauer,      University of Copenhagen,     Denmark     (SOPPA(CCSD), SOPPA prop., AOSOPPA, vibrational g-factors)
+  Andre S. P. Gomes,        CNRS/Universite de Lille,     France      (Frozen density embedding model)
   Bernd Schimmelpfennig,    Forschungszentrum Karlsruhe,  Germany     (AMFI module)
   Kristian Sneskov,         Aarhus University,            Denmark     (Polarizable embedding model, QM/MM)
   Arnfinn H. Steindal,      UiT The Arctic U. of Norway,  Norway      (parallel QM/MM, Polarizable embedding model)
@@ -138,11 +141,12 @@
   Andrew M. Teale,          University of Nottingham,     England     (DFT-AC, DFT-D)
   David P. Tew,             University of Bristol,        England     (CCSD(R12))
   Olav Vahtras,             KTH Stockholm,                Sweden      (triplet response, spin-orbit, ESR, TDDFT, open-shell DFT)
+  Lucas Visscher,           Vrije Universiteit Amsterdam, Netherlands (Frozen density embedding model)
   David J. Wilson,          La Trobe University,          Australia   (DFT Hessian and DFT magnetizabilities)
   Hans Agren,               KTH Stockholm,                Sweden      (SIRIUS module, RESPONS, MC-SCRF solvation model)
  --------------------------------------------------------------------------------
 
-     Date and time (Linux)  : Sun Jan 21 18:25:24 2018
+     Date and time (Linux)  : Sun Dec  8 16:29:19 2019
      Host name              : vladimir-Kubuntu-16                     
 
  * Work memory size             :    64000000 =  488.28 megabytes.
@@ -157,24 +161,23 @@ Compilation information
 
  Who compiled             | vladimir
  Host                     | vladimir-Kubuntu-16
- System                   | Linux-4.10.0-42-generic
+ System                   | Linux-4.15.0-72-generic
  CMake generator          | Unix Makefiles
  Processor                | x86_64
  64-bit integers          | OFF
  MPI                      | OFF
  Fortran compiler         | /usr/bin/gfortran
- Fortran compiler version | GNU Fortran (Ubuntu 6.3.0-12ubuntu2) 6.3.0 2017040
-                          | 6
+ Fortran compiler version | GNU Fortran (Ubuntu 7.4.0-1ubuntu1~18.04.1) 7.4.0
  C compiler               | /usr/bin/gcc
- C compiler version       | gcc (Ubuntu 6.3.0-12ubuntu2) 6.3.0 20170406
+ C compiler version       | gcc (Ubuntu 7.4.0-1ubuntu1~18.04.1) 7.4.0
  C++ compiler             | /usr/bin/g++
- C++ compiler version     | g++ (Ubuntu 6.3.0-12ubuntu2) 6.3.0 20170406
- BLAS                     | /usr/lib/libopenblas.so
- LAPACK                   | /usr/lib/liblapack.so
+ C++ compiler version     | g++ (Ubuntu 7.4.0-1ubuntu1~18.04.1) 7.4.0
+ BLAS                     | /usr/lib/x86_64-linux-gnu/libopenblas.so
+ LAPACK                   | /usr/lib/x86_64-linux-gnu/liblapack.so
  Static linking           | OFF
- Last Git revision        | 9303ffee678b31bc7478a34c517e03bc6fdd0083
- Git branch               | master
- Configuration time       | 2018-01-21 17:35:12.315804
+ Last Git revision        | 4aa945ecd235fbf67ed0c1609617c553ef40be89
+ Git branch               | (HEAD отделён на Dalton2018.2)
+ Configuration time       | 2019-12-08 14:17:35.483502
 
 
    Content of the .dal input file
@@ -399,8 +402,6 @@ N       0.5200     -0.5200     -0.5200
 
  Default print level:        1
 
- * Nuclear model: Point charge
-
  Calculation of one- and two-electron Hamiltonian integrals.
 
  Center of mass  (bohr):     -0.000000000000      0.000000000000     -0.000000000000
@@ -425,14 +426,15 @@ N       0.5200     -0.5200     -0.5200
       z     -0.00000000        -0.00000000        -0.00000000
 
 
+  Time used in ONEDRV     is       0.15 seconds
 
  Threshold for neglecting two-electron integrals:  1.00D-12
  HERMIT - Number of two-electron integrals written:   324630185 ( 95.3% )
  HERMIT - Megabytes written:                           3717.166
 
-  Time used in TWOINT     is      1 minute  47 seconds
-  Total CPU  time used in HERMIT:  1 minute  48 seconds
-  Total wall time used in HERMIT:  1 minute  54 seconds
+  Time used in TWOINT     is      2 minutes 20 seconds
+  Total CPU  time used in HERMIT:  2 minutes 20 seconds
+  Total wall time used in HERMIT:  2 minutes 25 seconds
 
 
                         .----------------------------------.
@@ -467,7 +469,7 @@ N       0.5200     -0.5200     -0.5200
  **********************************************************************
 
  
-     Date and time (Linux)  : Sun Jan 21 18:27:19 2018
+     Date and time (Linux)  : Sun Dec  8 16:31:47 2019
      Host name              : vladimir-Kubuntu-16                     
 
  Title lines from ".mol" input file:
@@ -528,8 +530,8 @@ N       0.5200     -0.5200     -0.5200
 Calculating AOSUPINT
      (Precalculated AO two-electron integrals are transformed to P-supermatrix elements.
       Threshold for discarding integrals :  1.00D-12 )
-  CPU  time used in FORMSUP    is  22.60 seconds
-  WALL time used in FORMSUP    is  36.68 seconds
+  CPU  time used in FORMSUP    is  34.79 seconds
+  WALL time used in FORMSUP    is  1 minute   2 seconds
 @  1    -216.770973893        4.38542D+00   -2.17D+02    1
       Virial theorem: -V/T =      2.009157
 @    MULPOP   N       0.00; N      -0.00; N       0.00; N      -0.00; 
@@ -574,7 +576,7 @@ Calculating AOSUPINT
       Virial theorem: -V/T =      2.003427
 @    MULPOP   N      -0.00; N      -0.00; N       0.00; N      -0.00; 
  -----------------------------------------------------------------------------
-@ 11    -217.608435955        6.99028D-06   -8.24D-11    8
+@ 11    -217.608435955        6.99028D-06   -8.25D-11    8
 
 @ *** DIIS converged in  11 iterations !
 @     Converged SCF energy, gradient:   -217.608435955023    6.99D-06
@@ -605,7 +607,7 @@ Calculating AOSUPINT
 
  --- Writing SIRIFC interface file
 
- CPU and wall time for SCF :      51.224      67.764
+ CPU and wall time for SCF :      87.268     106.049
 
 
                        .-----------------------------------.
@@ -624,10 +626,10 @@ Calculating AOSUPINT
 @    Final gradient norm:           0.000006990276
 
  
-     Date and time (Linux)  : Sun Jan 21 18:28:27 2018
+     Date and time (Linux)  : Sun Dec  8 16:33:33 2019
      Host name              : vladimir-Kubuntu-16                     
 
-File label for MO orbitals:  21Jan18   FOCKDIIS
+File label for MO orbitals:   8Dec19   FOCKDIIS
 
  (Only coefficients > 0.0100 are printed.)
 
@@ -1004,11 +1006,11 @@ File label for MO orbitals:  21Jan18   FOCKDIIS
  218 N   :4f2+   0.0003   0.0013  -0.0035  -0.0055   0.0050  -0.0119
  219 N   :4f3+   0.0020   0.0003   0.0041  -0.0193  -0.0108  -0.0032
 
-  Total CPU  time used in SIRIUS :  52.75 seconds
-  Total wall time used in SIRIUS :  1 minute   9 seconds
+  Total CPU  time used in SIRIUS :  1 minute  31 seconds
+  Total wall time used in SIRIUS :  1 minute  49 seconds
 
  
-     Date and time (Linux)  : Sun Jan 21 18:28:27 2018
+     Date and time (Linux)  : Sun Dec  8 16:33:33 2019
      Host name              : vladimir-Kubuntu-16                     
 
 
@@ -1016,9 +1018,9 @@ File label for MO orbitals:  21Jan18   FOCKDIIS
                      | End of Wave Function Section (SIRIUS) |
                      `---------------------------------------'
 
-  Total CPU  time used in DALTON:  2 minutes 41 seconds
-  Total wall time used in DALTON:  3 minutes  4 seconds
+  Total CPU  time used in DALTON:  3 minutes 53 seconds
+  Total wall time used in DALTON:  4 minutes 14 seconds
 
  
-     Date and time (Linux)  : Sun Jan 21 18:28:28 2018
+     Date and time (Linux)  : Sun Dec  8 16:33:34 2019
      Host name              : vladimir-Kubuntu-16                     

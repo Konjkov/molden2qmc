@@ -378,7 +378,7 @@ scf-first  1  THROUGH  11
      -217.5993402742
      -217.5993402743
 [TITLE]
-*** Dalton interface to Molden, wave function type : HF            21Jan18   18:
+*** Dalton interface to Molden, wave function type : HF             8Dec19   16:
 [Atoms] AU
 N          1     7        -1.2141710420         0.0000000000         1.192911653
 N          2     7         1.3902700099        -0.8023365584         0.582123105

@@ -35,7 +35,7 @@ Latest versions tested:
 - Psi4      - 1.1 release
 - CFOUR     - 2.1
 - ORCA      - Version 4.1.1
-- Dalton    - 2017.alpha (2017)
+- Dalton    - 2018.2
 - Molpro    - Version 2012.1
 - NWChem    - 6.8.1
 - Q-Chem    - 4.4
