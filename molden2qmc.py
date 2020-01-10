@@ -348,6 +348,24 @@ class Molden:
         """
         return sum(orbital['OCCUPATION'] for orbital in self.mo_matrix)
 
+    def nalpha(self):
+        """
+        :returns: total number of alpha electrons
+        """
+        if self.spin_unrestricted():
+            return sum(orbital['OCCUPATION'] for orbital in self.mo_matrix if orbital['SPIN'] == 'Alpha')
+        else:
+            return self.nelec() / 2
+
+    def nbeta(self):
+        """
+        :returns: total number of beta electrons
+        """
+        if self.spin_unrestricted():
+            return sum(orbital['OCCUPATION'] for orbital in self.mo_matrix if orbital['SPIN'] == 'Beta')
+        else:
+            return self.nelec() / 2
+
 
 class GWFN(Molden):
     """gwfn.data file writer."""
