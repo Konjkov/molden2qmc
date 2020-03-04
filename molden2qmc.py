@@ -622,8 +622,7 @@ ORBITAL COEFFICIENTS
 
         GroupParameter.create_dataset("numAO",(1,),dtype="i4",data=NbAO)
 
-        print ('Wavefunction successfully saved to QMCPACK HDF5 Format')
-        print ('Use: "convert4qmc -orbitals  {}.h5" to generate QMCPACK input files'.format(f))
+
         H5_qmcpack.close()
 
     def natom(self):
@@ -1497,10 +1496,14 @@ def main():
         "all = pseudopotential was used for all atoms in this calculation.\n"
         "white space separated numbers = number of pseudoatoms (started from 1)."))
 
-    parser.add_argument('--qmcpack', dest='qmcpack', action='store_true')
+    parser.add_argument('--qmcpack', dest='qmcpack', action='store_true', help=(
+        'Use: "convert4qmc -orbitals  {output_file}.h5" to generate QMCPACK input files'))
     parser.set_defaults(qmcpack=False)
 
     args = parser.parse_args()
+
+    if args.qmcpack and args.output_file == "gwfn.data":
+            arg.output_file = "Mol.orbs.h5"
 
     if not os.path.exists(args.input_file):
         print ("File %s not found..." % args.input_file)
