@@ -1530,8 +1530,7 @@ def main():
         "all = pseudopotential was used for all atoms in this calculation.\n"
         "white space separated numbers = number of pseudoatoms (started from 1)."))
 
-    parser.add_argument('--qmcpack', dest='qmcpack', action='store_true', help=(
-        'Use: "convert4qmc -orbitals  {output_file}.h5" to generate QMCPACK input files'))
+    parser.add_argument('--qmcpack', dest='qmcpack', action='store_true', help=('generates an HDF5 file  named Mol.orbs.h5 compatible with the QMCPACK format.'))
     parser.set_defaults(qmcpack=False)
 
     args = parser.parse_args()
