@@ -494,6 +494,7 @@ class test_Orca4(unittest.TestCase):
             orca = molden2qmc.Orca(f)
         self.assertTrue(np.allclose(mo_matrix(orca4), mo_matrix(orca), atol=0.001))
 
+import os
 
 class test_QMCPACK(unittest.TestCase):
     base_dir = 'test/N4/QMCPACK/'
