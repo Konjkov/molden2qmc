@@ -1102,13 +1102,13 @@ class DefaultConverter(GWFN):
                                     15.0 / sqrt(2.0), 15.0 / sqrt(2.0),
                                     15.0 * sqrt(3.0), 15.0 * sqrt(3.0)) 
 
-        return (coefficient[0] * self.m_dependent_factor(3,  0),
-                coefficient[1] * self.m_dependent_factor(3,  1),
-                coefficient[2] * self.m_dependent_factor(3, -1),
-                coefficient[3] * self.m_dependent_factor(3,  2),
-                coefficient[4] * self.m_dependent_factor(3, -2),
-                coefficient[5] * self.m_dependent_factor(3,  3),
-                coefficient[6] * self.m_dependent_factor(3, -3))
+        return (coefficient[0] * self.m_dependent_factor(3,  0) * premultiplied_factor[0],
+                coefficient[1] * self.m_dependent_factor(3,  1) * premultiplied_factor[1],
+                coefficient[2] * self.m_dependent_factor(3, -1) * premultiplied_factor[2],
+                coefficient[3] * self.m_dependent_factor(3,  2) * premultiplied_factor[3],
+                coefficient[4] * self.m_dependent_factor(3, -2) * premultiplied_factor[4],
+                coefficient[5] * self.m_dependent_factor(3,  3) * premultiplied_factor[5],
+                coefficient[6] * self.m_dependent_factor(3, -3) * premultiplied_factor[6])
 
     def g_normalize(self, coefficient):
         """
