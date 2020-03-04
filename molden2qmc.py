@@ -11,6 +11,21 @@ from functools import reduce
 __version__ = '4.0.4'
 
 
+#Common bloc
+dIonName2nelec=dict([('H',1),  ('He',2),  ('Li',3),('Be',4),  ('B', 5),  ('C', 6),  ('N', 7),('O', 8),  ('F', 9),   ('Ne',10), 
+              ('Na',11),('Mg',12),   ('Al',13),   ('Si',14),   ('P', 15),   ('S', 16),('Cl',17),   ('Ar',18),   ('K', 19),   
+              ('Ca',20),   ('Sc',21),   ('Ti',22),   ('V', 23),   ('Cr',24),   ('Mn',25),   ('Fe',26),   ('Co',27),   
+              ('Ni',28),   ('Cu',29),   ('Zn',30),   ('Ga',31),   ('Ge',32),   ('As',33),   ('Se',34),   ('Br',35),  
+              ('Kr',36),   ('Rb',37),   ('Sr',38),   ('Y', 39),  ('Zr',40),   ('Nb',41),   ('Mo',42),   ('Tc',43),  
+              ('Ru',44),   ('Rh',45),   ('Pd',46),   ('Ag',47),   ('Cd',48),   ('In',49),   ('Sn',50),   ('Sb',51),  
+              ('Te',52),   ('I', 53),   ('Xe',54),   ('Cs',55),   ('Ba',56),   ('La',57),   ('Ce',58), ('Pr',59),  
+              ('Nd',60),   ('Pm',61),   ('Sm',62),   ('Eu',63),   ('Gd',64),   ('Tb',65),   ('Dy',66),   ('Ho',67),
+              ('Er',68),   ('Tm',69),   ('Yb',70),   ('Lu',71),   ('Hf',72),   ('Ta',73),   ('W', 74),   ('Re',75),
+              ('Os',76),   ('Ir',77),   ('Pt',78),   ('Au',79),   ('Hg',80), ('Tl',81),   ('Pb',82),  ('Bi',83),  
+              ('Po',84),   ('At',85),   ('Rn',86),   ('Fr',87),   ('Ra',88),   ('Ac',89),   ('Th',90),   ('Pa',91),  
+              ('U', 92),   ('Np',93)])
+dnelec2IonName = {v:k for k,v in dIonName2nelec.items()}
+
 def fact2(k):
     """
     Compute double factorial: k!! = 1*3*5*....k
@@ -366,6 +381,31 @@ class Molden:
         else:
             return self.nelec() / 2
 
+    def species_list(self):
+
+        def uuid_species(atom):
+            return ( atom['N'], self.charge(atom) )
+
+        # We need to uniquify the list of atoms.
+        # Because atoms are non hashable, we will assum that atom are similar is they have the same 'Atom_numer', and the same number of shell
+
+        d_atom_list_unique = {}
+        for atom in self.atom_list:
+            if uuid_species(atom) not in d_atom_list_unique:
+                d_atom_list_unique[uuid_species(atom)] = atom
+
+        return list(d_atom_list_unique.values())
+
+    def species_idx(self):
+
+        def uuid_species(atom):
+            return ( atom['N'], self.charge(atom) )
+
+        l_key = list(map(uuid_species,self.species_list()))
+        l_atom = list(map(uuid_species,self.atom_list))
+
+        return [l_key.index(atom) for atom in l_atom]
+
 
 class GWFN(Molden):
     """gwfn.data file writer."""
@@ -481,9 +521,7 @@ ORBITAL COEFFICIENTS
         groupPBC=H5_qmcpack.create_group("PBC")
         groupPBC.create_dataset("PBC",(1,),dtype="b1",data=False)
 
-        #Common block of default parameters"
-        IonName=dict([('H',1),  ('He',2),  ('Li',3),('Be',4),  ('B', 5),  ('C', 6),  ('N', 7),('O', 8),  ('F', 9),   ('Ne',10),   ('Na',11),('Mg',12),   ('Al',13),   ('Si',14),   ('P', 15),   ('S', 16),('Cl',17),   ('Ar',18),   ('K', 19),   ('Ca',20),   ('Sc',21),   ('Ti',22),   ('V', 23),   ('Cr',24),   ('Mn',25),   ('Fe',26),   ('Co',27),   ('Ni',28),   ('Cu',29),   ('Zn',30),   ('Ga',31),   ('Ge',32),   ('As',33),   ('Se',34),   ('Br',35),   ('Kr',36),   ('Rb',37),   ('Sr',38),   ('Y', 39),  ('Zr',40),   ('Nb',41),   ('Mo',42),   ('Tc',43),   ('Ru',44),   ('Rh',45),   ('Pd',46),   ('Ag',47),   ('Cd',48),   ('In',49),   ('Sn',50),   ('Sb',51),   ('Te',52),   ('I', 53),   ('Xe',54),   ('Cs',55),   ('Ba',56),   ('La',57),   ('Ce',58), ('Pr',59),   ('Nd',60),   ('Pm',61),   ('Sm',62),   ('Eu',63),   ('Gd',64),   ('Tb',65),   ('Dy',66),   ('Ho',67),  ('Er',68),   ('Tm',69),   ('Yb',70),   ('Lu',71),   ('Hf',72),   ('Ta',73),   ('W', 74),   ('Re',75),   ('Os',76),   ('Ir',77),   ('Pt',78),   ('Au',79),   ('Hg',80), ('Tl',81),   ('Pb',82),  ('Bi',83),   ('Po',84),   ('At',85),   ('Rn',86),   ('Fr',87),   ('Ra',88),   ('Ac',89),   ('Th',90),   ('Pa',91),   ('U', 92),   ('Np',93)]) 
-        NameIon = {v:k for k,v in IonName.items()}
+
 
         natom=self.natom()
         #Group Atoms
@@ -506,31 +544,27 @@ ORBITAL COEFFICIENTS
                 d_atom_list_unique[uuid_species(atom)] = atom
 
 
-        groupAtom.create_dataset("number_of_species",(1,),dtype="i4",data=len(d_atom_list_unique))
+        groupAtom.create_dataset("number_of_species",(1,),dtype="i4",data=len(self.species_list()))
         #Dataset positions 
 
         positions = np.array([ [atom['X'],atom['Y'],atom['Z']] for atom in self.atom_list], 'f8')
         groupAtom.create_dataset("positions",data=positions)
 
-        for x,atom in enumerate(d_atom_list_unique.values()):
+        for x,atom in enumerate(self.species_list()):
             groupSpecies=groupAtom.create_group(f"species_{x}")
-            groupSpecies.create_dataset('name', (1,),data=np.string_(NameIon[atom['N']]))
+            groupSpecies.create_dataset('name', (1,),data=np.string_(dnelec2IonName[atom['N']]))
             groupSpecies.create_dataset("atomic_number",(1,),dtype="i4",data=atom['N'])
             groupSpecies.create_dataset("charge",(1,),dtype="f8",data= self.charge(atom))
             groupSpecies.create_dataset("core",(1,),dtype="f8",data=self.core_elec(atom))
 
       
         #SpeciesID
+        groupAtom.create_dataset("species_ids",data=np.array(self.species_idx(),"i4") )
 
-        l_key = list(d_atom_list_unique.keys())
-        groupAtom.create_dataset("species_ids",data=np.array([l_key.index(uuid_species(atom)) for atom in self.atom_list],"i4") )
-
-      
         #Parameter Group
         GroupParameter=H5_qmcpack.create_group("parameters")
       
-        ecp = any(atom['pseudo']for atom in self.atom_list )
-        GroupParameter.create_dataset("ECP",(1,),dtype="b1",data=ecp)
+        GroupParameter.create_dataset("ECP",(1,),dtype="b1",data=self.pseudoatoms == None)
 
 
         GroupParameter.create_dataset("Unit",(1,),dtype="b1",data=True) 
@@ -555,7 +589,7 @@ ORBITAL COEFFICIENTS
         for x, atom in enumerate(d_atom_list_unique.values()):
        
           atomicBasisSetGroup=GroupBasisSet.create_group(f"atomicBasisSet{x}")      
-          atomicBasisSetGroup.create_dataset('elementType', (1,),data=np.string_(NameIon[atom['N']]))
+          atomicBasisSetGroup.create_dataset('elementType', (1,),data=np.string_(dnelec2IonName[atom['N']]))
 
           if cart:
             atomicBasisSetGroup.create_dataset('angular', (1,),data=np.string_('cartesian'))
@@ -584,7 +618,7 @@ ORBITAL COEFFICIENTS
 
             BasisGroup=atomicBasisSetGroup.create_group(f"basisGroup{i}")
             BasisGroup.create_dataset('type',(1,),data=np.string_("Gaussian"))          
-            BasisGroup.create_dataset('rid', (1,), data=np.string_(f"{NameIon[atom['N']]}{i}{l_qmcpack}"))
+            BasisGroup.create_dataset('rid', (1,), data=np.string_(f"{dnelec2IonName[atom['N']]}{i}{l_qmcpack}"))
           
             coord= [atom['X'],atom['Y'],atom['Z']]
 
