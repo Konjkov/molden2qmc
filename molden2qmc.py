@@ -1063,7 +1063,7 @@ class DefaultConverter(GWFN):
         minus_4 = sqrt(35) * (xxxy - yyyx) / 2.0
         return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3, plus_4, minus_4
 
-    def d_normalize(self, coefficient, qmcpack_normalization):
+    def d_normalize(self, coefficient, qmcpack_normalization=False):
         """
         The following order of D functions is expected:
             5D: D 0, D+1, D-1, D+2, D-2
@@ -1089,7 +1089,7 @@ class DefaultConverter(GWFN):
                 coefficient[3] * self.m_dependent_factor(2,  2) * premultiplied_factor[3],
                 coefficient[4] * self.m_dependent_factor(2, -2) * premultiplied_factor[4])
 
-    def f_normalize(self, coefficient,qmcpack_normalization):
+    def f_normalize(self, coefficient,qmcpack_normalization=False):
         """
         The following order of F functions is expected:
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
@@ -1110,7 +1110,7 @@ class DefaultConverter(GWFN):
                 coefficient[5] * self.m_dependent_factor(3,  3) * premultiplied_factor[5],
                 coefficient[6] * self.m_dependent_factor(3, -3) * premultiplied_factor[6])
 
-    def g_normalize(self, coefficient):
+    def g_normalize(self, coefficient,qmcpack_normalization=False):
         """
         The following order of G functions is expected:
             9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
@@ -1125,7 +1125,7 @@ class DefaultConverter(GWFN):
                 coefficient[7] * self.m_dependent_factor(4,  4),
                 coefficient[8] * self.m_dependent_factor(4, -4))
 
-    def mo_matrix_converter(self,qmcpack):
+    def mo_matrix_converter(self,qmcpack=False):
         """
         Only mo_coefficients of d, f, g must be converted by default.
         """
@@ -1273,7 +1273,7 @@ class Orca(DefaultConverter):
                     if l == 4:
                         primitive[1] *= sqrt(3)
 
-    def f_normalize(self, coefficient):
+    def f_normalize(self, coefficient,qmcpack_normalization=False):
         """
         ORCA use slightly different sign conventions:
             F(+3)_ORCA = - F(+3)_MOLDEN
@@ -1281,9 +1281,9 @@ class Orca(DefaultConverter):
         """
         coefficient[5] *= -1
         coefficient[6] *= -1
-        return super(Orca, self).f_normalize(coefficient)
+        return super(Orca, self).f_normalize(coefficient,qmcpack_normalization)
 
-    def g_normalize(self, coefficient):
+    def g_normalize(self, coefficient,qmcpack_normalization=False):
         """
         ORCA use slightly different sign conventions:
             G(+3)_ORCA = - G(+3)_MOLDEN
@@ -1295,7 +1295,7 @@ class Orca(DefaultConverter):
         coefficient[6] *= -1
         coefficient[7] *= -1
         coefficient[8] *= -1
-        return super(Orca, self).g_normalize(coefficient)
+        return super(Orca, self).g_normalize(coefficient,qmcpack_normalization)
 
     def CodeInfo(self):
         """
