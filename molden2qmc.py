@@ -475,6 +475,13 @@ ORBITAL COEFFICIENTS
 {orbital_coefficients}
 
 """
+#Changes to write
+    def write(self, f, qmcpack = False):
+        if not qmcpack:
+            self.gwfn(f)
+        else:
+            self.qmcpack(f)
+
     def gwfn(self, f='gwfn.data'):
         """
         write out gwfn.data file
@@ -1536,7 +1543,7 @@ def main():
     args = parser.parse_args()
 
     if args.qmcpack and args.output_file == "gwfn.data":
-            arg.output_file = "Mol.orbs.h5"
+            args.output_file = "Mol.orbs.h5"
 
     if not os.path.exists(args.input_file):
         print ("File %s not found..." % args.input_file)
@@ -1545,21 +1552,21 @@ def main():
     input_file = open(args.input_file, "r")
 
     if args.code == 0:
-        Turbomole(input_file, args.pseudoatoms,args.qmcpack).gwfn(args.output_file)
+        Turbomole(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
     elif args.code == 1:
-        PSI4(input_file, args.pseudoatoms,args.qmcpack).gwfn(args.output_file)
+        PSI4(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
     elif args.code == 2:
-        CFour(input_file, args.pseudoatoms,args.qmcpack).gwfn(args.output_file)
+        CFour(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
     elif args.code == 3:
-        Orca(input_file, args.pseudoatoms,args.qmcpack).gwfn(args.output_file)
+        Orca(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
     elif args.code == 4:
-        Dalton(input_file, args.pseudoatoms,args.qmcpack).gwfn(args.output_file)
+        Dalton(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
     elif args.code == 5:
-        Molpro(input_file, args.pseudoatoms,args.qmcpack).gwfn(args.output_file)
+        Molpro(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
     elif args.code == 6:
-        NwChem(input_file, args.pseudoatoms,args.qmcpack).gwfn(args.output_file)
+        NwChem(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
     elif args.code == 7:
-        QChem(input_file, args.pseudoatoms,args.qmcpack).gwfn(args.output_file)
+        QChem(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
 
 
 if __name__ == "__main__":
