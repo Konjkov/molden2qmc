@@ -570,8 +570,9 @@ ORBITAL COEFFICIENTS
 
         #Parameter Group
         GroupParameter=H5_qmcpack.create_group("parameters")
-      
-        GroupParameter.create_dataset("ECP",(1,),dtype="b1",data=self.pseudoatoms == None)
+        
+        #changed == to !=
+        GroupParameter.create_dataset("ECP",(1,),dtype="b1",data=self.pseudoatoms != None)
 
 
         GroupParameter.create_dataset("Unit",(1,),dtype="b1",data=True) 
@@ -825,11 +826,12 @@ ORBITAL COEFFICIENTS
         if l_molden == 2:
           print("Warning, BASIS SET WITH SP not implemented. Contact Developers")
         elif l_molden == 6:
-          print ("G orbitals detected. These are not yet implemented as we are missing a correction in the orbitals. Please get rid of the G orbital in the basis set or contact developers")
+          #print ("G orbitals detected. These are not yet implemented as we are missing a correction in the orbitals. Please get rid of the G orbital in the basis set or contact developers")
+          print ("G orbitals detected. These are partially implemented, but still missing the contraction correction")
         elif l_molden > 6:
           print ("WARNING. BASIS SET WITH l>4 not implemented. Contact Developers")
 
-        molden2qmc = {1:0,3:1,4:2,5:3}
+        molden2qmc = {1:0,3:1,4:2,5:3,6:4}# Added 6:4 to bypass key error with G orbitals
         return molden2qmc[l_molden]
 
     def shell_types(self):
@@ -1150,20 +1152,29 @@ class DefaultConverter(GWFN):
                 coefficient[5] * self.m_dependent_factor(3,  3) * premultiplied_factor[5],
                 coefficient[6] * self.m_dependent_factor(3, -3) * premultiplied_factor[6])
 
-    def g_normalize(self, coefficient,qmcpack_normalization=False):
+    def g_normalize(self, coefficient,qmcpack_normalization=False):# Added g normalization
         """
         The following order of G functions is expected:
             9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
         """
-        return (coefficient[0] * self.m_dependent_factor(4,  0),
-                coefficient[1] * self.m_dependent_factor(4,  1),
-                coefficient[2] * self.m_dependent_factor(4, -1),
-                coefficient[3] * self.m_dependent_factor(4,  2),
-                coefficient[4] * self.m_dependent_factor(4, -2),
-                coefficient[5] * self.m_dependent_factor(4,  3),
-                coefficient[6] * self.m_dependent_factor(4, -3),
-                coefficient[7] * self.m_dependent_factor(4,  4),
-                coefficient[8] * self.m_dependent_factor(4, -4))
+        if not qmcpack_normalization:
+            premultiplied_factor = (1,1,1,1,1,1,1,1,1)
+        else:
+            premultiplied_factor = (0.25 * sqrt(105.0), 
+                                    2.5 * sqrt(11.5), 2.5 * sqrt(11.5), 
+                                    7.5 * sqrt(21.0), 7.5 * sqrt(21.0),
+                                    105.0 * sqrt(1.5), 105.0 * sqrt(1.5),
+                                    210.0 * sqrt(3.0), 210.0 * sqrt(3.0))
+                                    
+        return (coefficient[0] * self.m_dependent_factor(4,  0) * premultiplied_factor[0],
+                coefficient[1] * self.m_dependent_factor(4,  1) * premultiplied_factor[1],
+                coefficient[2] * self.m_dependent_factor(4, -1) * premultiplied_factor[2],
+                coefficient[3] * self.m_dependent_factor(4,  2) * premultiplied_factor[3],
+                coefficient[4] * self.m_dependent_factor(4, -2) * premultiplied_factor[4],
+                coefficient[5] * self.m_dependent_factor(4,  3) * premultiplied_factor[5],
+                coefficient[6] * self.m_dependent_factor(4, -3) * premultiplied_factor[6],
+                coefficient[7] * self.m_dependent_factor(4,  4) * premultiplied_factor[7],
+                coefficient[8] * self.m_dependent_factor(4, -4) * premultiplied_factor[8])
 
     def mo_matrix_converter(self,qmcpack=False):
         """
