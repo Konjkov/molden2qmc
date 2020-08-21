@@ -826,7 +826,6 @@ ORBITAL COEFFICIENTS
         if l_molden == 2:
           print("Warning, BASIS SET WITH SP not implemented. Contact Developers")
         elif l_molden == 6:
-          #print ("G orbitals detected. These are not yet implemented as we are missing a correction in the orbitals. Please get rid of the G orbital in the basis set or contact developers")
           print ("G orbitals detected. These are partially implemented, but still missing the contraction correction")
         elif l_molden > 6:
           print ("WARNING. BASIS SET WITH l>4 not implemented. Contact Developers")
