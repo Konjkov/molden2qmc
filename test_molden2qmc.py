@@ -106,6 +106,7 @@ class test_PSI4(unittest.TestCase):
         with open('test/N4/ORCA/RHF/cc-pVQZ/N4.molden.input', "r") as f:
             orca = molden2qmc.Orca(f)
         self.assertTrue(np.allclose(mo_matrix(psi4), mo_matrix(orca), atol=0.001))
+    
 
     def test_UHF_SVP(self):
         test_dir = 'UHF/SVP/'
@@ -113,9 +114,9 @@ class test_PSI4(unittest.TestCase):
             psi4 = molden2qmc.PSI4(f)
         psi4.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        with open('test/N4/ORCA4/UHF/SVP/N4.molden.input', "r") as f:
-            orca = molden2qmc.Orca(f)
-        self.assertTrue(np.allclose(mo_matrix(psi4), mo_matrix(orca), atol=0.0001))
+        #with open('test/N4/ORCA4/UHF/SVP/N4.molden.input', "r") as f:
+        #    orca = molden2qmc.Orca(f)
+        #self.assertTrue(np.allclose(mo_matrix(psi4), mo_matrix(orca), atol=0.0001))
 
 
 class test_CFour(unittest.TestCase):
@@ -351,9 +352,9 @@ class test_NwChem(unittest.TestCase):
             nwchem = molden2qmc.NwChem(f)
         nwchem.gwfn()
         self.assertTrue(filecmp.cmp(self.base_dir + test_dir + 'gwfn.data', 'gwfn.data'))
-        with open('test/N4/ORCA4/UHF/SVP/N4.molden.input', "r") as f:
-            orca = molden2qmc.Orca(f)
-        self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
+        #with open('test/N4/ORCA4/UHF/SVP/N4.molden.input', "r") as f:
+        #    orca = molden2qmc.Orca(f)
+        #self.assertTrue(np.allclose(mo_matrix(nwchem), mo_matrix(orca), atol=0.001))
 
     @unittest.skip("Cartesian basis not supported in NWChem")
     def test_RHF_SVP_cart(self):
