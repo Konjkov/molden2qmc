@@ -517,6 +517,7 @@ ORBITAL COEFFICIENTS
         import numpy as np
         from collections import defaultdict 
         H5_qmcpack=h5py.File(f,'w')
+        ECP=False
 
         codeName , codever = self.CodeInfo()
 
@@ -571,8 +572,8 @@ ORBITAL COEFFICIENTS
         #Parameter Group
         GroupParameter=H5_qmcpack.create_group("parameters")
         
-        #changed == to !=
-        GroupParameter.create_dataset("ECP",(1,),dtype="b1",data=self.pseudoatoms != None)
+        #GroupParameter.create_dataset("ECP",(1,),dtype="b1",data=self.pseudoatoms )
+        GroupParameter.create_dataset("ECP",(1,),dtype="b1",data=ECP )
 
 
         GroupParameter.create_dataset("Unit",(1,),dtype="b1",data=True) 
@@ -654,14 +655,19 @@ ORBITAL COEFFICIENTS
            NbMO_up,NbMO_dn = self.nmo_unrestricted()
            eigenset=GroupDet.create_dataset("eigenset_0",(NbMO_up,NbAO),dtype="f8",data=self.orbital_coefficients_per_spin('Alpha'))
            eigenset=GroupDet.create_dataset("eigenset_1",(NbMO_dn,NbAO),dtype="f8",data=self.orbital_coefficients_per_spin('Beta'))
-           GroupParameter.create_dataset("numMO_up",(1,),dtype="i4",data=NbMO_up)
-           GroupParameter.create_dataset("numMO_dn",(1,),dtype="i4",data=NbMO_dn)
-           GroupParameter.create_dataset("numAO_dn",(1,),dtype="i4",data=NbAO)
+           eigenvalue=GroupDet.create_dataset("eigenval_0",(1,NbMO_up),dtype="f8",data=self.orbital_mo_energy_per_spin('Alpha'))
+           eigenvalue=GroupDet.create_dataset("eigenval_1",(1,NbMO_dn),dtype="f8",data=self.orbital_mo_energy_per_spin('Beta'))
+
+           if (NbMO_up>NbMO_dn):
+                NbMO=NbMO_up
+           else:
+                NbMO=NbMO_dn
         else:
            NbMO=self.nmo()
            eigenset=GroupDet.create_dataset("eigenset_0",(NbMO,NbAO),dtype="f8",data=self.orbital_coefficients_per_spin('Alpha'))
-           GroupParameter.create_dataset("numMO",(1,),dtype="i4",data=NbMO)
+           eigenvalue=GroupDet.create_dataset("eigenval_0",(1,NbMO),dtype="f8",data=self.orbital_mo_energy_per_spin('Alpha'))
 
+        GroupParameter.create_dataset("numMO",(1,),dtype="i4",data=NbMO)
         GroupParameter.create_dataset("numAO",(1,),dtype="i4",data=NbAO)
 
 
@@ -825,8 +831,6 @@ ORBITAL COEFFICIENTS
 
         if l_molden == 2:
           print("Warning, BASIS SET WITH SP not implemented. Contact Developers")
-        elif l_molden == 6:
-          print ("G orbitals detected. These are partially implemented, but still missing the contraction correction")
         elif l_molden > 6:
           print ("WARNING. BASIS SET WITH l>4 not implemented. Contact Developers")
 
@@ -946,6 +950,18 @@ ORBITAL COEFFICIENTS
              for ao in orbital['MO']:
                l.extend(ao['DATA'])
         return l
+
+    def orbital_mo_energy_per_spin(self,spin):
+        """
+        :returns: ORBITAL Energy,
+        for a given 'SPIN'
+        """
+        l = [] 
+        for orbital in self.mo_matrix:
+           if orbital['SPIN'] == spin:
+             l.append(orbital['ENERGY'])
+        return l
+
 
 class DefaultConverter(GWFN):
     """

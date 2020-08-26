@@ -510,6 +510,33 @@ class test_QMCPACK(unittest.TestCase):
         os.remove("Mol.orbs.h5")
         self.assertTrue(res == 0)
 
+    def test_ORCA4_UHF_SVP(self):
+        test_dir = 'ORCA4/UHF/SVP/'
+        with open(self.base_dir + test_dir + self.molden_file, "r") as f:
+            orca = molden2qmc.Orca(f,qmcpack_normalization=True)
+        orca.qmcpack()
+        res=os.system('h5diff -d 0.000001 Mol.orbs.h5 ' + self.base_dir + test_dir + 'Mol.orbs.h5')
+        os.remove("Mol.orbs.h5")
+        self.assertTrue(res == 0)
+
+    def test_ORCA4_RHF_SVP(self):
+        test_dir = 'ORCA4/RHF/SVP/'
+        with open(self.base_dir + test_dir + self.molden_file, "r") as f:
+            orca = molden2qmc.Orca(f,qmcpack_normalization=True)
+        orca.qmcpack()
+        res=os.system('h5diff -d 0.000001 Mol.orbs.h5 ' + self.base_dir + test_dir + 'Mol.orbs.h5')
+        os.remove("Mol.orbs.h5")
+        self.assertTrue(res == 0)
+
+    def test_CFOUR_UHF_SVP(self):
+        test_dir = 'CFOUR/UHF/SVP/'
+        with open(self.base_dir + test_dir + self.molden_file, "r") as f:
+            cfour = molden2qmc.CFour(f,qmcpack_normalization=True)
+        cfour.qmcpack()
+        res=os.system('h5diff -d 0.000001 Mol.orbs.h5 ' + self.base_dir + test_dir + 'Mol.orbs.h5')
+        os.remove("Mol.orbs.h5")
+        self.assertTrue(res == 0)
+
     def test_MOLPRO_RHF_TZVP(self):
         test_dir = 'MOLPRO/RHF/TZVP/'
         with open(self.base_dir + test_dir + self.molden_file, "r") as f:
@@ -521,6 +548,15 @@ class test_QMCPACK(unittest.TestCase):
 
     def test_NWCHEM_RHF_SVP(self):
         test_dir = 'NWCHEM/RHF/SVP/'
+        with open(self.base_dir + test_dir + self.molden_file, "r") as f:
+            nwchem = molden2qmc.NwChem(f,qmcpack_normalization=True)
+        nwchem.qmcpack()
+        res=os.system('h5diff -d 0.000001 Mol.orbs.h5 ' + self.base_dir + test_dir + 'Mol.orbs.h5') 
+        os.remove("Mol.orbs.h5")
+        self.assertTrue(res == 0)
+
+    def test_NWCHEM_UHF_SVP(self):
+        test_dir = 'NWCHEM/UHF/SVP/'
         with open(self.base_dir + test_dir + self.molden_file, "r") as f:
             nwchem = molden2qmc.NwChem(f,qmcpack_normalization=True)
         nwchem.qmcpack()
@@ -582,6 +618,15 @@ class test_QMCPACK(unittest.TestCase):
         os.remove("Mol.orbs.h5")
         self.assertTrue(res == 0)
 
+    def test_QCHEM_RHF_SVP(self):
+        test_dir = 'QCHEM/UHF/cc-pVDZ/'
+        with open(self.base_dir + test_dir + self.molden_file, "r") as f:
+            qchem = molden2qmc.QChem(f,qmcpack_normalization=True)
+        qchem.qmcpack()
+        res=os.system('h5diff -d 0.000001 Mol.orbs.h5 ' + self.base_dir + test_dir + 'Mol.orbs.h5') 
+        os.remove("Mol.orbs.h5")
+        self.assertTrue(res == 0)
+
     def test_QCHEM_RHF_TZVP(self):
         test_dir = 'QCHEM/RHF/TZVP/'
         with open(self.base_dir + test_dir + self.molden_file, "r") as f:
@@ -608,6 +653,16 @@ class test_QMCPACK(unittest.TestCase):
             qchem = molden2qmc.QChem(f,qmcpack_normalization=True)
         qchem.qmcpack()
         res=os.system('h5diff -d 0.000001 Mol.orbs.h5 ' + self.base_dir + test_dir + 'Mol.orbs.h5') 
+        os.remove("Mol.orbs.h5")
+        self.assertTrue(res == 0)
+
+    def test_QCHEM_g_ane(self):
+        test_dir = '../../QCHEM/g-ane/'
+        ane_file='methane.molden'
+        with open(self.base_dir + test_dir + ane_file, "r") as f:
+            qchem = molden2qmc.QChem(f,qmcpack_normalization=True)
+        qchem.qmcpack()
+        res=os.system('h5diff -d 0.000001 Mol.orbs.h5 ' + self.base_dir + test_dir + 'Mol.orbs.h5')
         os.remove("Mol.orbs.h5")
         self.assertTrue(res == 0)
 
