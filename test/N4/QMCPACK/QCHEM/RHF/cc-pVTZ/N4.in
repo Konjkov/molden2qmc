@@ -1,0 +1,20 @@
+$comment0
+$end
+
+$rem
+SYMMETRY              false
+SYM_IGNORE            true
+BASIS                 cc-pVTZ
+METHOD                HF
+SCF_CONVERGENCE       8
+MOLDEN_FORMAT         true
+PRINT_ORBITALS        1000
+$end
+
+$molecule
+   0 1
+   N       0.5200      0.5300      0.5100
+   N      -0.5200     -0.5200      0.5200
+   N      -0.5200      0.5200     -0.5200
+   N       0.5200     -0.5200     -0.5200
+$end

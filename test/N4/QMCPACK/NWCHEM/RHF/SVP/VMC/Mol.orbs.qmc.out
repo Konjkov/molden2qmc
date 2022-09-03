@@ -1,0 +1,386 @@
+  Input file(s): Mol.orbs.qmc.in-wfnoj.xml 
+
+=====================================================
+                    QMCPACK 3.8.9
+
+       (c) Copyright 2003-  QMCPACK developers
+
+                    Please cite:
+ J. Kim et al. J. Phys. Cond. Mat. 30 195901 (2018)
+      https://doi.org/10.1088/1361-648X/aab9c3
+
+  Git branch: develop
+  Last git commit: 569f657f1bbd7a7229fe99cc3f1205f67d888678-dirty
+  Last git commit date: Mon Jan 6 17:07:27 2020 -0500
+  Last git commit subject: Merge pull request #2128 from jtkrogel/nx_opt_nlpp
+=====================================================
+  Global options 
+
+  Total number of MPI ranks = 1
+  Number of MPI groups      = 1
+  MPI group ID              = 0
+  Number of ranks in group  = 1
+  MPI ranks per node        = 1
+  OMP 1st level threads     = 8
+  OMP nested threading disabled or only 1 thread on the 2nd level
+
+  Precision used in this calculation, see definitions in the manual:
+  Base precision      = double
+  Full precision      = double
+
+  Structure-of-arrays (SoA) optimization enabled
+
+  Input XML = Mol.orbs.qmc.in-wfnoj.xml
+
+  Project = Mol.orbs
+  date    = 2020-01-08 16:27:35 CST
+  host    = abenali
+
+ Random Number
+ -------------
+  Offset for the random number seeds based on time: 855
+
+  Range of prime numbers to use as seeds over processors and threads = 6653-6703
+
+
+ Particle Set 
+ ------------
+  Name: ion0
+  All the species have the same mass 1
+  Particle set size: 4
+
+ Particle Set 
+ ------------
+  Name: e
+  All the species have the same mass 1
+  Particle set size: 28
+
+ Wavefunction setup: 
+ ------------------- 
+  Name: psi0
+  LCAO: SoaAtomicBasisSet<MultiQuintic,1>
+Reading BasisSet from HDF5 file:Mol.orbs.h5
+<input node="atomicBasisSet" name="gaussian" expandYlm="Gaussian" angular="spherical" elementType="N" normalized="yes" type="Numerical" expM="0" />
+  AO BasisSet for N
+   Spherical Harmonics contain (-1)^m factor
+   Angular momentum m expanded according to Gaussian
+   Grid is created by the input paremters in h5
+    Using log grid ri = 1e-06 rf = 100 npts = 1001
+   R(n,l,m,s) 0 0 0 0
+   R(n,l,m,s) 1 0 0 0
+   R(n,l,m,s) 2 0 0 0
+   R(n,l,m,s) 3 1 0 0
+   R(n,l,m,s) 4 1 0 0
+   R(n,l,m,s) 5 2 0 0
+Expanding Ylm according to Gaussian98
+Adding 1 spherical orbitals for l= 0
+Adding 1 spherical orbitals for l= 0
+Adding 1 spherical orbitals for l= 0
+Adding 3 spherical orbitals for l= 1
+Adding 3 spherical orbitals for l= 1
+Adding 5 spherical orbitals for l= 2
+  Setting cutoff radius 81078.8
+
+   Maximum Angular Momentum  = 2
+   Number of Radial functors = 6
+   Basis size                = 14
+
+  Created SPOSet builder named 'LCAOBSet' of type molecularorbital
+Reuse SPOSetBuilder "LCAOBSet" type MolecularOrbital
+  Building SPOSet '' with '' basis set.
+Reading cusp info from : updet.cuspInfo.xml
+Could not find precomputed cusp data for spo set: updet
+Recalculating data.
+  Number of molecular orbitals to compute correction on this rank: 14
+   Working on MO: 1 Center: 0
+   Working on MO: 0 Center: 0
+   Working on MO: 3 Center: 0
+   Working on MO: 2 Center: 0
+   Working on MO: 4 Center: 0
+   Working on MO: 5 Center: 0
+   Working on MO: 6 Center: 0
+   Working on MO: 7 Center: 0
+   Working on MO: 8 Center: 0
+   Working on MO: 9 Center: 0
+   Working on MO: 10 Center: 0
+   Working on MO: 11 Center: 0
+   Working on MO: 12 Center: 0
+   Working on MO: 13 Center: 0
+   Working on MO: 0 Center: 1
+   Working on MO: 1 Center: 1
+   Working on MO: 2 Center: 1
+   Working on MO: 3 Center: 1
+   Working on MO: 4 Center: 1
+   Working on MO: 5 Center: 1
+   Working on MO: 6 Center: 1
+   Working on MO: 7 Center: 1
+   Working on MO: 8 Center: 1
+   Working on MO: 9 Center: 1
+   Working on MO: 10 Center: 1
+   Working on MO: 11 Center: 1
+   Working on MO: 12 Center: 1
+   Working on MO: 13 Center: 1
+   Working on MO: 0 Center: 2
+   Working on MO: 1 Center: 2
+   Working on MO: 2 Center: 2
+   Working on MO: 3 Center: 2
+   Working on MO: 4 Center: 2
+   Working on MO: 5 Center: 2
+   Working on MO: 6 Center: 2
+   Working on MO: 7 Center: 2
+   Working on MO: 9 Center: 2
+   Working on MO: 10 Center: 2
+   Working on MO: 8 Center: 2
+   Working on MO: 11 Center: 2
+   Working on MO: 12 Center: 2
+   Working on MO: 13 Center: 2
+   Working on MO: 0 Center: 3
+   Working on MO: 1 Center: 3
+   Working on MO: 2 Center: 3
+   Working on MO: 3 Center: 3
+   Working on MO: 4 Center: 3
+   Working on MO: 5 Center: 3
+   Working on MO: 6 Center: 3
+   Working on MO: 7 Center: 3
+   Working on MO: 8 Center: 3
+   Working on MO: 9 Center: 3
+   Working on MO: 10 Center: 3
+   Working on MO: 11 Center: 3
+   Working on MO: 12 Center: 3
+   Working on MO: 13 Center: 3
+Saving resulting cusp Info xml block to: updet.cuspInfo.xml
+Reuse SPOSetBuilder "LCAOBSet" type MolecularOrbital
+  Building SPOSet '' with '' basis set.
+Reading cusp info from : downdet.cuspInfo.xml
+Could not find precomputed cusp data for spo set: downdet
+Recalculating data.
+  Number of molecular orbitals to compute correction on this rank: 14
+   Working on MO: 1 Center: 0
+   Working on MO: 2 Center: 0
+   Working on MO: 3 Center: 0
+   Working on MO: 5 Center: 0
+   Working on MO: 0 Center: 0
+   Working on MO: 6 Center: 0
+   Working on MO: 7 Center: 0
+   Working on MO: 4 Center: 0
+   Working on MO: 8 Center: 0
+   Working on MO: 9 Center: 0
+   Working on MO: 10 Center: 0
+   Working on MO: 11 Center: 0
+   Working on MO: 12 Center: 0
+   Working on MO: 0 Center: 1
+   Working on MO: 13 Center: 0
+   Working on MO: 1 Center: 1
+   Working on MO: 2 Center: 1
+   Working on MO: 3 Center: 1
+   Working on MO: 4 Center: 1
+   Working on MO: 5 Center: 1
+   Working on MO: 6 Center: 1
+   Working on MO: 7 Center: 1
+   Working on MO: 8 Center: 1
+   Working on MO: 9 Center: 1
+   Working on MO: 10 Center: 1
+   Working on MO: 11 Center: 1
+   Working on MO: 12 Center: 1
+   Working on MO: 13 Center: 1
+   Working on MO: 0 Center: 2
+   Working on MO: 1 Center: 2
+   Working on MO: 2 Center: 2
+   Working on MO: 3 Center: 2
+   Working on MO: 4 Center: 2
+   Working on MO: 5 Center: 2
+   Working on MO: 6 Center: 2
+   Working on MO: 7 Center: 2
+   Working on MO: 8 Center: 2
+   Working on MO: 9 Center: 2
+   Working on MO: 10 Center: 2
+   Working on MO: 11 Center: 2
+   Working on MO: 12 Center: 2
+   Working on MO: 13 Center: 2
+   Working on MO: 0 Center: 3
+   Working on MO: 1 Center: 3
+   Working on MO: 2 Center: 3
+   Working on MO: 3 Center: 3
+   Working on MO: 4 Center: 3
+   Working on MO: 5 Center: 3
+   Working on MO: 6 Center: 3
+   Working on MO: 7 Center: 3
+   Working on MO: 8 Center: 3
+   Working on MO: 9 Center: 3
+   Working on MO: 10 Center: 3
+   Working on MO: 11 Center: 3
+   Working on MO: 12 Center: 3
+   Working on MO: 13 Center: 3
+Saving resulting cusp Info xml block to: downdet.cuspInfo.xml
+  Creating a determinant updet group=0 sposet=updet
+  Reusing a SPO set updet
+  Using DiracDeterminant with DelayedUpdate engine
+  Setting delay_rank by default!
+  Using rank-1 Sherman-Morrison Fahy update
+
+  Creating a determinant downdet group=1 sposet=downdet
+  Reusing a SPO set downdet
+  Using DiracDeterminant with DelayedUpdate engine
+  Setting delay_rank by default!
+  Using rank-1 Sherman-Morrison Fahy update
+
+  Added a fermionic WaveFunctionComponent SlaterDet
+  QMCHamiltonian::addOperator Kinetic to H, physical Hamiltonian 
+  QMCHamiltonian::addOperator ElecElec to H, physical Hamiltonian 
+QMCHamiltonian::addOperatorType added type coulomb named ElecElec
+  QMCHamiltonian::addOperator IonIon to H, physical Hamiltonian 
+QMCHamiltonian::addOperatorType added type coulomb named IonIon
+  QMCHamiltonian::addOperator IonElec to H, physical Hamiltonian 
+QMCHamiltonian::addOperatorType added type coulomb named IonElec
+
+  QMCHamiltonian::add2WalkerProperty added
+    4 to P::PropertyList 
+    0 to P::Collectables 
+    starting Index of the observables in P::PropertyList = 9
+ParticleSetPool::randomize 1 ParticleSet.
+<init source="ion0" target="e">
+</init>
+  Initialization Execution time = 3.061 secs
+=========================================================
+ Summary of QMC systems 
+=========================================================
+ParticleSetPool has: 
+
+  ParticleSet 'e' contains 28 particles :  u(14) d(14)
+
+    u  6.4298390027e-01  3.3005440525e-01  1.5346953035e-01
+    u  1.3130043439e+00  7.8495535265e-01 -6.6019125699e-02
+    u  1.6923629775e+00  5.0751523711e-01  2.7486597649e-01
+    u -2.0698718933e+00 -8.2063207475e-01  1.1072876097e+00
+    u -1.1796011663e+00 -5.2567682172e-01  1.3495438912e-03
+    u -4.5368212128e-01 -1.8685523260e+00  1.3971885788e+00
+    u -7.3174062128e-01 -9.6128723342e-02 -8.9047073381e-01
+    u -1.1520289634e+00  1.0968239057e+00  1.0898735698e-01
+    u -2.0377533855e+00  8.3649617422e-01 -1.2795724760e+00
+    u  7.8163558520e-01 -1.8167576417e+00 -1.6821660644e+00
+    (... and 18 more particle positions ...)
+
+  Distance table for dissimilar particles (A-B):
+    source: ion0  target: e
+    Using structure-of-arrays (SoA) data layout
+    Distance computations use open boundary conditions in 3D.
+
+  Distance table for similar particles (A-A):
+    source/target: e
+    Using structure-of-arrays (SoA) data layout
+    Distance computations use open boundary conditions in 3D.
+
+
+  ParticleSet 'ion0' contains 4 particles :  N(4)
+
+    N  9.8265751410e-01  9.9683045900e-01  9.6848456910e-01
+    N -9.8265751410e-01 -9.8738182900e-01  9.8738182900e-01
+    N -9.8265751410e-01  9.7793319910e-01 -9.7793319910e-01
+    N  9.8265751410e-01 -9.8738182900e-01 -9.7793319910e-01
+
+  Distance table for similar particles (A-A):
+    source/target: ion0
+    Using structure-of-arrays (SoA) data layout
+    Distance computations use open boundary conditions in 3D.
+
+
+  Hamiltonian h0
+  Kinetic         Kinetic energy
+  ElecElec        CoulombAB source=e
+
+  IonIon          CoulombAA source/target ion0
+
+  IonElec         CoulombAA source/target ion0
+
+
+
+=========================================================
+  Start VMC
+  File Root Mol.orbs.s000 append = no 
+=========================================================
+Resetting walkers
+  Adding 8 walkers to 0 existing sets
+  Total number of walkers: 8.0000000000e+00
+  Total weight: 8.0000000000e+00
+  Resetting Properties of the walkers 1 x 13
+
+<vmc function="put">
+  qmc_counter=0  my_counter=0
+  time step      = 1.0000000000e-03
+  blocks         = 1000
+  steps          = 10
+  substeps       = 100
+  current        = 0
+  target samples = 8.0000000000e+02
+  walkers/mpi    = 8
+
+  stepsbetweensamples = 100
+  SpinMoves      = no
+<parameter name="blocks" condition="int">1000</parameter>
+<parameter name="blocks_between_recompute" condition="int">0</parameter>
+<parameter name="check_properties" condition="int">100</parameter>
+<parameter name="checkproperties" condition="int">100</parameter>
+<parameter name="current" condition="int">0</parameter>
+<parameter name="dmcwalkersperthread" condition="real">1.0000000000e+02</parameter>
+<parameter name="maxcpusecs" condition="real">3.6000000000e+05</parameter>
+<parameter name="record_configs" condition="int">0</parameter>
+<parameter name="record_walkers" condition="int">100</parameter>
+<parameter name="recordconfigs" condition="int">0</parameter>
+<parameter name="recordwalkers" condition="int">100</parameter>
+<parameter name="rewind" condition="int">0</parameter>
+<parameter name="samples" condition="real">8.0000000000e+02</parameter>
+<parameter name="samplesperthread" condition="real">1.0000000000e+02</parameter>
+<parameter name="spinmass" condition="double">1.0000000000e+00</parameter>
+<parameter name="spinmoves" condition="string">no</parameter>
+<parameter name="steps" condition="int">10</parameter>
+<parameter name="stepsbetweensamples" condition="int">100</parameter>
+<parameter name="store_configs" condition="int">0</parameter>
+<parameter name="storeconfigs" condition="int">0</parameter>
+<parameter name="sub_steps" condition="int">100</parameter>
+<parameter name="substeps" condition="int">100</parameter>
+<parameter name="tau" condition="au">1.0000000000e-03</parameter>
+<parameter name="time_step" condition="au">1.0000000000e-03</parameter>
+<parameter name="timestep" condition="au">1.0000000000e-03</parameter>
+<parameter name="use_drift" condition="string">no</parameter>
+<parameter name="usedrift" condition="string">no</parameter>
+<parameter name="walkers" condition="int">8</parameter>
+<parameter name="warmup_steps" condition="int">100</parameter>
+<parameter name="warmupsteps" condition="int">100</parameter>
+  DumpConfig==false Nothing (configurations, state) will be saved.
+  Walker Samples are dumped every 100 steps.
+</vmc>
+  Set drift_modifier UNR parameter a = 1.0000000000e+00
+  CloneManager::makeClones makes 8 clones for W/Psi/H.
+  Cloning methods for both Psi and H are used
+===== Memory Usage before cloning =====
+Available memory on node 0, free + buffers : 20783 MB
+Memory footprint by rank 0 on node 0       : 92 MB
+==================================================
+===== Memory Usage after cloning =====
+Available memory on node 0, free + buffers : 20783 MB
+Memory footprint by rank 0 on node 0       : 93 MB
+==================================================
+  Initial partition of walkers 0 1 2 3 4 5 6 7 8 
+
+  Using Particle by Particle moves
+  Walker moves without drift
+  Total Sample Size   =800
+  Walker distribution on root = 0 1 2 3 4 5 6 7 8 
+===== Memory Usage after the buffer registration =====
+Available memory on node 0, free + buffers : 20783 MB
+Memory footprint by rank 0 on node 0       : 93 MB
+==================================================
+  Anonymous Buffer size per walker : 17472 Bytes.
+MEMORY increase 0 MB VMC::resetRun
+====================================================
+  SimpleFixedNodeBranch::finalize after a VMC block
+    QMC counter        = 0
+    time step          = 0.001
+    reference energy   = -218.422
+    reference variance = 27.2304
+====================================================
+  QMC Execution time = 1.9784e+02 secs
+  Total Execution time = 1.9784e+02 secs
+
+=========================================================
+  A new xml input file : Mol.orbs.s000.cont.xml

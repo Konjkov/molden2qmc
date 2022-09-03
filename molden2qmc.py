@@ -11,6 +11,21 @@ from functools import reduce
 __version__ = '4.0.4'
 
 
+#Common bloc
+dIonName2nelec=dict([('H',1),  ('He',2),  ('Li',3),('Be',4),  ('B', 5),  ('C', 6),  ('N', 7),('O', 8),  ('F', 9),   ('Ne',10), 
+              ('Na',11),('Mg',12),   ('Al',13),   ('Si',14),   ('P', 15),   ('S', 16),('Cl',17),   ('Ar',18),   ('K', 19),   
+              ('Ca',20),   ('Sc',21),   ('Ti',22),   ('V', 23),   ('Cr',24),   ('Mn',25),   ('Fe',26),   ('Co',27),   
+              ('Ni',28),   ('Cu',29),   ('Zn',30),   ('Ga',31),   ('Ge',32),   ('As',33),   ('Se',34),   ('Br',35),  
+              ('Kr',36),   ('Rb',37),   ('Sr',38),   ('Y', 39),  ('Zr',40),   ('Nb',41),   ('Mo',42),   ('Tc',43),  
+              ('Ru',44),   ('Rh',45),   ('Pd',46),   ('Ag',47),   ('Cd',48),   ('In',49),   ('Sn',50),   ('Sb',51),  
+              ('Te',52),   ('I', 53),   ('Xe',54),   ('Cs',55),   ('Ba',56),   ('La',57),   ('Ce',58), ('Pr',59),  
+              ('Nd',60),   ('Pm',61),   ('Sm',62),   ('Eu',63),   ('Gd',64),   ('Tb',65),   ('Dy',66),   ('Ho',67),
+              ('Er',68),   ('Tm',69),   ('Yb',70),   ('Lu',71),   ('Hf',72),   ('Ta',73),   ('W', 74),   ('Re',75),
+              ('Os',76),   ('Ir',77),   ('Pt',78),   ('Au',79),   ('Hg',80), ('Tl',81),   ('Pb',82),  ('Bi',83),  
+              ('Po',84),   ('At',85),   ('Rn',86),   ('Fr',87),   ('Ra',88),   ('Ac',89),   ('Th',90),   ('Pa',91),  
+              ('U', 92),   ('Np',93)])
+dnelec2IonName = {v:k for k,v in dIonName2nelec.items()}
+
 def fact2(k):
     """
     Compute double factorial: k!! = 1*3*5*....k
@@ -366,6 +381,31 @@ class Molden:
         else:
             return self.nelec() / 2
 
+    def species_list(self):
+
+        def uuid_species(atom):
+            return ( atom['N'], self.charge(atom) )
+
+        # We need to uniquify the list of atoms.
+        # Because atoms are non hashable, we will assum that atom are similar is they have the same 'Atom_numer', and the same number of shell
+
+        d_atom_list_unique = {}
+        for atom in self.atom_list:
+            if uuid_species(atom) not in d_atom_list_unique:
+                d_atom_list_unique[uuid_species(atom)] = atom
+
+        return list(d_atom_list_unique.values())
+
+    def species_idx(self):
+
+        def uuid_species(atom):
+            return ( atom['N'], self.charge(atom) )
+
+        l_key = list(map(uuid_species,self.species_list()))
+        l_atom = list(map(uuid_species,self.atom_list))
+
+        return [l_key.index(atom) for atom in l_atom]
+
 
 class GWFN(Molden):
     """gwfn.data file writer."""
@@ -435,6 +475,12 @@ ORBITAL COEFFICIENTS
 {orbital_coefficients}
 
 """
+#Changes to write
+    def write(self, f, qmcpack = False):
+        if not qmcpack:
+            self.gwfn(f)
+        else:
+            self.qmcpack(f)
 
     def gwfn(self, f='gwfn.data'):
         """
@@ -466,11 +512,218 @@ ORBITAL COEFFICIENTS
             )
             gwfn.write(self.template.format(**params))
 
+    def qmcpack(self, f='Mol.orbs.h5'):
+        import h5py, re, sys
+        import numpy as np
+        from collections import defaultdict 
+        H5_qmcpack=h5py.File(f,'w')
+        ECP=False
+
+        codeName , codever = self.CodeInfo()
+
+        groupApp=H5_qmcpack.create_group("application")
+        groupApp.create_dataset('code', (1,),data=np.string_(codeName))
+
+        groupApp.create_dataset("version",data=np.array(codever,"i4"))
+
+        groupPBC=H5_qmcpack.create_group("PBC")
+        groupPBC.create_dataset("PBC",(1,),dtype="b1",data=False)
+
+
+
+        natom=self.natom()
+        #Group Atoms
+        groupAtom=H5_qmcpack.create_group("atoms")
+        
+        #Dataset Number Of Atoms
+        groupAtom.create_dataset("number_of_atoms",(1,),dtype="i4",data=natom)
+        
+
+
+        def uuid_species(atom):
+            return ( atom['N'], self.charge(atom) )
+
+        # We need to uniquify the list of atoms.
+        # Because atoms are non hashable, we will assum that atom are similar is they have the same 'Atom_numer', and the same number of shell
+
+        d_atom_list_unique = {}
+        for atom in self.atom_list:
+            if uuid_species(atom) not in d_atom_list_unique:
+                d_atom_list_unique[uuid_species(atom)] = atom
+
+
+        groupAtom.create_dataset("number_of_species",(1,),dtype="i4",data=len(self.species_list()))
+        #Dataset positions 
+
+        positions = np.array([ [atom['X'],atom['Y'],atom['Z']] for atom in self.atom_list], 'f8')
+        groupAtom.create_dataset("positions",data=positions)
+
+        for x,atom in enumerate(self.species_list()):
+            groupSpecies=groupAtom.create_group(f"species_{x}")
+            groupSpecies.create_dataset('name', (1,),data=np.string_(dnelec2IonName[atom['N']]))
+            groupSpecies.create_dataset("atomic_number",(1,),dtype="i4",data=atom['N'])
+            groupSpecies.create_dataset("charge",(1,),dtype="f8",data= self.charge(atom))
+            groupSpecies.create_dataset("core",(1,),dtype="f8",data=self.core_elec(atom))
+
+      
+        #SpeciesID
+        groupAtom.create_dataset("species_ids",data=np.array(self.species_idx(),"i4") )
+
+        #Parameter Group
+        GroupParameter=H5_qmcpack.create_group("parameters")
+        
+        #GroupParameter.create_dataset("ECP",(1,),dtype="b1",data=self.pseudoatoms )
+        GroupParameter.create_dataset("ECP",(1,),dtype="b1",data=ECP )
+
+
+        GroupParameter.create_dataset("Unit",(1,),dtype="b1",data=True) 
+        GroupParameter.create_dataset("NbAlpha",(1,),dtype="i4",data=self.nalpha()) 
+        GroupParameter.create_dataset("NbBeta",(1,),dtype="i4",data=self.nbeta()) 
+        
+        GroupParameter.create_dataset("NbTotElec",(1,),dtype="i4",data=self.nelec())
+        GroupParameter.create_dataset("spin",(1,),dtype="i4",data=self.spin_unrestricted()) 
+        
+        #basisset Group
+        GroupBasisSet=H5_qmcpack.create_group("basisset")
+        #Dataset Number Of Atoms
+        GroupBasisSet.create_dataset("NbElements",(1,),dtype="i4",data=len(d_atom_list_unique))
+        GroupBasisSet.create_dataset('name', (1,), data=np.string_('LCAOBSet'))
+
+        nbSpecies=len(d_atom_list_unique)
+
+
+        #SPHERICAL IS ASSUMED!!!!
+        cart=False
+        #atomicBasisSets Group
+        for x, atom in enumerate(d_atom_list_unique.values()):
+       
+          atomicBasisSetGroup=GroupBasisSet.create_group(f"atomicBasisSet{x}")      
+          atomicBasisSetGroup.create_dataset('elementType', (1,),data=np.string_(dnelec2IonName[atom['N']]))
+
+          if cart:
+            atomicBasisSetGroup.create_dataset('angular', (1,),data=np.string_('cartesian'))
+            atomicBasisSetGroup.create_dataset('expandYlm', (1,),data=np.string_('Gamess'))
+          else:
+            atomicBasisSetGroup.create_dataset('angular', (1,),data=np.string_('spherical'))
+            atomicBasisSetGroup.create_dataset('expandYlm', (1,),data=np.string_('Gaussian'))
+
+
+          atomicBasisSetGroup.create_dataset("grid_npts",(1,),dtype="i4",data=1001)
+          atomicBasisSetGroup.create_dataset("grid_rf",(1,),dtype="i4",data=100)
+          atomicBasisSetGroup.create_dataset("grid_ri",(1,),dtype="f8",data=1e-06)
+
+          atomicBasisSetGroup.create_dataset('grid_type', (1,),data=np.string_('log'))
+          atomicBasisSetGroup.create_dataset('name',(1,),data=np.string_('gaussian'))
+          atomicBasisSetGroup.create_dataset('normalized',(1,),data=np.string_('yes'))
+
+
+          nshell = self.nshell_species(atom) 
+          for i in range(nshell):
+            l_molden = self.shell_type_species(atom,i)
+            l_qmcpack = self.shell_type_species(atom,i,qmcpack_normalization=True)
+
+            contracted_coeffs = atom['SHELLS'][i]['DATA']
+            NbRadFunc =len(contracted_coeffs)
+
+            BasisGroup=atomicBasisSetGroup.create_group(f"basisGroup{i}")
+            BasisGroup.create_dataset('type',(1,),data=np.string_("Gaussian"))          
+            BasisGroup.create_dataset('rid', (1,), data=np.string_(f"{dnelec2IonName[atom['N']]}{i}{l_qmcpack}"))
+          
+            coord= [atom['X'],atom['Y'],atom['Z']]
+
+            BasisGroup.create_dataset("Shell_coord",(3,),dtype="f8",data=coord)
+            BasisGroup.create_dataset("NbRadFunc",(1,),dtype="i4",data=NbRadFunc)
+            Val_l=BasisGroup.create_dataset("l",(1,),dtype="i4",data=l_qmcpack)
+            Val_n=BasisGroup.create_dataset("n",(1,),dtype="i4",data=i)
+            RadGroup=BasisGroup.create_group("radfunctions")
+
+            for j,(exp,contrac) in enumerate(contracted_coeffs):
+                DataRadGrp=RadGroup.create_group("DataRad"+str(j))
+                DataRadGrp.create_dataset("exponent",(1,),dtype="f8",data=exp)
+                DataRadGrp.create_dataset("contraction",(1,),dtype="f8",data=contrac*self.contractioncorrection(l_molden) )
+    
+          atomicBasisSetGroup.create_dataset("NbBasisGroups",(1,),dtype="i4",data=nshell)
+
+
+        GroupParameter.create_dataset("IsComplex",(1,),dtype="b1",data=False)
+        GroupParameter.create_dataset("SpinRestricted",(1,),dtype="b1",data=not self.spin_unrestricted())
+        GroupDet=H5_qmcpack.create_group("Super_Twist")
+
+        NbAO=self.nbasis_functions()
+
+        if self.spin_unrestricted():
+           NbMO_up,NbMO_dn = self.nmo_unrestricted()
+           eigenset=GroupDet.create_dataset("eigenset_0",(NbMO_up,NbAO),dtype="f8",data=self.orbital_coefficients_per_spin('Alpha'))
+           eigenset=GroupDet.create_dataset("eigenset_1",(NbMO_dn,NbAO),dtype="f8",data=self.orbital_coefficients_per_spin('Beta'))
+           eigenvalue=GroupDet.create_dataset("eigenval_0",(1,NbMO_up),dtype="f8",data=self.orbital_mo_energy_per_spin('Alpha'))
+           eigenvalue=GroupDet.create_dataset("eigenval_1",(1,NbMO_dn),dtype="f8",data=self.orbital_mo_energy_per_spin('Beta'))
+
+           if (NbMO_up>NbMO_dn):
+                NbMO=NbMO_up
+           else:
+                NbMO=NbMO_dn
+        else:
+           NbMO=self.nmo()
+           eigenset=GroupDet.create_dataset("eigenset_0",(NbMO,NbAO),dtype="f8",data=self.orbital_coefficients_per_spin('Alpha'))
+           eigenvalue=GroupDet.create_dataset("eigenval_0",(1,NbMO),dtype="f8",data=self.orbital_mo_energy_per_spin('Alpha'))
+
+        GroupParameter.create_dataset("numMO",(1,),dtype="i4",data=NbMO)
+        GroupParameter.create_dataset("numAO",(1,),dtype="i4",data=NbAO)
+
+
+        H5_qmcpack.close()
+
     def natom(self):
         """
         :returns: total number of atoms
         """
         return len(self.atom_list)
+
+    def contractioncorrection(self,shell_id):
+        """
+        :return corrected contraction of basis set compatible with QMCPACK
+        """
+        import math
+        pi      = math.pi
+        sqrtpi = sqrt(pi)
+        fac = 1.0e0
+  
+        if (shell_id==1):  #s, 1/(2 sqrt(pi))
+            fac = 2.0 * sqrtpi
+        elif (shell_id==2): # sp
+            fac = 2.0 * sqrtpi
+        elif (shell_id==3): # p
+            fac = sqrt(4.0 / 3.0) * sqrtpi
+        elif (shell_id==4): # d
+            fac = sqrt(16.0 / 15.0) * sqrtpi
+        elif (shell_id==5): # f
+            fac = 1.0e0
+        return fac  
+
+    def nmo_unrestricted(self):
+        """
+        :returns: number of MO_alpha and number of MO_beta for spin unrestricted calculations
+        """
+        alpha, beta = 0, 0  
+        for mo in self.mo_matrix:
+           if mo['SPIN'] == 'Alpha':
+                  alpha += 1 
+           elif mo['SPIN'] == 'Beta':
+                  beta += 1
+        return alpha, beta
+
+    def nmo(self):
+        """
+        :returns: number of Molecular Orbitals 
+        """
+        return len(self.mo_matrix)
+           
+
+    def nshell_species(self,atom):
+        """
+        :returns: total number of shells
+        """
+        return len(atom['SHELLS']) 
 
     def nshell(self):
         """
@@ -557,6 +810,32 @@ ORBITAL COEFFICIENTS
                 result += "\n"
             result += "{: .13E}".format(self.charge(atom))
         return result
+
+    def core_elec(self,atom):
+        """
+        :return: core electrons 
+        """
+        if atom['pseudo']:
+            return atom['N']-self.charge(atom)
+        else :
+            return atom['N']
+
+    def shell_type_species(self,atom,shell,qmcpack_normalization=False):
+        """
+        :return: the current shell type of the index of the atom
+        """
+        ang_type_map = {'s': 1, 'sp': 2, 'p': 3, 'd': 4, 'f': 5, 'g': 6}
+        l_molden = ang_type_map[atom['SHELLS'][shell]['TYPE']]
+        if not qmcpack_normalization:
+            return l_molden
+
+        if l_molden == 2:
+          print("Warning, BASIS SET WITH SP not implemented. Contact Developers")
+        elif l_molden > 6:
+          print ("WARNING. BASIS SET WITH l>4 not implemented. Contact Developers")
+
+        molden2qmc = {1:0,3:1,4:2,5:3,6:4}# Added 6:4 to bypass key error with G orbitals
+        return molden2qmc[l_molden]
 
     def shell_types(self):
         """
@@ -660,6 +939,29 @@ ORBITAL COEFFICIENTS
                     num += 1
         return result
 
+    def orbital_coefficients_per_spin(self,spin):
+        """
+        :returns: ORBITAL COEFFICIENTS section of gwfn.data file,
+        for a given 'SPIN'
+        """
+        l = []
+        for orbital in self.mo_matrix:
+           if orbital['SPIN'] == spin:
+             for ao in orbital['MO']:
+               l.extend(ao['DATA'])
+        return l
+
+    def orbital_mo_energy_per_spin(self,spin):
+        """
+        :returns: ORBITAL Energy,
+        for a given 'SPIN'
+        """
+        l = [] 
+        for orbital in self.mo_matrix:
+           if orbital['SPIN'] == spin:
+             l.append(orbital['ENERGY'])
+        return l
+
 
 class DefaultConverter(GWFN):
     """
@@ -670,10 +972,10 @@ class DefaultConverter(GWFN):
 
     tolerance = 1e-5
 
-    def __init__(self, f, pseudoatoms="none"):
+    def __init__(self, f, pseudoatoms="none", qmcpack_normalization=False):
         super(DefaultConverter, self).__init__(f, pseudoatoms)
         self.atom_list_converter()
-        self.mo_matrix_converter()
+        self.mo_matrix_converter(qmcpack_normalization)
 
     def whole_contraction_factor(self, primitives, l):
         """
@@ -818,7 +1120,7 @@ class DefaultConverter(GWFN):
         minus_4 = sqrt(35) * (xxxy - yyyx) / 2.0
         return zero, plus_1, minus_1, plus_2, minus_2, plus_3, minus_3, plus_4, minus_4
 
-    def d_normalize(self, coefficient):
+    def d_normalize(self, coefficient, qmcpack_normalization=False):
         """
         The following order of D functions is expected:
             5D: D 0, D+1, D-1, D+2, D-2
@@ -833,42 +1135,63 @@ class DefaultConverter(GWFN):
         may or may not be changed in the future if it can be done in a.
         backwards-consistent way)
         """
-        premultiplied_factor = (0.5, 3.0, 3.0, 3.0, 6.0)
+        if not qmcpack_normalization:
+            premultiplied_factor = (0.5, 3.0, 3.0, 3.0, 6.0)
+        else:
+            premultiplied_factor = (0.5*sqrt(3.0) , 1.5, 1.5, 3.0, 3.0) 
+
         return (coefficient[0] * self.m_dependent_factor(2,  0) * premultiplied_factor[0],
                 coefficient[1] * self.m_dependent_factor(2,  1) * premultiplied_factor[1],
                 coefficient[2] * self.m_dependent_factor(2, -1) * premultiplied_factor[2],
                 coefficient[3] * self.m_dependent_factor(2,  2) * premultiplied_factor[3],
                 coefficient[4] * self.m_dependent_factor(2, -2) * premultiplied_factor[4])
 
-    def f_normalize(self, coefficient):
+    def f_normalize(self, coefficient,qmcpack_normalization=False):
         """
         The following order of F functions is expected:
             7F: F 0, F+1, F-1, F+2, F-2, F+3, F-3
         """
-        return (coefficient[0] * self.m_dependent_factor(3,  0),
-                coefficient[1] * self.m_dependent_factor(3,  1),
-                coefficient[2] * self.m_dependent_factor(3, -1),
-                coefficient[3] * self.m_dependent_factor(3,  2),
-                coefficient[4] * self.m_dependent_factor(3, -2),
-                coefficient[5] * self.m_dependent_factor(3,  3),
-                coefficient[6] * self.m_dependent_factor(3, -3))
+        if not qmcpack_normalization:
+            premultiplied_factor = (1,1,1,1,1,1,1)
+        else:
+            premultiplied_factor = (sqrt(15.0 / 8.0), 
+                                    1.5 * sqrt(5.0), 1.5 * sqrt(5.0), 
+                                    15.0 / sqrt(2.0), 15.0 / sqrt(2.0),
+                                    15.0 * sqrt(3.0), 15.0 * sqrt(3.0)) 
 
-    def g_normalize(self, coefficient):
+        return (coefficient[0] * self.m_dependent_factor(3,  0) * premultiplied_factor[0],
+                coefficient[1] * self.m_dependent_factor(3,  1) * premultiplied_factor[1],
+                coefficient[2] * self.m_dependent_factor(3, -1) * premultiplied_factor[2],
+                coefficient[3] * self.m_dependent_factor(3,  2) * premultiplied_factor[3],
+                coefficient[4] * self.m_dependent_factor(3, -2) * premultiplied_factor[4],
+                coefficient[5] * self.m_dependent_factor(3,  3) * premultiplied_factor[5],
+                coefficient[6] * self.m_dependent_factor(3, -3) * premultiplied_factor[6])
+
+    def g_normalize(self, coefficient,qmcpack_normalization=False):# Added g normalization
         """
         The following order of G functions is expected:
             9G: G 0, G+1, G-1, G+2, G-2, G+3, G-3, G+4, G-4
         """
-        return (coefficient[0] * self.m_dependent_factor(4,  0),
-                coefficient[1] * self.m_dependent_factor(4,  1),
-                coefficient[2] * self.m_dependent_factor(4, -1),
-                coefficient[3] * self.m_dependent_factor(4,  2),
-                coefficient[4] * self.m_dependent_factor(4, -2),
-                coefficient[5] * self.m_dependent_factor(4,  3),
-                coefficient[6] * self.m_dependent_factor(4, -3),
-                coefficient[7] * self.m_dependent_factor(4,  4),
-                coefficient[8] * self.m_dependent_factor(4, -4))
+        if not qmcpack_normalization:
+            premultiplied_factor = (1,1,1,1,1,1,1,1,1)
+        else:
+            premultiplied_factor = (0.25 * sqrt(105.0), 
+                                    2.5 * sqrt(11.5), 2.5 * sqrt(11.5), 
+                                    7.5 * sqrt(21.0), 7.5 * sqrt(21.0),
+                                    105.0 * sqrt(1.5), 105.0 * sqrt(1.5),
+                                    210.0 * sqrt(3.0), 210.0 * sqrt(3.0))
+                                    
+        return (coefficient[0] * self.m_dependent_factor(4,  0) * premultiplied_factor[0],
+                coefficient[1] * self.m_dependent_factor(4,  1) * premultiplied_factor[1],
+                coefficient[2] * self.m_dependent_factor(4, -1) * premultiplied_factor[2],
+                coefficient[3] * self.m_dependent_factor(4,  2) * premultiplied_factor[3],
+                coefficient[4] * self.m_dependent_factor(4, -2) * premultiplied_factor[4],
+                coefficient[5] * self.m_dependent_factor(4,  3) * premultiplied_factor[5],
+                coefficient[6] * self.m_dependent_factor(4, -3) * premultiplied_factor[6],
+                coefficient[7] * self.m_dependent_factor(4,  4) * premultiplied_factor[7],
+                coefficient[8] * self.m_dependent_factor(4, -4) * premultiplied_factor[8])
 
-    def mo_matrix_converter(self):
+    def mo_matrix_converter(self,qmcpack=False):
         """
         Only mo_coefficients of d, f, g must be converted by default.
         """
@@ -877,15 +1200,15 @@ class DefaultConverter(GWFN):
                 if ao['TYPE'] == 'd':
                     if self.D_orb_conversion_required:
                         ao['DATA'] = self.d_to_spherical(ao['DATA'])
-                    ao['DATA'] = self.d_normalize(ao['DATA'])
+                    ao['DATA'] = self.d_normalize(ao['DATA'],qmcpack)
                 elif ao['TYPE'] == 'f':
                     if self.F_orb_conversion_required:
                         ao['DATA'] = self.f_to_spherical(ao['DATA'])
-                    ao['DATA'] = self.f_normalize(ao['DATA'])
+                    ao['DATA'] = self.f_normalize(ao['DATA'],qmcpack)
                 elif ao['TYPE'] == 'g':
                     if self.G_orb_conversion_required:
                         ao['DATA'] = self.g_to_spherical(ao['DATA'])
-                    ao['DATA'] = self.g_normalize(ao['DATA'])
+                    ao['DATA'] = self.g_normalize(ao['DATA'],qmcpack)
 
 
 class Turbomole(DefaultConverter):
@@ -925,6 +1248,13 @@ class Turbomole(DefaultConverter):
         norm = [24.0/sqrt(105)] * 3 + [6.0/sqrt(15)] * 6 + [4.0/3.0] * 3 + [2.0/sqrt(3)] * 3
         return super(Turbomole, self).g_to_spherical(map(mul, norm, cartesian))
 
+    def CodeInfo(self):
+        """
+        uuid for turbomole
+        """
+        CodeName="Molden_TurboMole"
+        CodeVer=[6,6,0]
+        return CodeName,CodeVer 
 
 class CFour(DefaultConverter):
     """
@@ -972,6 +1302,13 @@ class CFour(DefaultConverter):
         norm = [24.0/sqrt(105)] * 3 + [6.0/sqrt(105)] * 6 + [4.0/sqrt(105)] * 3 + [2.0/sqrt(105)] * 3
         return super(CFour, self).g_to_spherical(map(mul, norm, cartesian))
 
+    def CodeInfo(self):
+        """
+        Uuid for CFour
+        """
+        CodeName="Molden_CFour"
+        CodeVer=[2,1,0]
+        return CodeName,CodeVer 
 
 class Orca(DefaultConverter):
     """
@@ -1002,7 +1339,7 @@ class Orca(DefaultConverter):
                     if l == 4:
                         primitive[1] *= sqrt(3)
 
-    def f_normalize(self, coefficient):
+    def f_normalize(self, coefficient,qmcpack_normalization=False):
         """
         ORCA use slightly different sign conventions:
             F(+3)_ORCA = - F(+3)_MOLDEN
@@ -1010,9 +1347,9 @@ class Orca(DefaultConverter):
         """
         coefficient[5] *= -1
         coefficient[6] *= -1
-        return super(Orca, self).f_normalize(coefficient)
+        return super(Orca, self).f_normalize(coefficient,qmcpack_normalization)
 
-    def g_normalize(self, coefficient):
+    def g_normalize(self, coefficient,qmcpack_normalization=False):
         """
         ORCA use slightly different sign conventions:
             G(+3)_ORCA = - G(+3)_MOLDEN
@@ -1024,8 +1361,15 @@ class Orca(DefaultConverter):
         coefficient[6] *= -1
         coefficient[7] *= -1
         coefficient[8] *= -1
-        return super(Orca, self).g_normalize(coefficient)
+        return super(Orca, self).g_normalize(coefficient,qmcpack_normalization)
 
+    def CodeInfo(self):
+        """
+        Uuid for orca
+        """
+        CodeName="Molden_Orca"
+        CodeVer=[3,0,4]
+        return CodeName,CodeVer 
 
 class PSI4(DefaultConverter):
     """
@@ -1042,6 +1386,13 @@ class PSI4(DefaultConverter):
 
     g_to_spherical = f_to_spherical = d_to_spherical
 
+    def CodeInfo(self):
+        """
+        UUid for PSI4
+        """
+        CodeName="Molden_PSI4"
+        CodeVer=[1,0,0]
+        return CodeName,CodeVer 
 
 class Dalton(DefaultConverter):
     """
@@ -1058,6 +1409,10 @@ class Dalton(DefaultConverter):
 
     g_to_spherical = f_to_spherical = d_to_spherical
 
+    def CodeInfo(self):
+        CodeName="Molden_Dalton"
+        CodeVer=[2016,0,0]
+        return CodeName,CodeVer 
 
 class Molpro(DefaultConverter):
     """
@@ -1099,6 +1454,11 @@ class Molpro(DefaultConverter):
         return super(Molpro, self).g_to_spherical(map(mul, norm, cartesian))
 
 
+    def CodeInfo(self):
+        CodeName="Molden_Molpro"
+        CodeVer=[1,0,0]
+        return CodeName,CodeVer 
+
 class NwChem(DefaultConverter):
     """
     NwChem
@@ -1136,6 +1496,10 @@ class NwChem(DefaultConverter):
         norm = [24.0/sqrt(105)] * 3 + [6.0/sqrt(15)] * 6 + [4.0/3.0] * 3 + [2.0/sqrt(3)] * 3
         return super(NwChem, self).g_to_spherical(map(mul, norm, cartesian))
 
+    def CodeInfo(self):
+        CodeName="Molden_NWChem"
+        CodeVer=[1,0,0]
+        return CodeName,CodeVer 
 
 class QChem(DefaultConverter):
     """
@@ -1166,6 +1530,11 @@ class QChem(DefaultConverter):
 
     g_to_spherical = f_to_spherical = d_to_spherical
 
+    def CodeInfo(self):
+        CodeName="Molden_QChem"
+        CodeVer=[4,4,0]
+        return CodeName,CodeVer 
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -1194,7 +1563,13 @@ def main():
         "all = pseudopotential was used for all atoms in this calculation.\n"
         "white space separated numbers = number of pseudoatoms (started from 1)."))
 
+    parser.add_argument('--qmcpack', dest='qmcpack', action='store_true', help=('generates an HDF5 file  named Mol.orbs.h5 compatible with the QMCPACK format.'))
+    parser.set_defaults(qmcpack=False)
+
     args = parser.parse_args()
+
+    if args.qmcpack and args.output_file == "gwfn.data":
+            args.output_file = "Mol.orbs.h5"
 
     if not os.path.exists(args.input_file):
         print ("File %s not found..." % args.input_file)
@@ -1203,21 +1578,21 @@ def main():
     input_file = open(args.input_file, "r")
 
     if args.code == 0:
-        Turbomole(input_file, args.pseudoatoms).gwfn(args.output_file)
+        Turbomole(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
     elif args.code == 1:
-        PSI4(input_file, args.pseudoatoms).gwfn(args.output_file)
+        PSI4(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
     elif args.code == 2:
-        CFour(input_file, args.pseudoatoms).gwfn(args.output_file)
+        CFour(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
     elif args.code == 3:
-        Orca(input_file, args.pseudoatoms).gwfn(args.output_file)
+        Orca(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
     elif args.code == 4:
-        Dalton(input_file, args.pseudoatoms).gwfn(args.output_file)
+        Dalton(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
     elif args.code == 5:
-        Molpro(input_file, args.pseudoatoms).gwfn(args.output_file)
+        Molpro(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
     elif args.code == 6:
-        NwChem(input_file, args.pseudoatoms).gwfn(args.output_file)
+        NwChem(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
     elif args.code == 7:
-        QChem(input_file, args.pseudoatoms).gwfn(args.output_file)
+        QChem(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
 
 
 if __name__ == "__main__":
