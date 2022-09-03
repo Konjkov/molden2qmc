@@ -3,7 +3,7 @@
 import argparse
 import os
 import sys
-from math import pi, sqrt, factorial, fabs
+from math import pi, sqrt, factorial
 from itertools import combinations
 from operator import itemgetter, mul
 from functools import reduce
@@ -1024,7 +1024,7 @@ class DefaultConverter(GWFN):
         if l < 2 or m == 0:
             return 1.0
         else:
-            return sqrt(2.0 * factorial(l - fabs(m))/factorial(l + fabs(m)))
+            return sqrt(2.0 * factorial(l - abs(m))/factorial(l + abs(m)))
 
     def atom_list_converter(self):
         """
