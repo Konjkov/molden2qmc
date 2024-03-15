@@ -4,7 +4,8 @@ molden format file to Casino gwfn.data file format converter.
 This python script is used to create qwfn.data file which used for input in the [CASINO](https://vallico.net/casinoqmc/what-is-casino/) program.
 The gwfn.data file contains molecular geometry and molecular orbitals expanded in a Gaussian basis set.
 
-In general any file that confirms [MOLDEN](http://www.cmbi.ru.nl/molden/molden_format.html) specification can be used,
+In general any file that confirms [MOLDEN](https://www.theochem.ru.nl/molden/molden_format.html) specification can be used,
+
 but different quantum chemistry code not always fully comply with the required specifications,
 in such cases, the script corrects these discrepancies.
 
