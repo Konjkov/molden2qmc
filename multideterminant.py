@@ -189,7 +189,7 @@ class PSI4(Default):
             print('END MDET', file=output_file)
 
 
-class Orca(Default):
+class Orca4(Default):
     """
     ORCA 4.X
     """
@@ -299,6 +299,206 @@ class Orca(Default):
                     val['spin_det'].append((key, Decimal(spin_det)))
                 line = orca_input.readline()
         self.determinants = OrderedDict(sorted(determinants.items(), key=lambda x: abs(x[1]['weight']), reverse=True))
+
+    def parity_shell(self, values):
+        """Determine parity of list of integers.
+        from http://www.dalkescientific.com/writings/diary/archive/2016/08/14/fragment_chiral_molecules.html
+        """
+        N = len(values)
+        num_swaps = 0
+        for i in range(N - 1):
+            for j in range(i + 1, N):
+                if values[i] > values[j]:
+                    values[i], values[j] = values[j], values[i]
+                    num_swaps += 1
+        return num_swaps % 2
+
+    def set_determinant_parity(self, det):
+        """parity of determinant in CSF in ORCA
+        '2u000000' -  1
+        '0u200000' - -1
+        '0u020000' - -1
+        'du00u000' - -1
+        'ud00u000' -  1
+        'uu00d000' - -1
+        """
+        csf = []
+        count_u = 0
+        count_d = 0
+        for x in det[0]:
+            if x == 'u':
+                csf.append(count_u * 2)
+                count_u += 1
+            elif x == 'd':
+                csf.append(count_d * 2 + 1)
+                count_d += 1
+            elif x == '2':
+                csf.append(count_u * 2)
+                count_u += 1
+                csf.append(count_d * 2 + 1)
+                count_d += 1
+        parity = self.parity_shell(csf)
+        return det[0], (-1)**parity*det[1]
+
+    def set_promotion_parity(self, det):
+        """parity of promotion rule in CASINO"""
+        count_2 = det[0].count('2')
+        count_u = det[0].count('u')
+        count_d = det[0].count('d')
+        count_0 = det[0].count('0')
+        up_det = list(range(count_2 + count_u)) + (count_0 + count_d) * [None]
+        down_det = list(range(count_2 + count_d)) + (count_0 + count_u) * [None]
+        rules = self.get_promotion_rules(self.ground_state(det[0]), det[0])
+        for s, f, t in rules:
+            if s == 1:
+                up_det[t-1], up_det[f-1] = up_det[f-1], None
+            elif s == 2:
+                down_det[t-1], down_det[f-1] = down_det[f-1], None
+        up_det = [x for x in up_det if x is not None]
+        down_det = [x for x in down_det if x is not None]
+        parity = self.parity_shell(up_det) + self.parity_shell(down_det)
+        return det[0], (-1)**parity*det[1]
+
+    def correlation(self):
+        """
+        :returns: MDET section of correlation.data file
+        """
+        with open('correlation.data', 'w') as output_file:
+            print('START MDET', file=output_file)
+            print('Title', file=output_file)
+            print(' multideterminant WFN {}\n'.format(self.title), file=output_file)
+            print('MD', file=output_file)
+            print('  {}'.format(sum((len(self.determinants[det]['spin_det']) for det in self.determinants))), file=output_file)
+            opt_group_number = 0
+            prev_weight = None
+            for i, det in enumerate(self.determinants):
+                weight = self.determinants[det]['weight']
+                if prev_weight != weight:
+                    opt_group_number += 1
+                for spin_det in self.determinants[det]['spin_det']:
+                    print(' {: .9f}  {} {}'.format(spin_det[1], opt_group_number, int(i > 0)), file=output_file)
+                prev_weight = weight
+
+            i = 0
+            for det in self.determinants:
+                for spin_det in self.determinants[det]['spin_det']:
+                    i += 1
+                    for s, f, t in self.get_promotion_rules(self.ground_state(spin_det[0]), spin_det[0]):
+                        print('  DET {} {} PR {} 1 {} 1'.format(i, s, f + self.internal, t + self.internal), file=output_file)
+            print('END MDET', file=output_file)
+
+
+class Orca5(Default):
+    """
+    ORCA 5.X
+    """
+    title = "generated from Orca output data"
+
+    def __init__(self, input_path):
+        """Initialise multi-determinant support."""
+        super().__init__(input_path)
+        # ORCA output precision
+        self.tolerance = Decimal('0.000000001')
+        self.internal = 0  # CASSCF internal orbitals
+        self.active = 0  # CASSCF active orbitals
+        self.input_path = input_path
+        self.parse_output()
+
+    def orca_section(self, section_name):
+        """
+        :returns: content of named section
+        """
+        with open(self.input_path, "r") as orca_input:
+            orca_input.seek(0)
+            line = orca_input.readline()
+            while line and not line.startswith(section_name):
+                line = orca_input.readline()
+            if not line:
+                raise SectionNotFound(section_name)
+            result = [line]
+            line = orca_input.readline()
+            line = orca_input.readline()
+            while line and not line.startswith('-------'):
+                result.append(line)
+                line = orca_input.readline()
+            return result
+
+    def parse_output(self):
+        """Retrive from ORCA output:
+            Spin-Determinant information
+            number of active & internal orbitals in CASSCF
+
+        because of this issue https://orcaforum.cec.mpg.de/viewtopic.php?f=8&t=3212
+        ORCA input should be:
+        ! CASSCF cc-pVQZ
+
+        %casscf
+          nel  3
+          norb 4
+          PrintWF det
+        end
+
+        * xyzfile 0 2 ../../mol.xyz
+
+        $new_job
+        %casscf
+          nel  3
+          norb 4
+          PrintWF csf
+        end
+
+        * xyzfile 0 2 ../../mol.xyz
+
+        :return: list of spin-determinants, number of internal orbitals
+        """
+
+        determinants = dict()
+        cfg = weight = None
+
+        with open(self.input_path, "r") as orca_input:
+            line = orca_input.readline()
+            while line and not (line.startswith('  Spin-Determinant CI Printing') or line.startswith('  Extended CI Printing')):
+                line = orca_input.readline()
+                if line.startswith('   Internal'):
+                    self.internal = int(line.split()[5])
+                if line.startswith('   Active'):
+                    self.active = int(line.split()[5])
+            if not line:
+                return
+            line = orca_input.readline()
+            while line and not line.startswith('DENSITY MATRIX'):
+                # Group determinants by CFD weights
+                if line.startswith('   ['):
+                    cfg, weight = line.split()
+                    cfg = cfg[1:-1]
+                    determinants[cfg] = dict(weight=Decimal(weight), spin_det=[])
+                elif weight and line.startswith('   ['):
+                    det, val = line.split()
+                    spin_det = [det[1:-1], Decimal(val)]
+                    if abs(spin_det[1]) > self.tolerance:
+                        spin_det = self.set_promotion_parity(spin_det)
+                        spin_det = self.set_determinant_parity(spin_det)
+                        determinants[cfg]['spin_det'].append(spin_det)
+                line = orca_input.readline()
+
+        with open(self.input_path, "r") as orca_input:
+            line = orca_input.readline()
+            key = val = None
+            while line and not line.startswith('  Extended CI Printing'):
+                line = orca_input.readline()
+            if not line:
+                raise ORCASectionNotFound('Extended CI Printing')
+            line = orca_input.readline()
+            while line and not line.startswith('DENSITY MATRIX'):
+                if line.startswith(' CFG['):
+                    _, key, _, _ = line.split()
+                    val = determinants.get(key)
+                elif key and val and not val['spin_det'] and line.startswith(' \tCSF['):
+                    _, spin_det = line.split()
+                    val['spin_det'].append((key, Decimal(spin_det)))
+                line = orca_input.readline()
+        self.determinants = OrderedDict(sorted(determinants.items(), key=lambda x: abs(x[1]['weight']), reverse=True))
+        print(dict(self.determinants))
 
     def parity_shell(self, values):
         """Determine parity of list of integers.
@@ -522,7 +722,7 @@ def main():
         PSI4(args.input_file).correlation()
 
     if args.code == 3:
-        Orca(args.input_file).correlation()
+        Orca5(args.input_file).correlation()
 
     if args.code == 7:
         QChem(args.input_file, args.excitation, args.amplitude).correlation()
