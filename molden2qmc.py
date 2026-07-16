@@ -8,7 +8,7 @@ from itertools import combinations
 from operator import itemgetter, mul
 from functools import reduce
 
-__version__ = '4.0.4'
+__version__ = '4.0.5'
 
 
 #Common bloc
@@ -25,6 +25,63 @@ dIonName2nelec=dict([('H',1),  ('He',2),  ('Li',3),('Be',4),  ('B', 5),  ('C', 6
               ('Po',84),   ('At',85),   ('Rn',86),   ('Fr',87),   ('Ra',88),   ('Ac',89),   ('Th',90),   ('Pa',91),  
               ('U', 92),   ('Np',93)])
 dnelec2IonName = {v:k for k,v in dIonName2nelec.items()}
+
+def Z_of(symbol):
+    """
+    Returns the Z value of the element whose symbol is symbol.
+    """
+    periodic_table_symbols = [ "none",
+       "H",  "He", #1s
+       "Li", "Be", #2s
+       "B",  "C",  "N",  "O",  "F",  "Ne", #2p
+       "Na", "Mg", #3s
+       "Al", "Si", "P",  "S",  "Cl", "Ar", #3p
+       "K",  "Ca", #4s
+       "Sc", "Ti", "V",  "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", #3d
+       "Ga", "Ge", "As", "Se", "Br", "Kr", #4p
+       "Rb", "Sr", #5s
+       "Y",  "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", #4d
+       "In", "Sn", "Sb", "Te", "I",  "Xe", #5p
+       "Cs", "Ba", #6s
+       "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er",
+          "Tm", "Yb", #4f
+       "Lu", "Hf", "Ta", "W",  "Re", "Os", "Ir", "Pt", "Au", "Hg", #5d
+       "Tl", "Pb", "Bi", "Po", "At", "Rn", #6p
+       "Fr", "Ra", #7s
+       "Ac", "Th", "Pa", "U",  "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm",
+          "Md", "No", #5f
+       "Lr", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", #6d
+       "Nh", "Fl", "Mc", "Lv", "Ts", "Og" #7p
+       ]
+    # Use .title() to force correct capitalization.
+    Z = periodic_table_symbols.index(symbol.title())
+    return Z
+
+def tn_arep_charge(Z):
+    """
+    Returns valence charge of atom of provided Z value in Trail-Needs AREP PPs.
+    """
+    if Z <= 2:     # H-He
+        return Z
+    elif Z <= 10:  # Li-Ne
+        return Z - 2
+    elif Z <= 18:  # Na-Ar
+        return Z - 10
+    elif Z <= 30:  # K-Zn
+        return Z - 18
+    elif Z <= 36:  # Ga-Kr
+        return Z - 28
+    elif Z <= 48:  # Rb-Cd
+        return Z - 36
+    elif Z <= 54:  # In-Xe
+        return Z - 46
+    elif Z <= 71:  # Cs-Lu
+        return Z - 54
+    elif Z <= 80:  # Hf-Hg
+        return Z - 68
+    else:
+        raise NotImplementedError("AREP Trail & Needs PP didn't support " +
+           "elements after Hg")
 
 def fact2(k):
     """
@@ -59,10 +116,11 @@ class Molden:
     """
     Data structures used in Molden Class:
     atom_list = [
-        {'N': <atomic_number>,
-         'X': <x-coordinate>,
-         'Y': <y-coordinate>,
-         'Z': <z-coordinate>,
+        {'Z': <atomic_number>,
+         'N': <valence_charge>,
+         'x': <x-coordinate>,
+         'y': <y-coordinate>,
+         'z': <z-coordinate>,
          'pseudo': <True|False>,
          'SHELLS': [{'TYPE': <'s', 'p', 'd', ...>,
                      'DATA': [[exponent_primitive_1, contraction_coefficient_1],
@@ -105,17 +163,19 @@ class Molden:
     ang_momentum_map = {'s': 0, 'p': 1, 'd': 2, 'f': 3, 'g': 4, 'sp': 1}
     title = "Insert Your Title Here"
 
-    def __init__(self, f, pseudoatoms=None):
+    def __init__(self, f, pseudoatoms=None, cell=None):
         """ Create instance that represent MOLDEN file data
         http://www.cmbi.ru.nl/molden/molden_format.html
 
         :param f: file descriptor of MOLDEN file
         :param pseudoatoms: list of pseudoatoms (none, all or white space separated numbers)
+        :param cell: lattice vectors (None for aperiodic systems, else a semicolon separated list of three vectors of three space separated numbers)
         """
         self.D_orb_conversion_required = True  # Conversion D orbitals Cartesian -> Spherical required
         self.F_orb_conversion_required = True  # Conversion F orbitals Cartesian -> Spherical required
         self.G_orb_conversion_required = True  # Conversion G orbitals Cartesian -> Spherical required
         self.pseudoatoms = pseudoatoms
+        self.cell = cell
         self.atom_list = []
         self.mo_matrix = []
         self.f = f
@@ -131,13 +191,13 @@ class Molden:
         self.f.seek(0)
         line = self.f.readline()
         # CFOUR requires case insensitive comparison
-        while line and not line.upper().startswith("[%s]" % section_name.upper()):
+        while line and not line.upper().lstrip().startswith("[%s]" % section_name.upper()):
             line = self.f.readline()
         if not line:
             raise SectionNotFound(section_name)
-        result = [line]
+        result = [line.lstrip()]
         line = self.f.readline()
-        while line and not line.startswith('['):
+        while line and not line.lstrip().startswith('['):
             result.append(line)
             line = self.f.readline()
         return result
@@ -156,15 +216,17 @@ class Molden:
         for line in section_body:
             split_line = line.split()
             if section_header.split()[1] in ('Angs', '(Angs)'): # QCHEM uses (Angs)
-                atom = {'N': int(split_line[2]),  # atomic number
-                        'X': float(split_line[3]) * self.Ang2Bohr,
-                        'Y': float(split_line[4]) * self.Ang2Bohr,
-                        'Z': float(split_line[5]) * self.Ang2Bohr}
+                atom = {'Z': Z_of(split_line[0]), # atomic number
+                        'N': int(split_line[2]),  # valence charge
+                        'x': float(split_line[3]) * self.Ang2Bohr,
+                        'y': float(split_line[4]) * self.Ang2Bohr,
+                        'z': float(split_line[5]) * self.Ang2Bohr}
             else:
-                atom = {'N': int(split_line[2]),  # atomic number
-                        'X': float(split_line[3]),
-                        'Y': float(split_line[4]),
-                        'Z': float(split_line[5])}
+                atom = {'Z': Z_of(split_line[0]), # atomic number
+                        'N': int(split_line[2]),  # valence charge
+                        'x': float(split_line[3]),
+                        'y': float(split_line[4]),
+                        'z': float(split_line[5])}
             self.atom_list.append(atom)
 
     def molden_pseudo(self):
@@ -175,9 +237,12 @@ class Molden:
         if self.pseudoatoms is None:
             for atom in self.atom_list:
                 atom['pseudo'] = False
+                atom['N'] = atom['Z']
         elif self.pseudoatoms == "all":
             for atom in self.atom_list:
                 atom['pseudo'] = True
+                if atom['N'] == atom['Z']:
+                    atom['N'] = tn_arep_charge(atom['Z'])
         else:
             for i, atom in enumerate(self.atom_list):
                 if str(i + 1) in self.pseudoatoms.split():
@@ -208,9 +273,10 @@ class Molden:
         sp_flag = None
         for line in section_body:
             split_line = line.split()
-            if len(split_line) < 2:  # empty line
+            if len(split_line) < 1:  # empty line
                 pass
-            elif len(split_line) == 2 and split_line[-1] == '0':  # new atom
+            elif ( ( len(split_line) == 2 and split_line[-1] == '0' ) or
+                   len(split_line) == 1) :  # new atom
                 atom = self.atom_list[int(split_line[0])-1]
                 atom['SHELLS'] = []
             elif split_line[0].lower() in ('s', 'p', 'd', 'f', 'g'):   # new shell
@@ -247,6 +313,7 @@ class Molden:
         """
         self.f.seek(0)
         for line in self.f:
+            line = line.upper().lstrip()
             if line.startswith("[5D]") or line.startswith("[5D7F]"):
                 self.D_orb_conversion_required = False
                 self.F_orb_conversion_required = False
@@ -329,34 +396,6 @@ class Molden:
         """
         return any(mo_orbital_block['SPIN'] == 'Beta' for mo_orbital_block in self.mo_matrix)
 
-    def charge(self, atom):
-        """
-        :returns: valence charge of atom.
-        """
-        if atom['pseudo']:
-            if atom['N'] <= 2:     # H-He
-                return atom['N']
-            elif atom['N'] <= 10:  # Li-Ne
-                return atom['N'] - 2
-            elif atom['N'] <= 18:  # Na-Ar
-                return atom['N'] - 10
-            elif atom['N'] <= 30:  # K-Zn
-                return atom['N'] - 18
-            elif atom['N'] <= 36:  # Ga-Kr
-                return atom['N'] - 28
-            elif atom['N'] <= 48:  # Rb-Cd
-                return atom['N'] - 36
-            elif atom['N'] <= 54:  # In-Xe
-                return atom['N'] - 46
-            elif atom['N'] <= 71:  # Cs-Lu
-                return atom['N'] - 54
-            elif atom['N'] <= 80:  # Hf-Hg
-                return atom['N'] - 68
-            else:
-                raise NotImplementedError("AREP Trail & Needs PP didn't support elements after Hg")
-        else:
-            return atom['N']
-
     def nelec(self):
         """
         :returns: total number of electrons
@@ -384,7 +423,7 @@ class Molden:
     def species_list(self):
 
         def uuid_species(atom):
-            return ( atom['N'], self.charge(atom) )
+            return ( atom['Z'], atom['N'] )
 
         # We need to uniquify the list of atoms.
         # Because atoms are non hashable, we will assum that atom are similar is they have the same 'Atom_numer', and the same number of shell
@@ -399,7 +438,7 @@ class Molden:
     def species_idx(self):
 
         def uuid_species(atom):
-            return ( atom['N'], self.charge(atom) )
+            return ( atom['Z'], atom['N'] )
 
         l_key = list(map(uuid_species,self.species_list()))
         l_atom = list(map(uuid_species,self.atom_list))
@@ -422,7 +461,7 @@ Method:
 DFT Functional:
 
 Periodicity:
-         0
+{periodicity:10d}
 Spin unrestricted:
     {spin_restriction}
 nuclear-nuclear repulsion energy (au/atom):
@@ -440,7 +479,7 @@ Atomic numbers for each atom:
 {atomic_numbers}
 Valence charges for each atom:
 {valence_charges}
-
+{periodic_info}
 BASIS SET
 ---------
 Number of Gaussian centres
@@ -474,7 +513,7 @@ ORBITAL COEFFICIENTS
 ------------------------
 {orbital_coefficients}
 
-"""
+{eigenvalues_section}"""
 #Changes to write
     def write(self, f, qmcpack = False):
         if not qmcpack:
@@ -491,6 +530,7 @@ ORBITAL COEFFICIENTS
             params = dict(
                 title=self.title,
                 version=__version__,
+                periodicity=self.periodicity(),
                 spin_restriction=fortran_bool[self.spin_unrestricted()],
                 repulsion=self.nuclear_repulsion()/self.natom(),
                 nelec=int(round(self.nelec())),
@@ -508,7 +548,9 @@ ORBITAL COEFFICIENTS
                 exponents=self.exponents(),
                 contraction_coefficients=self.contraction_coefficients(),
                 shell_positions=self.shell_positions(),
-                orbital_coefficients=self.orbital_coefficients()
+                orbital_coefficients=self.orbital_coefficients(),
+                periodic_info=self.periodic_info(),
+                eigenvalues_section=self.eigenvalues_section()
             )
             gwfn.write(self.template.format(**params))
 
@@ -541,7 +583,7 @@ ORBITAL COEFFICIENTS
 
 
         def uuid_species(atom):
-            return ( atom['N'], self.charge(atom) )
+            return ( atom['Z'], atom['N'] )
 
         # We need to uniquify the list of atoms.
         # Because atoms are non hashable, we will assum that atom are similar is they have the same 'Atom_numer', and the same number of shell
@@ -555,14 +597,14 @@ ORBITAL COEFFICIENTS
         groupAtom.create_dataset("number_of_species",(1,),dtype="i4",data=len(self.species_list()))
         #Dataset positions 
 
-        positions = np.array([ [atom['X'],atom['Y'],atom['Z']] for atom in self.atom_list], 'f8')
+        positions = np.array([ [atom['x'],atom['y'],atom['z']] for atom in self.atom_list], 'f8')
         groupAtom.create_dataset("positions",data=positions)
 
         for x,atom in enumerate(self.species_list()):
             groupSpecies=groupAtom.create_group(f"species_{x}")
-            groupSpecies.create_dataset('name', (1,),data=np.string_(dnelec2IonName[atom['N']]))
-            groupSpecies.create_dataset("atomic_number",(1,),dtype="i4",data=atom['N'])
-            groupSpecies.create_dataset("charge",(1,),dtype="f8",data= self.charge(atom))
+            groupSpecies.create_dataset('name', (1,),data=np.string_(dnelec2IonName[atom['Z']]))
+            groupSpecies.create_dataset("atomic_number",(1,),dtype="i4",data=atom['Z'])
+            groupSpecies.create_dataset("charge",(1,),dtype="f8",data= atom['N'])
             groupSpecies.create_dataset("core",(1,),dtype="f8",data=self.core_elec(atom))
 
       
@@ -598,7 +640,7 @@ ORBITAL COEFFICIENTS
         for x, atom in enumerate(d_atom_list_unique.values()):
        
           atomicBasisSetGroup=GroupBasisSet.create_group(f"atomicBasisSet{x}")      
-          atomicBasisSetGroup.create_dataset('elementType', (1,),data=np.string_(dnelec2IonName[atom['N']]))
+          atomicBasisSetGroup.create_dataset('elementType', (1,),data=np.string_(dnelec2IonName[atom['Z']]))
 
           if cart:
             atomicBasisSetGroup.create_dataset('angular', (1,),data=np.string_('cartesian'))
@@ -627,9 +669,9 @@ ORBITAL COEFFICIENTS
 
             BasisGroup=atomicBasisSetGroup.create_group(f"basisGroup{i}")
             BasisGroup.create_dataset('type',(1,),data=np.string_("Gaussian"))          
-            BasisGroup.create_dataset('rid', (1,), data=np.string_(f"{dnelec2IonName[atom['N']]}{i}{l_qmcpack}"))
-          
-            coord= [atom['X'],atom['Y'],atom['Z']]
+            BasisGroup.create_dataset('rid', (1,), data=np.string_(f"{dnelec2IonName[atom['Z']]}{i}{l_qmcpack}"))
+
+            coord= [atom['x'],atom['y'],atom['z']]
 
             BasisGroup.create_dataset("Shell_coord",(3,),dtype="f8",data=coord)
             BasisGroup.create_dataset("NbRadFunc",(1,),dtype="i4",data=NbRadFunc)
@@ -766,15 +808,25 @@ ORBITAL COEFFICIENTS
         """
         :returns: distance between atoms
         """
-        return sqrt((atom1['X'] - atom2['X'])**2 +
-                    (atom1['Y'] - atom2['Y'])**2 +
-                    (atom1['Z'] - atom2['Z'])**2)
+        return sqrt((atom1['x'] - atom2['x'])**2 +
+                    (atom1['y'] - atom2['y'])**2 +
+                    (atom1['z'] - atom2['z'])**2)
+
+    def periodicity(self):
+        """
+        :returns: system periodicity
+        """
+        if self.cell is None:
+            p = 0
+        else:
+            p = 3
+        return p
 
     def nuclear_repulsion(self):
         """
         :returns: n-n repulsion energy
         """
-        return sum(self.charge(atom1) * self.charge(atom2)/self.distance(atom1, atom2)
+        return sum(atom1['N'] * atom2['N']/self.distance(atom1, atom2)
                    for atom1, atom2 in combinations(self.atom_list, 2))
 
     def positions(self):
@@ -783,7 +835,7 @@ ORBITAL COEFFICIENTS
         """
         return '\n'.join(
             ("{: .13E}{: .13E}{: .13E}".format(
-                atom['X'], atom['Y'], atom['Z']) for atom in self.atom_list)
+                atom['x'], atom['y'], atom['z']) for atom in self.atom_list)
         )
 
     def atomic_numbers(self):
@@ -795,9 +847,9 @@ ORBITAL COEFFICIENTS
             if num % 8 == 0 and num > 0:
                 result += "\n"
             if atom['pseudo']:
-                result += "{:10d}".format(atom['N'] + 200)
+                result += "{:10d}".format(atom['Z'] + 200)
             else:
-                result += "{:10d}".format(atom['N'])
+                result += "{:10d}".format(atom['Z'])
         return result
 
     def valence_charges(self):
@@ -808,17 +860,61 @@ ORBITAL COEFFICIENTS
         for num, atom in enumerate(self.atom_list):
             if num % 4 == 0 and num > 0:
                 result += "\n"
-            result += "{: .13E}".format(self.charge(atom))
+            result += "{: .13E}".format(atom['N'])
+        return result
+
+    def periodic_info(self):
+        """
+        :return: periodic system info block
+        """
+        result = ''
+        if self.cell is not None:
+            result += 'Lattice vectors\n'
+            for vector in self.cell.split(';'):
+                result += ''.join("{: .13E}".format(float(x))
+                                  for x in vector.split()) + '\n'
+            result += '\n'
+            result += 'K SPACE NET\n'
+            result += '-----------\n'
+            result += 'Number of k points\n'
+            result += '1\n'
+            result += "Number of `real' k points on BZ edge\n"
+            result += '1\n'
+            result += 'k point coordinates (au)\n'
+            result += ' 0.0000000000000E+00 0.0000000000000E+00 0.0000000000000E+00\n'
+        return result
+
+    def eigenvalues_section(self):
+        """
+        :return: eigenvalues block
+
+        CASINO reads this section for periodic systems and ignores it for
+        molecules (gwfn.data allows it since Feb 2001), but the orbital
+        energies are always written so that post-processing tools can
+        recover the level structure without the MOLDEN file.
+        """
+        if any('ENERGY' not in orbital for orbital in self.mo_matrix):
+            return ''
+        result = 'EIGENVALUES\n'
+        result += '-----------\n'
+        spins = ('Alpha', 'Beta') if self.spin_unrestricted() else ('Alpha',)
+        for spin in spins:
+            result += 'k 1 0.00000000 0.00000000 0.00000000\n'
+            for num, energy in enumerate(self.orbital_mo_energy_per_spin(spin)):
+                if num % 4 == 0 and num > 0:
+                    result += "\n"
+                result += "{: .13E}".format(energy)
+            result += '\n'
         return result
 
     def core_elec(self,atom):
         """
-        :return: core electrons 
+        :return: core electrons
         """
         if atom['pseudo']:
-            return atom['N']-self.charge(atom)
+            return atom['Z']-atom['N']
         else :
-            return atom['N']
+            return atom['Z']
 
     def shell_type_species(self,atom,shell,qmcpack_normalization=False):
         """
@@ -918,7 +1014,7 @@ ORBITAL COEFFICIENTS
         for atom in self.atom_list:
             for _ in atom['SHELLS']:  # throwaway variable
                 result.append("{: .13E}{: .13E}{: .13E}".format(
-                    atom['X'], atom['Y'], atom['Z'])
+                    atom['x'], atom['y'], atom['z'])
                 )
         return '\n'.join(result)
 
@@ -935,6 +1031,8 @@ ORBITAL COEFFICIENTS
                 for coefficient in ao['DATA']:
                     if num % 4 == 0 and num > 0:
                         result += "\n"
+                    if abs(coefficient) <= 1.1e-99:
+                        coefficient = 0
                     result += "{: .13E}".format(coefficient)
                     num += 1
         return result
@@ -972,8 +1070,8 @@ class DefaultConverter(GWFN):
 
     tolerance = 1e-5
 
-    def __init__(self, f, pseudoatoms="none", qmcpack_normalization=False):
-        super(DefaultConverter, self).__init__(f, pseudoatoms)
+    def __init__(self, f, pseudoatoms="none", qmcpack_normalization=False, cell=None):
+        super(DefaultConverter, self).__init__(f, pseudoatoms, cell)
         self.atom_list_converter()
         self.mo_matrix_converter(qmcpack_normalization)
 
@@ -1374,12 +1472,13 @@ class Orca(DefaultConverter):
 class PSI4(DefaultConverter):
     """
     PSI4 https://github.com/psi4/psi4public
+    PySCF https://github.com/pyscf
     """
-    title = "generated from PSI4 output data."
+    title = "generated from PSI4 or PySCF output data."
 
     def d_to_spherical(self, cartesian):
         """
-        In PSI4 spherical MOLDEN input expected.
+        In PSI4 and PySCF, spherical MOLDEN input is expected.
         """
         raise RuntimeWarning("Cartesian input is not expected. Check that"
                              " the quantum chemistry code is selected correctly")
@@ -1416,9 +1515,9 @@ class Dalton(DefaultConverter):
 
 class Molpro(DefaultConverter):
     """
-    Molpro
+    Molpro or [open]molCAS
     """
-    title = "generated from Molpro output data."
+    title = "generated from Molpro or [open]molCAS output data."
 
     def d_to_spherical(self, cartesian):
         """
@@ -1545,11 +1644,11 @@ def main():
         'code', type=int, help=(
             "number corresponding to the quantum chemistry code used to produce this MOLDEN file:\n"
             "0 -- TURBOMOLE\n"
-            "1 -- PSI4\n"
+            "1 -- PSI4 or PySCF\n"
             "2 -- CFOUR 2.0beta\n"
             "3 -- ORCA 3.X - 4.X\n"
             "4 -- DALTON2016\n"
-            "5 -- MOLPRO\n"
+            "5 -- MOLPRO, MOLCAS, or openMOLCAS\n"
             "6 -- NWCHEM\n"
             "7 -- QCHEM 4.X"
         )
@@ -1566,33 +1665,38 @@ def main():
     parser.add_argument('--qmcpack', dest='qmcpack', action='store_true', help=('generates an HDF5 file  named Mol.orbs.h5 compatible with the QMCPACK format.'))
     parser.set_defaults(qmcpack=False)
 
+    parser.add_argument('--cell', type=str, help=(
+        "Sets the reciprocal lattice vectors of a periodic system, which "
+        "is not contained in a molden file.  Use the format "
+        "'1 0 0; 0 1 0; 0 0 1'"))
+
     args = parser.parse_args()
 
     if args.qmcpack and args.output_file == "gwfn.data":
             args.output_file = "Mol.orbs.h5"
 
     if not os.path.exists(args.input_file):
-        print ("File %s not found..." % args.input_file)
+        print ("File %s not found." % args.input_file)
         sys.exit(1)
 
     input_file = open(args.input_file, "r")
 
     if args.code == 0:
-        Turbomole(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
+        Turbomole(input_file, args.pseudoatoms, args.qmcpack, args.cell).write(args.output_file, args.qmcpack)
     elif args.code == 1:
-        PSI4(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
+        PSI4(input_file, args.pseudoatoms, args.qmcpack, args.cell).write(args.output_file, args.qmcpack)
     elif args.code == 2:
-        CFour(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
+        CFour(input_file, args.pseudoatoms, args.qmcpack, args.cell).write(args.output_file, args.qmcpack)
     elif args.code == 3:
-        Orca(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
+        Orca(input_file, args.pseudoatoms, args.qmcpack, args.cell).write(args.output_file, args.qmcpack)
     elif args.code == 4:
-        Dalton(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
+        Dalton(input_file, args.pseudoatoms, args.qmcpack, args.cell).write(args.output_file, args.qmcpack)
     elif args.code == 5:
-        Molpro(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
+        Molpro(input_file, args.pseudoatoms, args.qmcpack, args.cell).write(args.output_file, args.qmcpack)
     elif args.code == 6:
-        NwChem(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
+        NwChem(input_file, args.pseudoatoms, args.qmcpack, args.cell).write(args.output_file, args.qmcpack)
     elif args.code == 7:
-        QChem(input_file, args.pseudoatoms,args.qmcpack).write(args.output_file,args.qmcpack)
+        QChem(input_file, args.pseudoatoms, args.qmcpack, args.cell).write(args.output_file, args.qmcpack)
 
 
 if __name__ == "__main__":
