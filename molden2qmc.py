@@ -1410,7 +1410,7 @@ class CFour(DefaultConverter):
 
 class Orca(DefaultConverter):
     """
-    ORCA 3.X / 4.X
+    ORCA 3.X / 4.X / 5.X
     """
     title = "generated from Orca output data."
 
@@ -1646,7 +1646,7 @@ def main():
             "0 -- TURBOMOLE\n"
             "1 -- PSI4 or PySCF\n"
             "2 -- CFOUR 2.0beta\n"
-            "3 -- ORCA 3.X - 4.X\n"
+            "3 -- ORCA 3.X - 5.X\n"
             "4 -- DALTON2016\n"
             "5 -- MOLPRO, MOLCAS, or openMOLCAS\n"
             "6 -- NWCHEM\n"
